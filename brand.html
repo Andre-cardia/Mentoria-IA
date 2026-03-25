@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brand & Design System — Mentoria IA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg:           #060606;
+      --bg-2:         #0b0b0b;
+      --panel:        #101010;
+      --panel-2:      #141414;
+      --line:         rgba(255,255,255,.08);
+      --line-strong:  rgba(255,255,255,.16);
+      --text:         #f5f2ea;
+      --muted:        #8b867c;
+      --accent:       #ff6a00;
+      --accent-soft:  rgba(255,106,0,.14);
+      --green:        #84cc16;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      line-height: 1.6;
+    }
+
+    .font-mono { font-family: 'Space Mono', monospace; }
+
+    /* ─── Background Patterns ─── */
+    .bg-grid-tech {
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 34px 34px;
+    }
+
+    .bg-noise-tech {
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(255,106,0,.1), transparent 20%),
+        radial-gradient(circle at 80% 10%, rgba(255,255,255,.05), transparent 18%),
+        radial-gradient(circle at 50% 100%, rgba(255,106,0,.08), transparent 28%);
+    }
+
+    /* ─── Animations ─── */
+    @keyframes pulseLine {
+      0%,100% { opacity: .28; transform: scaleX(.94); }
+      50%      { opacity: .9;  transform: scaleX(1); }
+    }
+    @keyframes glow {
+      0%,100% { box-shadow: 0 0 0 rgba(255,106,0,0); }
+      50%      { box-shadow: 0 0 28px rgba(255,106,0,.22); }
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scan {
+      0%   { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+    @keyframes blink {
+      0%,49%   { opacity: 1; }
+      50%,100% { opacity: 0; }
+    }
+    @keyframes marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes progressFill {
+      from { width: 0%; }
+      to   { width: 73%; }
+    }
+    @keyframes pulse-green {
+      0%,100% { opacity: 1; }
+      50%      { opacity: .4; }
+    }
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .animate-pulseLine  { animation: pulseLine 3s ease-in-out infinite; }
+    .animate-glow       { animation: glow 2.4s ease-in-out infinite; }
+    .animate-rise       { animation: rise .7s ease forwards; }
+    .animate-blink      { animation: blink 1s step-end infinite; }
+    .animate-marquee    { animation: marquee 28s linear infinite; }
+    .animate-fadeIn     { animation: fadeIn .6s ease forwards; }
+    .animate-progress   { animation: progressFill 1.8s ease forwards; }
+    .animate-pulse-green { animation: pulse-green 2s ease-in-out infinite; }
+
+    /* ─── Terminal caret ─── */
+    .terminal-caret::after {
+      content: '▋';
+      display: inline-block;
+      animation: blink 1s step-end infinite;
+      color: var(--accent);
+    }
+
+    /* ─── Scan overlay ─── */
+    .scan-overlay { position: relative; overflow: hidden; }
+    .scan-overlay::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 45%, rgba(255,106,0,.06) 50%, transparent 55%);
+      animation: scan 4s linear infinite;
+      pointer-events: none;
+    }
+
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-2); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,106,0,.3); border-radius: 3px; }
+
+    /* ─── Utility ─── */
+    .border-line        { border-color: var(--line); }
+    .border-line-strong { border-color: var(--line-strong); }
+    .text-muted         { color: var(--muted); }
+    .text-accent        { color: var(--accent); }
+    .bg-panel           { background: var(--panel); }
+    .bg-panel-2         { background: var(--panel-2); }
+    .bg-accent-soft     { background: var(--accent-soft); }
+
+    /* ─── Sticky nav ─── */
+    .brand-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(6,6,6,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* ─── Section separators ─── */
+    .section-rule {
+      border: none;
+      border-top: 1px solid var(--line);
+    }
+
+    /* ─── Color swatch ─── */
+    .swatch {
+      width: 100%;
+      aspect-ratio: 3/2;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+    }
+
+    /* ─── Token table ─── */
+    .token-table { width: 100%; border-collapse: collapse; }
+    .token-table th,
+    .token-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      font-size: .875rem;
+    }
+    .token-table th {
+      font-family: 'Space Mono', monospace;
+      font-size: .75rem;
+      color: var(--muted);
+      background: var(--panel-2);
+    }
+    .token-table tbody tr:hover { background: rgba(255,255,255,.02); }
+
+    /* ─── Component examples ─── */
+    .component-frame {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      min-height: 120px;
+    }
+
+    .component-label {
+      font-family: 'Space Mono', monospace;
+      font-size: .7rem;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    /* ─── Buttons (canonical) ─── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      background: var(--accent);
+      color: #000;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: .95rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: opacity .15s;
+      animation: glow 2.4s ease-in-out infinite;
+    }
+    .btn-primary:hover { opacity: .88; }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      background: transparent;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: .95rem;
+      border-radius: 4px;
+      border: 1px solid var(--line-strong);
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .btn-outline:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: .875rem;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: color .15s, border-color .15s;
+    }
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    /* ─── Badges ─── */
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 3px; font-family: 'Space Mono', monospace; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+    .badge-accent  { background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(255,106,0,.25); }
+    .badge-green   { background: rgba(132,204,22,.12); color: var(--green); border: 1px solid rgba(132,204,22,.25); }
+    .badge-neutral { background: rgba(255,255,255,.05); color: var(--muted); border: 1px solid var(--line); }
+
+    /* ─── Cards ─── */
+    .card-base {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 24px;
+      transition: border-color .2s;
+    }
+    .card-base:hover { border-color: var(--line-strong); }
+
+    .card-accent {
+      background: var(--panel);
+      border: 1px solid rgba(255,106,0,.25);
+      border-top: 2px solid var(--accent);
+      border-radius: 6px;
+      padding: 24px;
+    }
+
+    /* ─── Stat card ─── */
+    .stat-card {
+      background: rgba(255,106,0,.06);
+      border: 1px solid rgba(255,106,0,.2);
+      border-radius: 6px;
+      padding: 20px 24px;
+      text-align: center;
+    }
+
+    /* ─── Input ─── */
+    .input-base {
+      width: 100%;
+      background: var(--panel-2);
+      border: 1px solid var(--line-strong);
+      border-radius: 4px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .925rem;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .input-base:focus { border-color: var(--accent); }
+    .input-base::placeholder { color: var(--muted); }
+
+    /* ─── Progress bar ─── */
+    .progress-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      animation: progressFill 1.8s ease forwards;
+    }
+
+    /* ─── Logo ─── */
+    .logo-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #000;
+    }
+    .logo-text-primary {
+      font-weight: 700;
+      font-size: 1.1rem;
+      line-height: 1.1;
+    }
+    .logo-text-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: .65rem;
+      color: var(--muted);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    /* ─── Section header ─── */
+    .section-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: .7rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    /* ─── Anchor navigation ─── */
+    .nav-link {
+      font-family: 'Space Mono', monospace;
+      font-size: .7rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: .06em;
+      padding: 4px 0;
+      border-bottom: 1px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    .nav-link:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* ─── Type specimen ─── */
+    .type-specimen-row {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .type-specimen-meta {
+      width: 180px;
+      flex-shrink: 0;
+    }
+
+    /* ─── Animation demo ─── */
+    .anim-demo {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-height: 100px;
+      text-align: center;
+    }
+
+    /* ─── Side nav ─── */
+    @media (min-width: 1024px) {
+      .brand-layout {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        min-height: 100vh;
+      }
+      .brand-sidebar {
+        position: sticky;
+        top: 57px;
+        height: calc(100vh - 57px);
+        overflow-y: auto;
+        border-right: 1px solid var(--line);
+        padding: 32px 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════ TOP NAV ══════════════════════ -->
+<header class="brand-nav">
+  <div style="max-width:1600px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;">
+    <div class="logo-mark">
+      <div class="logo-icon">M</div>
+      <div>
+        <div class="logo-text-primary">Mentoria IA</div>
+        <div class="logo-text-sub">Brand & Design System</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:24px;">
+      <span class="badge badge-accent">v1.0</span>
+      <a href="/" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:.7rem;text-decoration:none;letter-spacing:.06em;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">← SITE PRINCIPAL</a>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════ LAYOUT ══════════════════════ -->
+<div class="brand-layout">
+
+  <!-- ─── Sidebar ─── -->
+  <aside class="brand-sidebar" style="background:var(--bg-2);">
+    <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:24px;">Navegação</p>
+    <nav style="display:flex;flex-direction:column;gap:4px;">
+      <a class="nav-link" href="#overview">Visão Geral</a>
+      <a class="nav-link" href="#logo">Logo & Marca</a>
+      <a class="nav-link" href="#colors">Cores</a>
+      <a class="nav-link" href="#typography">Tipografia</a>
+      <a class="nav-link" href="#spacing">Espaçamento</a>
+      <a class="nav-link" href="#borders">Bordas & Sombras</a>
+      <a class="nav-link" href="#backgrounds">Fundos & Padrões</a>
+      <a class="nav-link" href="#animations">Animações</a>
+      <div style="margin:12px 0;border-top:1px solid var(--line);"></div>
+      <a class="nav-link" href="#buttons">Botões</a>
+      <a class="nav-link" href="#badges">Badges & Tags</a>
+      <a class="nav-link" href="#cards">Cards & Painéis</a>
+      <a class="nav-link" href="#forms">Formulários</a>
+      <a class="nav-link" href="#progress">Progresso</a>
+      <a class="nav-link" href="#status">Indicadores</a>
+      <div style="margin:12px 0;border-top:1px solid var(--line);"></div>
+      <a class="nav-link" href="#voice">Voz & Tom</a>
+      <a class="nav-link" href="#principles">Princípios</a>
+    </nav>
+  </aside>
+
+  <!-- ─── Main content ─── -->
+  <main style="min-width:0;padding:48px 40px 96px;">
+    <div style="max-width:900px;">
+
+      <!-- ════════ OVERVIEW ════════ -->
+      <section id="overview" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:12px;">BRAND SYSTEM</div>
+        <h1 style="font-size:clamp(2rem,4vw,3.2rem);font-weight:700;line-height:1.1;margin-bottom:20px;">
+          Design System<br><span style="color:var(--accent);">Mentoria IA</span>
+        </h1>
+        <p style="color:var(--muted);font-size:1.1rem;line-height:1.7;max-width:600px;margin-bottom:40px;">
+          Documentação completa das decisões visuais, tokens de design, componentes e princípios que formam a identidade da Mentoria IA.
+        </p>
+
+        <!-- Quick overview cards -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+          <div class="stat-card">
+            <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:4px;">8</div>
+            <div style="font-size:.875rem;color:var(--muted);">Tokens de Cor</div>
+          </div>
+          <div class="stat-card">
+            <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:4px;">2</div>
+            <div style="font-size:.875rem;color:var(--muted);">Famílias Tipográficas</div>
+          </div>
+          <div class="stat-card">
+            <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:4px;">9</div>
+            <div style="font-size:.875rem;color:var(--muted);">Animações</div>
+          </div>
+          <div class="stat-card">
+            <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:4px;">6</div>
+            <div style="font-size:.875rem;color:var(--muted);">Componentes</div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ LOGO ════════ -->
+      <section id="logo" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">01 — LOGO & MARCA</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Identidade Visual</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">A marca é construída sobre dois elementos: o ícone e a tipografia. Sempre use em fundo escuro.</p>
+
+        <!-- Logo on dark -->
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:48px;display:flex;flex-wrap:wrap;gap:48px;align-items:center;justify-content:center;margin-bottom:24px;">
+          <!-- Full lockup -->
+          <div style="text-align:center;">
+            <div class="logo-mark" style="justify-content:center;margin-bottom:12px;">
+              <div class="logo-icon animate-glow">M</div>
+              <div>
+                <div class="logo-text-primary">Mentoria IA</div>
+                <div class="logo-text-sub">Zero-to-Hero</div>
+              </div>
+            </div>
+            <p class="component-label">LOCKUP COMPLETO</p>
+          </div>
+          <!-- Icon only -->
+          <div style="text-align:center;">
+            <div class="logo-icon animate-glow" style="width:48px;height:48px;font-size:1.25rem;margin:0 auto 12px;">M</div>
+            <p class="component-label">ÍCONE ISOLADO</p>
+          </div>
+          <!-- Text only -->
+          <div style="text-align:center;">
+            <div style="font-weight:700;font-size:1.5rem;margin-bottom:4px;">Mentoria <span style="color:var(--accent);">IA</span></div>
+            <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;">Zero-to-Hero</div>
+            <p class="component-label" style="margin-top:12px;">WORDMARK</p>
+          </div>
+        </div>
+
+        <!-- Don'ts -->
+        <div style="background:rgba(255,50,50,.04);border:1px solid rgba(255,50,50,.15);border-radius:8px;padding:24px;">
+          <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:rgba(255,80,80,.8);letter-spacing:.08em;margin-bottom:12px;">⚠ NÃO FAZER</p>
+          <ul style="color:var(--muted);font-size:.9rem;display:flex;flex-direction:column;gap:8px;list-style:none;padding-left:0;">
+            <li style="display:flex;gap:10px;"><span style="color:rgba(255,80,80,.7);">✕</span> Usar a logo em fundos claros ou coloridos</li>
+            <li style="display:flex;gap:10px;"><span style="color:rgba(255,80,80,.7);">✕</span> Alterar a cor do ícone (sempre laranja #ff6a00)</li>
+            <li style="display:flex;gap:10px;"><span style="color:rgba(255,80,80,.7);">✕</span> Distorcer proporções ou rotacionar o ícone</li>
+            <li style="display:flex;gap:10px;"><span style="color:rgba(255,80,80,.7);">✕</span> Usar fontes diferentes das especificadas</li>
+            <li style="display:flex;gap:10px;"><span style="color:rgba(255,80,80,.7);">✕</span> Adicionar efeitos extras como gradiente ou sombra colorida</li>
+          </ul>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ COLORS ════════ -->
+      <section id="colors" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">02 — CORES</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Paleta de Cores</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Tema escuro técnico. O laranja é o único acento — use com intenção.</p>
+
+        <!-- Swatches row - Primary -->
+        <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Cores de Fundo</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:40px;">
+          <div>
+            <div class="swatch" style="background:#060606;border-color:rgba(255,255,255,.12);"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);margin-top:10px;">--bg</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">#060606</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:4px;">Fundo principal</p>
+          </div>
+          <div>
+            <div class="swatch" style="background:#0b0b0b;"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);margin-top:10px;">--bg-2</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">#0b0b0b</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:4px;">Fundo secundário</p>
+          </div>
+          <div>
+            <div class="swatch" style="background:#101010;"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);margin-top:10px;">--panel</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">#101010</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:4px;">Cards e painéis</p>
+          </div>
+          <div>
+            <div class="swatch" style="background:#141414;"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);margin-top:10px;">--panel-2</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">#141414</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:4px;">Painéis alternativos</p>
+          </div>
+        </div>
+
+        <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Cores de Destaque</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:40px;">
+          <div>
+            <div class="swatch animate-glow" style="background:#ff6a00;border-color:#ff6a00;"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);margin-top:10px;">--accent</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">#ff6a00</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:4px;">Laranja primário</p>
+          </div>
+          <div>
+            <div class="swatch" style="background:rgba(255,106,0,.14);"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);margin-top:10px;">--accent-soft</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">rgba(255,106,0,.14)</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:4px;">Laranja suave</p>
+          </div>
+          <div>
+            <div class="swatch" style="background:#84cc16;border-color:#84cc16;"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);margin-top:10px;">--green</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">#84cc16</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:4px;">Status ativo / sucesso</p>
+          </div>
+          <div>
+            <div class="swatch" style="background:rgba(132,204,22,.12);"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);margin-top:10px;">green-soft</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">rgba(132,204,22,.12)</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:4px;">Verde suave</p>
+          </div>
+        </div>
+
+        <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Cores de Texto</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:40px;">
+          <div>
+            <div class="swatch" style="background:#f5f2ea;"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);margin-top:10px;">--text</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">#f5f2ea</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:4px;">Texto principal</p>
+          </div>
+          <div>
+            <div class="swatch" style="background:#8b867c;"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);margin-top:10px;">--muted</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">#8b867c</p>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:4px;">Texto secundário</p>
+          </div>
+        </div>
+
+        <!-- Token reference table -->
+        <table class="token-table">
+          <thead>
+            <tr>
+              <th>Token CSS</th>
+              <th>Valor</th>
+              <th>Uso</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">--bg</td><td style="font-family:'Space Mono',monospace;">#060606</td><td style="color:var(--muted);">Fundo da página</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">--bg-2</td><td style="font-family:'Space Mono',monospace;">#0b0b0b</td><td style="color:var(--muted);">Fundo sidebar, seções alternadas</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">--panel</td><td style="font-family:'Space Mono',monospace;">#101010</td><td style="color:var(--muted);">Cards, modais, painéis</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">--panel-2</td><td style="font-family:'Space Mono',monospace;">#141414</td><td style="color:var(--muted);">Painéis aninhados, inputs</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">--line</td><td style="font-family:'Space Mono',monospace;">rgba(255,255,255,.08)</td><td style="color:var(--muted);">Bordas sutis</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">--line-strong</td><td style="font-family:'Space Mono',monospace;">rgba(255,255,255,.16)</td><td style="color:var(--muted);">Bordas enfatizadas</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">--text</td><td style="font-family:'Space Mono',monospace;">#f5f2ea</td><td style="color:var(--muted);">Corpo de texto</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">--muted</td><td style="font-family:'Space Mono',monospace;">#8b867c</td><td style="color:var(--muted);">Labels, captions, metadata</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">--accent</td><td style="font-family:'Space Mono',monospace;">#ff6a00</td><td style="color:var(--muted);">CTAs, destaques, links ativos</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">--accent-soft</td><td style="font-family:'Space Mono',monospace;">rgba(255,106,0,.14)</td><td style="color:var(--muted);">Hover states, badges, fundos de destaque</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">--green</td><td style="font-family:'Space Mono',monospace;">#84cc16</td><td style="color:var(--muted);">Status ao vivo, sucesso, indicadores ativos</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ TYPOGRAPHY ════════ -->
+      <section id="typography" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">03 — TIPOGRAFIA</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Sistema Tipográfico</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Dois typefaces com papéis distintos: humanista para leitura, monospace para dados técnicos.</p>
+
+        <!-- Family cards -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:48px;">
+          <div class="card-base">
+            <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">PRIMÁRIA</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:2.5rem;font-weight:700;line-height:1;margin-bottom:16px;">Space Grotesk</div>
+            <p style="color:var(--muted);font-size:.875rem;">Humanista geométrica. Usada para headlines, corpo de texto, CTAs e conteúdo editorial.</p>
+            <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
+              <span class="badge badge-neutral">400 Regular</span>
+              <span class="badge badge-neutral">500 Medium</span>
+              <span class="badge badge-neutral">600 SemiBold</span>
+              <span class="badge badge-neutral">700 Bold</span>
+            </div>
+          </div>
+          <div class="card-base">
+            <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">TÉCNICA</div>
+            <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;line-height:1;margin-bottom:16px;color:var(--accent);">Space Mono</div>
+            <p style="color:var(--muted);font-size:.875rem;">Monospaced. Usada para labels, badges, metadata, código, eyebrows e elementos técnicos.</p>
+            <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
+              <span class="badge badge-neutral">400 Regular</span>
+              <span class="badge badge-neutral">700 Bold</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Type scale -->
+        <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Escala Tipográfica — Space Grotesk</p>
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:32px;margin-bottom:40px;">
+          <div class="type-specimen-row">
+            <div class="type-specimen-meta">
+              <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">Hero / Display</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">clamp(2.5rem,5vw,4rem)</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">weight: 700 · lh: 1.08</p>
+            </div>
+            <div style="font-size:clamp(2rem,4vw,3rem);font-weight:700;line-height:1.08;">IA no Trabalho</div>
+          </div>
+          <div class="type-specimen-row">
+            <div class="type-specimen-meta">
+              <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">H1 / Headline</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">2rem – 2.5rem</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">weight: 700 · lh: 1.15</p>
+            </div>
+            <div style="font-size:2rem;font-weight:700;line-height:1.15;">Currículo Vivo</div>
+          </div>
+          <div class="type-specimen-row">
+            <div class="type-specimen-meta">
+              <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">H2 / Section Title</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">1.5rem – 1.75rem</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">weight: 700 · lh: 1.2</p>
+            </div>
+            <div style="font-size:1.5rem;font-weight:700;line-height:1.2;">Agentes de IA</div>
+          </div>
+          <div class="type-specimen-row">
+            <div class="type-specimen-meta">
+              <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">H3 / Card Title</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">1.1rem – 1.25rem</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">weight: 600 · lh: 1.3</p>
+            </div>
+            <div style="font-size:1.1rem;font-weight:600;line-height:1.3;">Automações práticas</div>
+          </div>
+          <div class="type-specimen-row">
+            <div class="type-specimen-meta">
+              <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">Body / Paragraph</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">0.95rem – 1rem</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">weight: 400 · lh: 1.65</p>
+            </div>
+            <div style="font-size:.95rem;line-height:1.65;color:var(--muted);max-width:400px;">Formação técnica para profissionais que precisam dominar IA generativa com profundidade real.</div>
+          </div>
+          <div class="type-specimen-row" style="border-bottom:none;">
+            <div class="type-specimen-meta">
+              <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">Small / Caption</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">0.75rem – 0.875rem</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">weight: 400/500</p>
+            </div>
+            <div style="font-size:.8rem;color:var(--muted);">Vagas limitadas · Próxima turma</div>
+          </div>
+        </div>
+
+        <!-- Mono scale -->
+        <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Escala Monospace — Space Mono</p>
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:32px;">
+          <div class="type-specimen-row">
+            <div class="type-specimen-meta">
+              <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">Eyebrow / Label</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">0.65rem – 0.7rem</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">letter-spacing: .12em · uppercase</p>
+            </div>
+            <div style="font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);">FASE 01 — FUNDAMENTOS</div>
+          </div>
+          <div class="type-specimen-row">
+            <div class="type-specimen-meta">
+              <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">Metric / Number</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">2rem+</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">weight: 700</p>
+            </div>
+            <div style="font-family:'Space Mono',monospace;font-size:2.5rem;font-weight:700;color:var(--accent);">1.400+</div>
+          </div>
+          <div class="type-specimen-row" style="border-bottom:none;">
+            <div class="type-specimen-meta">
+              <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">Code / Terminal</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">0.8rem – 0.875rem</p>
+              <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">weight: 400</p>
+            </div>
+            <div style="font-family:'Space Mono',monospace;font-size:.85rem;color:var(--green);">$ agent.run(task="análise")<span class="terminal-caret"></span></div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ SPACING ════════ -->
+      <section id="spacing" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">04 — ESPAÇAMENTO</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Escala de Espaçamento</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Base 4px. Todos os valores são múltiplos de 4 para consistência visual.</p>
+
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;">
+          <table class="token-table">
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>Valor</th>
+                <th>Tailwind</th>
+                <th>Uso típico</th>
+                <th>Visual</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family:'Space Mono',monospace;">xs</td>
+                <td style="font-family:'Space Mono',monospace;">4px</td>
+                <td style="font-family:'Space Mono',monospace;color:var(--accent);">p-1</td>
+                <td style="color:var(--muted);">Ícones inline, gaps mínimos</td>
+                <td><div style="width:4px;height:16px;background:var(--accent);border-radius:2px;"></div></td>
+              </tr>
+              <tr>
+                <td style="font-family:'Space Mono',monospace;">sm</td>
+                <td style="font-family:'Space Mono',monospace;">8px</td>
+                <td style="font-family:'Space Mono',monospace;color:var(--accent);">p-2</td>
+                <td style="color:var(--muted);">Gap entre elementos inline</td>
+                <td><div style="width:8px;height:16px;background:var(--accent);border-radius:2px;"></div></td>
+              </tr>
+              <tr>
+                <td style="font-family:'Space Mono',monospace;">md</td>
+                <td style="font-family:'Space Mono',monospace;">16px</td>
+                <td style="font-family:'Space Mono',monospace;color:var(--accent);">p-4</td>
+                <td style="color:var(--muted);">Padding de badges, gap de grids</td>
+                <td><div style="width:16px;height:16px;background:var(--accent);border-radius:2px;"></div></td>
+              </tr>
+              <tr>
+                <td style="font-family:'Space Mono',monospace;">lg</td>
+                <td style="font-family:'Space Mono',monospace;">24px</td>
+                <td style="font-family:'Space Mono',monospace;color:var(--accent);">p-6</td>
+                <td style="color:var(--muted);">Padding de cards, gap de seções</td>
+                <td><div style="width:24px;height:16px;background:var(--accent);border-radius:2px;"></div></td>
+              </tr>
+              <tr>
+                <td style="font-family:'Space Mono',monospace;">xl</td>
+                <td style="font-family:'Space Mono',monospace;">32px</td>
+                <td style="font-family:'Space Mono',monospace;color:var(--accent);">p-8</td>
+                <td style="color:var(--muted);">Padding de painéis grandes</td>
+                <td><div style="width:32px;height:16px;background:var(--accent);border-radius:2px;"></div></td>
+              </tr>
+              <tr>
+                <td style="font-family:'Space Mono',monospace;">2xl</td>
+                <td style="font-family:'Space Mono',monospace;">48px</td>
+                <td style="font-family:'Space Mono',monospace;color:var(--accent);">py-12</td>
+                <td style="color:var(--muted);">Padding vertical de seções</td>
+                <td><div style="width:48px;height:16px;background:var(--accent);border-radius:2px;"></div></td>
+              </tr>
+              <tr>
+                <td style="font-family:'Space Mono',monospace;">3xl</td>
+                <td style="font-family:'Space Mono',monospace;">80px</td>
+                <td style="font-family:'Space Mono',monospace;color:var(--accent);">py-20</td>
+                <td style="color:var(--muted);">Espaço entre seções da página</td>
+                <td><div style="width:80px;height:16px;background:var(--accent);border-radius:2px;"></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ BORDERS & SHADOWS ════════ -->
+      <section id="borders" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">05 — BORDAS & SOMBRAS</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Divisores e Profundidade</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Bordas criam hierarquia. Sombras criam profundidade. Ambas são usadas com intenção mínima.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px;">
+          <!-- Border examples -->
+          <div>
+            <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Bordas</p>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="padding:16px 20px;border:1px solid rgba(255,255,255,.08);border-radius:6px;background:var(--panel);">
+                <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">--line · rgba(255,255,255,.08)</p>
+                <p style="font-size:.875rem;color:var(--muted);margin-top:4px;">Borda sutil — padrão</p>
+              </div>
+              <div style="padding:16px 20px;border:1px solid rgba(255,255,255,.16);border-radius:6px;background:var(--panel);">
+                <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">--line-strong · rgba(255,255,255,.16)</p>
+                <p style="font-size:.875rem;color:var(--muted);margin-top:4px;">Borda forte — hover, foco</p>
+              </div>
+              <div style="padding:16px 20px;border:1px solid rgba(255,106,0,.25);border-top:2px solid #ff6a00;border-radius:6px;background:var(--panel);">
+                <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--accent);">accent · rgba(255,106,0,.25) + top accent</p>
+                <p style="font-size:.875rem;color:var(--muted);margin-top:4px;">Card de destaque — primário</p>
+              </div>
+              <div style="padding:16px 20px;border:1px solid rgba(132,204,22,.25);border-radius:6px;background:rgba(132,204,22,.04);">
+                <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--green);">green · rgba(132,204,22,.25)</p>
+                <p style="font-size:.875rem;color:var(--muted);margin-top:4px;">Card de sucesso / ativo</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Border radius -->
+          <div>
+            <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Border Radius</p>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;align-items:center;gap:16px;">
+                <div style="width:48px;height:48px;background:var(--accent);border-radius:3px;flex-shrink:0;"></div>
+                <div>
+                  <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);">3px</p>
+                  <p style="font-size:.8rem;color:var(--muted);">Badges, pills pequenos</p>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;">
+                <div style="width:48px;height:48px;background:var(--accent);border-radius:4px;flex-shrink:0;"></div>
+                <div>
+                  <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);">4px</p>
+                  <p style="font-size:.8rem;color:var(--muted);">Botões, inputs, ícone da logo</p>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;">
+                <div style="width:48px;height:48px;background:var(--accent);border-radius:6px;flex-shrink:0;"></div>
+                <div>
+                  <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);">6px</p>
+                  <p style="font-size:.8rem;color:var(--muted);">Cards, painéis</p>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;">
+                <div style="width:48px;height:48px;background:var(--accent);border-radius:8px;flex-shrink:0;"></div>
+                <div>
+                  <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);">8px</p>
+                  <p style="font-size:.8rem;color:var(--muted);">Containers maiores, frames</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Glow effects -->
+        <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Efeitos de Brilho (Glow)</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+          <div style="text-align:center;padding:24px;background:var(--panel);border-radius:6px;border:1px solid var(--line);">
+            <button class="btn-primary" style="pointer-events:none;">CTA Primário</button>
+            <p class="component-label" style="margin-top:12px;">animate-glow · box-shadow laranja</p>
+          </div>
+          <div style="text-align:center;padding:24px;background:var(--panel);border-radius:6px;border:1px solid var(--line);">
+            <div style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:4px;background:var(--accent);box-shadow:0 0 24px rgba(255,106,0,.4);">M</div>
+            <p class="component-label" style="margin-top:12px;">Glow estático · 0 0 24px rgba(255,106,0,.4)</p>
+          </div>
+          <div style="text-align:center;padding:24px;background:var(--panel);border-radius:6px;border:1px solid var(--line);">
+            <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid rgba(255,106,0,.4);border-radius:4px;box-shadow:inset 0 0 20px rgba(255,106,0,.08);">
+              <span style="color:var(--accent);">◉</span>
+              <span style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--accent);">LIVE</span>
+            </div>
+            <p class="component-label" style="margin-top:12px;">Inset glow · border + box-shadow inset</p>
+          </div>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ BACKGROUNDS ════════ -->
+      <section id="backgrounds" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">06 — FUNDOS & PADRÕES</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Texturas e Atmosferas</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Três camadas criam profundidade visual: fundo sólido → grid técnico → ruído radial.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:32px;">
+          <div>
+            <div style="height:160px;background:#060606;border:1px solid var(--line);border-radius:6px;"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text);margin-top:10px;">Fundo sólido</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">background: #060606</p>
+          </div>
+          <div>
+            <div class="bg-grid-tech" style="height:160px;background-color:#060606;border:1px solid var(--line);border-radius:6px;"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text);margin-top:10px;">.bg-grid-tech</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">Grid 34×34px · rgba(255,255,255,.06)</p>
+          </div>
+          <div>
+            <div class="bg-grid-tech bg-noise-tech" style="height:160px;background-color:#060606;border:1px solid var(--line);border-radius:6px;"></div>
+            <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text);margin-top:10px;">.bg-grid-tech + .bg-noise-tech</p>
+            <p style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);">Grid + gradientes radiais laranja</p>
+          </div>
+        </div>
+
+        <!-- Code block -->
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:20px 24px;">
+          <p style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:16px;letter-spacing:.06em;">CSS — Padrões de fundo</p>
+          <pre style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--text);white-space:pre-wrap;line-height:1.7;"><span style="color:var(--accent);">.bg-grid-tech</span> {
+  background-image:
+    linear-gradient(to right,  rgba(255,255,255,.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+<span style="color:var(--accent);">.bg-noise-tech</span> {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255,106,0,.1),  transparent 20%),
+    radial-gradient(circle at 80% 10%, rgba(255,255,255,.05), transparent 18%),
+    radial-gradient(circle at 50% 100%, rgba(255,106,0,.08), transparent 28%);
+}</pre>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ ANIMATIONS ════════ -->
+      <section id="animations" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">07 — ANIMAÇÕES</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Sistema de Animações</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Todas as animações têm propósito: comunicar estado, guiar atenção ou reforçar a estética tech.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;">
+
+          <div class="anim-demo">
+            <div class="animate-glow" style="width:48px;height:48px;background:var(--accent);border-radius:4px;"></div>
+            <div>
+              <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);">glow</p>
+              <p style="font-size:.75rem;color:var(--muted);">2.4s ease-in-out infinite</p>
+              <p style="font-size:.75rem;color:var(--muted);">CTAs, logo icon</p>
+            </div>
+          </div>
+
+          <div class="anim-demo">
+            <div style="width:80%;height:3px;background:var(--accent);border-radius:2px;animate-pulseLine:pulseLine 3s ease-in-out infinite;" class="animate-pulseLine"></div>
+            <div>
+              <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);">pulseLine</p>
+              <p style="font-size:.75rem;color:var(--muted);">3s ease-in-out infinite</p>
+              <p style="font-size:.75rem;color:var(--muted);">Separadores, linhas de acento</p>
+            </div>
+          </div>
+
+          <div class="anim-demo">
+            <div style="font-family:'Space Mono',monospace;font-size:.85rem;color:var(--green);">$ deploy<span class="terminal-caret"></span></div>
+            <div>
+              <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);">blink (caret)</p>
+              <p style="font-size:.75rem;color:var(--muted);">1s step-end infinite</p>
+              <p style="font-size:.75rem;color:var(--muted);">Terminal, typing effects</p>
+            </div>
+          </div>
+
+          <div class="anim-demo">
+            <div class="animate-rise" style="padding:10px 20px;background:var(--accent-soft);border:1px solid rgba(255,106,0,.25);border-radius:4px;font-size:.875rem;">Elemento surgindo</div>
+            <div>
+              <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);">rise</p>
+              <p style="font-size:.75rem;color:var(--muted);">0.7s ease forwards</p>
+              <p style="font-size:.75rem;color:var(--muted);">Entrada de seções, cards</p>
+            </div>
+          </div>
+
+          <div class="anim-demo scan-overlay" style="height:100px;">
+            <div style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);">SISTEMA ATIVO</div>
+            <div>
+              <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);">scan</p>
+              <p style="font-size:.75rem;color:var(--muted);">4s linear infinite</p>
+              <p style="font-size:.75rem;color:var(--muted);">Painéis de terminal</p>
+            </div>
+          </div>
+
+          <div class="anim-demo" style="overflow:hidden;">
+            <div class="animate-marquee" style="display:flex;gap:24px;white-space:nowrap;font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);">
+              <span>AGENTES</span><span style="color:var(--accent);">●</span>
+              <span>AUTOMAÇÕES</span><span style="color:var(--accent);">●</span>
+              <span>SISTEMAS</span><span style="color:var(--accent);">●</span>
+              <span>AGENTES</span><span style="color:var(--accent);">●</span>
+              <span>AUTOMAÇÕES</span><span style="color:var(--accent);">●</span>
+            </div>
+            <div>
+              <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);">marquee</p>
+              <p style="font-size:.75rem;color:var(--muted);">28s linear infinite</p>
+              <p style="font-size:.75rem;color:var(--muted);">Logos de clientes, tags</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Progress animation -->
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:24px;margin-bottom:32px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);">progressFill</span>
+            <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent);">73%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width:73%;"></div>
+          </div>
+          <p style="font-size:.8rem;color:var(--muted);margin-top:10px;">1.8s ease forwards — Barras de progresso, métricas de adoção</p>
+        </div>
+
+        <!-- Pulse green -->
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:24px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+            <div class="animate-pulse-green" style="width:8px;height:8px;background:var(--green);border-radius:50%;"></div>
+            <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--green);">AO VIVO</span>
+          </div>
+          <p style="font-size:.8rem;color:var(--muted);">pulse-green · 2s ease-in-out infinite — Indicadores de status ativo, transmissões ao vivo</p>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ BUTTONS ════════ -->
+      <section id="buttons" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">08 — BOTÕES</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Sistema de Botões</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Hierarquia clara: um CTA primário por tela. Secundários e ghosts para ações de suporte.</p>
+
+        <!-- Primary -->
+        <div style="margin-bottom:32px;">
+          <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">Primário</p>
+          <div class="component-frame">
+            <button class="btn-primary">QUERO ENTRAR NA MENTORIA →</button>
+            <button class="btn-primary" style="font-size:.875rem;padding:10px 22px;">VER DETALHES →</button>
+            <button class="btn-primary" style="font-size:.8rem;padding:8px 16px;">ACESSAR →</button>
+          </div>
+          <p class="component-label">background: #ff6a00 · color: #000 · font-weight: 700 · animation: glow · border-radius: 4px</p>
+        </div>
+
+        <!-- Outline -->
+        <div style="margin-bottom:32px;">
+          <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">Outline</p>
+          <div class="component-frame">
+            <button class="btn-outline">VER CURRÍCULO COMPLETO</button>
+            <button class="btn-outline" style="font-size:.875rem;padding:10px 22px;">SABER MAIS</button>
+          </div>
+          <p class="component-label">border: 1px solid --line-strong · hover: border-color accent + bg accent-soft</p>
+        </div>
+
+        <!-- Ghost -->
+        <div style="margin-bottom:32px;">
+          <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">Ghost</p>
+          <div class="component-frame">
+            <button class="btn-ghost">← Voltar</button>
+            <button class="btn-ghost">Cancelar</button>
+            <button class="btn-ghost">Ver depois</button>
+          </div>
+          <p class="component-label">Ações secundárias e de navegação. Fundo transparente.</p>
+        </div>
+
+        <!-- States table -->
+        <table class="token-table" style="border:1px solid var(--line);border-radius:8px;overflow:hidden;">
+          <thead>
+            <tr>
+              <th>Variante</th>
+              <th>Default</th>
+              <th>Hover</th>
+              <th>Disabled</th>
+              <th>Loading</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-family:'Space Mono',monospace;color:var(--accent);">Primary</td>
+              <td style="color:var(--muted);">bg accent + glow</td>
+              <td style="color:var(--muted);">opacity .88</td>
+              <td style="color:var(--muted);">opacity .4 + cursor not-allowed</td>
+              <td style="color:var(--muted);">spinner + texto alterado</td>
+            </tr>
+            <tr>
+              <td style="font-family:'Space Mono',monospace;color:var(--accent);">Outline</td>
+              <td style="color:var(--muted);">border line-strong</td>
+              <td style="color:var(--muted);">border accent + bg accent-soft</td>
+              <td style="color:var(--muted);">opacity .4</td>
+              <td style="color:var(--muted);">spinner</td>
+            </tr>
+            <tr>
+              <td style="font-family:'Space Mono',monospace;color:var(--accent);">Ghost</td>
+              <td style="color:var(--muted);">transparente</td>
+              <td style="color:var(--muted);">border line + text primary</td>
+              <td style="color:var(--muted);">opacity .3</td>
+              <td style="color:var(--muted);">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ BADGES ════════ -->
+      <section id="badges" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">09 — BADGES & TAGS</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Etiquetas e Indicadores</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Sempre em Space Mono, uppercase. Comunicam status, categoria ou fase.</p>
+
+        <div class="component-frame" style="justify-content:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+          <span class="badge badge-accent">LOTE 1</span>
+          <span class="badge badge-accent">AO VIVO</span>
+          <span class="badge badge-accent">FASE 03</span>
+          <span class="badge badge-green">● ATIVO</span>
+          <span class="badge badge-green">VAGAS ABERTAS</span>
+          <span class="badge badge-neutral">NOVO</span>
+          <span class="badge badge-neutral">MÓDULO 04</span>
+          <span class="badge badge-neutral">v1.0</span>
+        </div>
+        <p class="component-label">font: Space Mono 700 · font-size: .7rem · letter-spacing: .06em · text-transform: uppercase · border-radius: 3px</p>
+
+        <!-- Eyebrow pattern -->
+        <div style="margin-top:32px;">
+          <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Eyebrow de Seção</p>
+          <div class="component-frame" style="justify-content:flex-start;flex-direction:column;align-items:flex-start;gap:8px;">
+            <div>
+              <p style="font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">01 — AGENTES</p>
+              <h3 style="font-size:1.5rem;font-weight:700;">Construa agentes que trabalham por você</h3>
+            </div>
+            <div style="margin-top:16px;">
+              <p style="font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">SOCIAL PROOF</p>
+              <p style="font-size:1.1rem;font-weight:600;color:var(--muted);">Mais de <span style="color:var(--text);">1.400 profissionais</span> já formados</p>
+            </div>
+          </div>
+          <p class="component-label">font: Space Mono · color: --accent · letter-spacing: .14em · sempre precede o título da seção</p>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ CARDS ════════ -->
+      <section id="cards" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">10 — CARDS & PAINÉIS</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Containers de Conteúdo</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Três variantes de card para diferentes hierarquias de informação.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;">
+          <!-- Base card -->
+          <div>
+            <div class="card-base">
+              <div class="badge badge-neutral" style="margin-bottom:12px;">MÓDULO 01</div>
+              <h3 style="font-size:1rem;font-weight:600;margin-bottom:8px;">Fundamentos de IA</h3>
+              <p style="font-size:.85rem;color:var(--muted);line-height:1.6;">LLMs, prompting avançado e primeiros agentes.</p>
+            </div>
+            <p class="component-label">card-base · bg: --panel · border: --line · hover: --line-strong</p>
+          </div>
+
+          <!-- Accent card -->
+          <div>
+            <div class="card-accent">
+              <div class="badge badge-accent" style="margin-bottom:12px;">DESTAQUE</div>
+              <h3 style="font-size:1rem;font-weight:600;margin-bottom:8px;">Acesso Vitalício</h3>
+              <p style="font-size:.85rem;color:var(--muted);line-height:1.6;">Currículo atualizado automaticamente com o mercado.</p>
+            </div>
+            <p class="component-label">card-accent · border-top: 2px accent · border: accent .25</p>
+          </div>
+
+          <!-- Stat card -->
+          <div>
+            <div class="stat-card">
+              <div style="font-family:'Space Mono',monospace;font-size:2.2rem;font-weight:700;color:var(--accent);margin-bottom:4px;">73%</div>
+              <div style="font-size:.875rem;color:var(--muted);">dos alunos mudaram de cargo</div>
+            </div>
+            <p class="component-label">stat-card · bg: accent .06 · border: accent .2 · text-align: center</p>
+          </div>
+        </div>
+
+        <!-- Terminal panel -->
+        <div style="margin-top:32px;">
+          <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Painel de Terminal</p>
+          <div class="scan-overlay" style="background:var(--panel);border:1px solid rgba(255,106,0,.3);border-radius:6px;padding:24px;box-shadow:0 0 40px rgba(255,106,0,.06),inset 0 0 40px rgba(0,0,0,.3);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--line);">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--green);" class="animate-pulse-green"></div>
+              <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent);letter-spacing:.1em;">SISTEMA ATIVO</span>
+              <span style="margin-left:auto;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);">TURMA 2025.1</span>
+            </div>
+            <div style="font-family:'Space Mono',monospace;font-size:.8rem;line-height:2;color:var(--muted);">
+              <div><span style="color:var(--green);">&gt;</span> <span style="color:var(--text);">alunos.count()</span> <span style="color:var(--accent);">1.400+</span></div>
+              <div><span style="color:var(--green);">&gt;</span> <span style="color:var(--text);">empresas.parceiras()</span> <span style="color:var(--accent);">100+</span></div>
+              <div><span style="color:var(--green);">&gt;</span> <span style="color:var(--text);">curriculo.status()</span> <span style="color:var(--green);">"VIVO"</span></div>
+              <div><span style="color:var(--green);">&gt;</span> <span style="color:var(--text);">vagas.disponiveis()</span> <span class="terminal-caret"></span></div>
+            </div>
+          </div>
+          <p class="component-label">Terminal panel · border: accent .3 · scan-overlay · box-shadow glow laranja</p>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ FORMS ════════ -->
+      <section id="forms" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">11 — FORMULÁRIOS</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Campos e Inputs</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Inputs escuros com foco em laranja. Labels em Space Mono.</p>
+
+        <div style="max-width:520px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+            <div>
+              <label style="display:block;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Nome *</label>
+              <input class="input-base" type="text" placeholder="André" />
+            </div>
+            <div>
+              <label style="display:block;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Sobrenome *</label>
+              <input class="input-base" type="text" placeholder="Cardia" />
+            </div>
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">E-mail *</label>
+            <input class="input-base" type="email" placeholder="seu@email.com.br" />
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">WhatsApp *</label>
+            <input class="input-base" type="tel" placeholder="(48) 9 9999-9999" />
+          </div>
+          <div style="margin-bottom:24px;">
+            <label style="display:block;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Área de atuação *</label>
+            <select class="input-base" style="cursor:pointer;">
+              <option value="" disabled selected>Selecione sua área</option>
+              <option>Tecnologia</option>
+              <option>Gestão / Negócios</option>
+              <option>Marketing / Comunicação</option>
+              <option>Saúde</option>
+              <option>Jurídico</option>
+            </select>
+          </div>
+          <button class="btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:14px;">GARANTIR MINHA VAGA →</button>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ PROGRESS ════════ -->
+      <section id="progress" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">12 — PROGRESSO</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Barras de Progresso</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Métricas e indicadores de avanço com animação de entrada.</p>
+
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:32px;display:flex;flex-direction:column;gap:24px;">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+              <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);">Adoção de IA no mercado brasileiro</span>
+              <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent);">73%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:73%;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+              <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);">Alunos empregados após mentoria</span>
+              <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent);">91%</span>
+            </div>
+            <div class="progress-track"><div style="height:100%;background:var(--accent);border-radius:2px;width:91%;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+              <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);">Vagas preenchidas — Lote 1</span>
+              <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--green);">22/30</span>
+            </div>
+            <div class="progress-track"><div style="height:100%;background:var(--green);border-radius:2px;width:73%;"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ STATUS INDICATORS ════════ -->
+      <section id="status" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">13 — INDICADORES DE STATUS</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Estados do Sistema</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Comunicam disponibilidade, urgência e estado do sistema.</p>
+
+        <div class="component-frame" style="justify-content:flex-start;flex-wrap:wrap;gap:24px;">
+          <!-- Live -->
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 20px;background:rgba(132,204,22,.06);border:1px solid rgba(132,204,22,.2);border-radius:6px;">
+            <div class="animate-pulse-green" style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></div>
+            <span style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--green);">AO VIVO</span>
+          </div>
+
+          <!-- Available -->
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 20px;background:var(--panel);border:1px solid var(--line);border-radius:6px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;"></div>
+            <span style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--accent);">8 VAGAS</span>
+          </div>
+
+          <!-- Filled -->
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 20px;background:var(--panel);border:1px solid var(--line);border-radius:6px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;"></div>
+            <span style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);">ENCERRADO</span>
+          </div>
+
+          <!-- Countdown -->
+          <div style="display:flex;align-items:center;gap:8px;padding:12px 20px;background:rgba(255,106,0,.06);border:1px solid rgba(255,106,0,.2);border-radius:6px;">
+            <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);">FECHA EM</span>
+            <span style="font-family:'Space Mono',monospace;font-size:.875rem;font-weight:700;color:var(--accent);">02:14:33</span>
+          </div>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ VOICE & TONE ════════ -->
+      <section id="voice" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">14 — VOZ & TOM</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Voz e Tom da Marca</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Como a Mentoria IA fala com o mundo.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px;">
+          <div class="card-accent">
+            <div class="badge badge-green" style="margin-bottom:16px;">FAZER</div>
+            <ul style="display:flex;flex-direction:column;gap:12px;list-style:none;padding:0;">
+              <li style="display:flex;gap:10px;font-size:.9rem;line-height:1.5;"><span style="color:var(--green);margin-top:2px;">✓</span> Direto e técnico — sem rodeios</li>
+              <li style="display:flex;gap:10px;font-size:.9rem;line-height:1.5;"><span style="color:var(--green);margin-top:2px;">✓</span> Fatos e números concretos</li>
+              <li style="display:flex;gap:10px;font-size:.9rem;line-height:1.5;"><span style="color:var(--green);margin-top:2px;">✓</span> Urgência real, não fabricada</li>
+              <li style="display:flex;gap:10px;font-size:.9rem;line-height:1.5;"><span style="color:var(--green);margin-top:2px;">✓</span> Respeitoso com a inteligência do leitor</li>
+              <li style="display:flex;gap:10px;font-size:.9rem;line-height:1.5;"><span style="color:var(--green);margin-top:2px;">✓</span> Terminologia técnica de IA quando relevante</li>
+              <li style="display:flex;gap:10px;font-size:.9rem;line-height:1.5;"><span style="color:var(--green);margin-top:2px;">✓</span> Verbos de ação: "construa", "automatize", "domine"</li>
+            </ul>
+          </div>
+          <div style="background:rgba(255,50,50,.04);border:1px solid rgba(255,50,50,.15);border-top:2px solid rgba(255,80,80,.4);border-radius:6px;padding:24px;">
+            <div class="badge" style="background:rgba(255,80,80,.1);color:rgba(255,80,80,.8);border:1px solid rgba(255,80,80,.2);margin-bottom:16px;">NÃO FAZER</div>
+            <ul style="display:flex;flex-direction:column;gap:12px;list-style:none;padding:0;">
+              <li style="display:flex;gap:10px;font-size:.9rem;line-height:1.5;"><span style="color:rgba(255,80,80,.7);margin-top:2px;">✕</span> Jargão vago ("transformação digital", "inovação")</li>
+              <li style="display:flex;gap:10px;font-size:.9rem;line-height:1.5;"><span style="color:rgba(255,80,80,.7);margin-top:2px;">✕</span> Promessas exageradas sem comprovação</li>
+              <li style="display:flex;gap:10px;font-size:.9rem;line-height:1.5;"><span style="color:rgba(255,80,80,.7);margin-top:2px;">✕</span> Tom condescendente ou infantilizado</li>
+              <li style="display:flex;gap:10px;font-size:.9rem;line-height:1.5;"><span style="color:rgba(255,80,80,.7);margin-top:2px;">✕</span> Emojis em headlines e títulos</li>
+              <li style="display:flex;gap:10px;font-size:.9rem;line-height:1.5;"><span style="color:rgba(255,80,80,.7);margin-top:2px;">✕</span> Adjetivos sem substância ("incrível", "revolucionário")</li>
+              <li style="display:flex;gap:10px;font-size:.9rem;line-height:1.5;"><span style="color:rgba(255,80,80,.7);margin-top:2px;">✕</span> Fontes, cores ou estilos fora do sistema</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Copy examples -->
+        <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Exemplos de Copy</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:12px;align-items:start;">
+            <span style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);padding-top:4px;">HEADLINE</span>
+            <div style="background:rgba(255,80,80,.04);border:1px solid rgba(255,80,80,.15);border-radius:4px;padding:12px 16px;font-size:.9rem;color:rgba(255,80,80,.7);">Descubra o incrível mundo da IA revolucionária!</div>
+            <div style="background:rgba(132,204,22,.04);border:1px solid rgba(132,204,22,.2);border-radius:4px;padding:12px 16px;font-size:.9rem;">IA no trabalho em <strong>6 meses</strong> ou você pede reembolso.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:12px;align-items:start;">
+            <span style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);padding-top:4px;">CTA</span>
+            <div style="background:rgba(255,80,80,.04);border:1px solid rgba(255,80,80,.15);border-radius:4px;padding:12px 16px;font-size:.9rem;color:rgba(255,80,80,.7);">Clique aqui agora!!!</div>
+            <div style="background:rgba(132,204,22,.04);border:1px solid rgba(132,204,22,.2);border-radius:4px;padding:12px 16px;font-size:.9rem;">GARANTIR MINHA VAGA →</div>
+          </div>
+          <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:12px;align-items:start;">
+            <span style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);padding-top:4px;">BODY</span>
+            <div style="background:rgba(255,80,80,.04);border:1px solid rgba(255,80,80,.15);border-radius:4px;padding:12px 16px;font-size:.9rem;color:rgba(255,80,80,.7);">Nossa plataforma vai transformar sua carreira com tecnologia inovadora.</div>
+            <div style="background:rgba(132,204,22,.04);border:1px solid rgba(132,204,22,.2);border-radius:4px;padding:12px 16px;font-size:.9rem;">1.400 profissionais formados. 100+ empresas. Currículo vivo atualizado com o mercado.</div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ PRINCIPLES ════════ -->
+      <section id="principles" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">15 — PRINCÍPIOS</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Princípios de Design</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Os cinco pilares que orientam todas as decisões visuais e de produto.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="card-base">
+            <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--accent);margin-bottom:12px;">01</div>
+            <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:10px;">Autenticidade Técnica</h3>
+            <p style="font-size:.875rem;color:var(--muted);line-height:1.65;">O design deve comunicar competência real. Grid técnico, tipografia monospace e terminologia precisa sinalizam profundidade — não superficialidade.</p>
+          </div>
+          <div class="card-base">
+            <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--accent);margin-bottom:12px;">02</div>
+            <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:10px;">Hierarquia de Intenção</h3>
+            <p style="font-size:.875rem;color:var(--muted);line-height:1.65;">Um único CTA primário por tela. O laranja nunca compete — ele aponta. Tudo o mais recua para que a ação principal seja inescapável.</p>
+          </div>
+          <div class="card-base">
+            <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--accent);margin-bottom:12px;">03</div>
+            <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:10px;">Escassez Honesta</h3>
+            <p style="font-size:.875rem;color:var(--muted);line-height:1.65;">Indicadores de urgência (contadores, vagas, status ao vivo) só existem quando são verdadeiros. Nunca fabricados para pressionar — usados para informar com precisão.</p>
+          </div>
+          <div class="card-base">
+            <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--accent);margin-bottom:12px;">04</div>
+            <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:10px;">Movimento com Propósito</h3>
+            <p style="font-size:.875rem;color:var(--muted);line-height:1.65;">Animações comunicam estado: glow indica energia, pulse-green indica atividade, rise indica chegada. Nunca decorativas — sempre funcionais.</p>
+          </div>
+          <div class="card-base" style="grid-column:1/-1;">
+            <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--accent);margin-bottom:12px;">05</div>
+            <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:10px;">Preto como fundação</h3>
+            <p style="font-size:.875rem;color:var(--muted);line-height:1.65;">O fundo quase-preto não é limitação — é a tela onde o conteúdo brilha. O contraste extremo entre fundo e laranja cria foco imediato. Nunca dilua com gradientes ou fundos claros.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- Footer -->
+<footer style="border-top:1px solid var(--line);background:var(--bg-2);padding:24px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+  <div class="logo-mark">
+    <div class="logo-icon" style="width:28px;height:28px;font-size:.8rem;">M</div>
+    <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);">Brand & Design System</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <span class="badge badge-neutral">v1.0 · 2025</span>
+    <a href="/" style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-decoration:none;letter-spacing:.06em;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">← VOLTAR AO SITE</a>
+  </div>
+</footer>
+
+</body>
+</html>

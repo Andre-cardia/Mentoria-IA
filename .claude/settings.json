@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unzip -l \"d:\\\\GitHub\\\\Mentoria-IA/SKILLS/design-pattern.skill\")",
+      "Bash(unzip -p \"d:\\\\GitHub\\\\Mentoria-IA/SKILLS/design-pattern.skill\" \"design-pattern/SKILL.md\")",
+      "Bash(npm install @supabase/supabase-js)"
+    ]
+  }
+}
