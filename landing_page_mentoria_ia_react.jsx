@@ -71,10 +71,10 @@ const pillars = [
 ];
 
 const proof = [
-  "2 encontros por semana",
-  "Carga horária mínima de 40 horas",
-  "R$ 497,00 por mês",
-  "Cancelamento com 30 dias de antecedência",
+  { text: "2 encontros por semana" },
+  { text: "Carga horária mínima de 40 horas" },
+  { text: "R$ 497,00 por mês", note: "1º lote · 30 vagas · até 03/04" },
+  { text: "Cancelamento com 30 dias de antecedência" },
 ];
 
 function useTypeSequence(words, speed = 70) {
@@ -455,9 +455,12 @@ export default function LandingPageMentoriaIA() {
 
             <div className="mt-10 grid grid-cols-1 gap-0 border border-[var(--line)] md:grid-cols-2 lg:grid-cols-4">
               {proof.map((item, index) => (
-                <div key={item} className="min-h-[220px] border-b border-[var(--line)] bg-black/30 p-6 md:p-8 lg:border-b-0 lg:border-r last:lg:border-r-0">
+                <div key={item.text} className="min-h-[220px] border-b border-[var(--line)] bg-black/30 p-6 md:p-8 lg:border-b-0 lg:border-r last:lg:border-r-0">
                   <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-[var(--accent)]">0{index + 1}</div>
-                  <div className="mt-6 text-3xl uppercase leading-[1.02] tracking-[-0.04em] text-[var(--text)]">{item}</div>
+                  <div className="mt-6 text-3xl uppercase leading-[1.02] tracking-[-0.04em] text-[var(--text)]">{item.text}</div>
+                  {item.note && (
+                    <div className="mt-3 font-mono-tech text-[10px] uppercase tracking-[0.18em] text-[var(--accent)]">{item.note}</div>
+                  )}
                 </div>
               ))}
             </div>
@@ -835,8 +838,19 @@ export default function LandingPageMentoriaIA() {
                 </p>
               </div>
               <div className="p-6 md:p-10 lg:col-span-4">
-                <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/70">Acesso imediato</div>
-                <div className="mt-6 flex flex-col gap-3">
+                <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/70">// Próxima turma</div>
+                <div className="mt-2 text-2xl font-bold uppercase leading-tight tracking-[-0.03em]">14 de abril de 2026</div>
+
+                <div className="mt-5 border border-black/25 bg-black/10 p-4">
+                  <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/60">1º lote · oferta limitada</div>
+                  <div className="mt-1 text-3xl font-bold uppercase tracking-[-0.03em]">R$ 497,00<span className="text-base font-normal">/mês</span></div>
+                  <div className="mt-2 font-mono-tech text-xs leading-5 text-black/70">
+                    Válido até <strong>03/04/2026</strong> ou ao encerrar as primeiras <strong>30 vagas</strong>.
+                    Após isso, o valor sobe.
+                  </div>
+                </div>
+
+                <div className="mt-5 flex flex-col gap-3">
                   <a
                     href="https://pag.ae/81CEushnG"
                     className="border border-black bg-black px-6 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.26em] text-[var(--text)] transition hover:bg-transparent hover:text-black"
