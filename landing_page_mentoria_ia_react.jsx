@@ -27,6 +27,8 @@ import logoSeagroSc       from "./src/assets/logo clientes/logo-seagrosc.webp";
 import logoBreitkopf      from "./src/assets/logo clientes/logo_grupo-breitkopf_4foiPq.png";
 import logoPrecicast      from "./src/assets/logo clientes/precicast.png";
 import logoSescoop        from "./src/assets/logo clientes/seescoop.png";
+import testimonialVideo1  from "./src/assets/testimonial-video-1.mp4";
+import testimonialVideo2  from "./src/assets/testimonial-video-2.mp4";
 import instructorAndre from "./src/assets/instructor-andre.jpg";
 import instructorCelso from "./src/assets/instructor-celso.jpg";
 
@@ -797,7 +799,7 @@ export default function LandingPageMentoriaIA() {
                   <span className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-[var(--accent)]">Depoimento 01</span>
                 </div>
                 <video
-                  src="https://site.neuralhub.ia.br/assets/testimonial-video-1-B7XcwcFj.mp4"
+                  src={testimonialVideo1}
                   controls
                   playsInline
                   preload="metadata"
@@ -812,7 +814,7 @@ export default function LandingPageMentoriaIA() {
                   <span className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-[var(--accent)]">Depoimento 02</span>
                 </div>
                 <video
-                  src="https://site.neuralhub.ia.br/assets/testimonial-video-2-CkD6JpZh.mp4"
+                  src={testimonialVideo2}
                   controls
                   playsInline
                   preload="metadata"
