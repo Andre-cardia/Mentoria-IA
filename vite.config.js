@@ -7,9 +7,10 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        lead: resolve(__dirname, 'lead.html'),
-        brand: resolve(__dirname, 'brand.html'),
+        main:     resolve(__dirname, 'index.html'),
+        lead:     resolve(__dirname, 'lead.html'),
+        brand:    resolve(__dirname, 'brand.html'),
+        obrigado: resolve(__dirname, 'obrigado.html'),
       },
     },
   },
