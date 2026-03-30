@@ -223,7 +223,7 @@ export default function LandingPageMentoriaIA() {
           </div>
           <a
             href="https://pag.ae/81CEushnG"
-            className="border border-[var(--line-strong)] bg-[var(--accent)] px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-black transition hover:brightness-110"
+            className="border border-[var(--line-strong)] bg-[var(--accent)] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.24em] text-black transition hover:brightness-110 active:scale-95 animate-glow"
           >
             Entrar agora
           </a>
@@ -262,15 +262,15 @@ export default function LandingPageMentoriaIA() {
                   <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                     <a
                       href="https://pag.ae/81CEushnG"
-                      className="bg-[var(--accent)] px-7 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.26em] text-black transition hover:brightness-110"
+                      className="bg-[var(--accent)] px-7 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-black transition hover:brightness-110 active:scale-95 animate-glow"
                     >
                       Quero entrar na mentoria
                     </a>
                     <a
-                      href="#arquitetura"
-                      className="border border-[var(--line-strong)] bg-black/30 px-7 py-4 text-center text-[11px] uppercase tracking-[0.26em] text-[var(--text)] transition hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                      href="#planos"
+                      className="border border-[var(--line-strong)] bg-black/30 px-7 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] active:scale-95"
                     >
-                      Ver a arquitetura do programa
+                      Ver planos de acesso
                     </a>
                   </div>
                 </div>
@@ -503,7 +503,7 @@ export default function LandingPageMentoriaIA() {
 
                 <a
                   href="https://pag.ae/81CEushnG"
-                  className="mt-auto border border-[var(--line-strong)] bg-[var(--accent)] px-6 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.26em] text-black transition hover:brightness-110"
+                  className="mt-auto border border-[var(--line-strong)] bg-black/40 px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] active:scale-95"
                 >
                   Assinar plano mensal
                 </a>
@@ -513,14 +513,14 @@ export default function LandingPageMentoriaIA() {
               <div className="relative border border-[var(--accent)] bg-[var(--panel)] p-8 flex flex-col gap-6">
                 {/* Badge destaque */}
                 <div className="absolute -top-3 left-8">
-                  <div className="bg-[var(--accent)] px-3 py-1 font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black font-semibold">
+                  <div className="bg-[var(--accent)] px-3 py-1 font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black font-bold">
                     Melhor custo-benefício
                   </div>
                 </div>
 
                 <div>
                   <div className="font-mono-tech text-[10px] uppercase tracking-[0.26em] text-[var(--accent)]">// Plano 02</div>
-                  <div className="mt-3 text-3xl uppercase font-semibold tracking-[-0.04em] text-[var(--text)]">Anual</div>
+                  <div className="mt-3 text-3xl uppercase font-bold tracking-[-0.04em] text-[var(--text)]">Anual</div>
                   <div className="mt-1 font-mono-tech text-xs uppercase tracking-[0.18em] text-[var(--muted)]">Compromisso com resultado</div>
                 </div>
 
@@ -548,8 +548,8 @@ export default function LandingPageMentoriaIA() {
                 </div>
 
                 <a
-                  href="https://pag.ae/81CEushnG"
-                  className="mt-auto border border-[var(--accent)] bg-[var(--accent)] px-6 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.26em] text-black transition hover:brightness-110 animate-glow"
+                  href="https://pag.ae/81DHpnF-r"
+                  className="mt-auto border border-[var(--accent)] bg-[var(--accent)] px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-black transition hover:brightness-110 animate-glow active:scale-95"
                 >
                   Assinar plano anual
                 </a>
@@ -945,14 +945,14 @@ export default function LandingPageMentoriaIA() {
 
                 <a
                   href="https://pag.ae/81CEushnG"
-                  className="mt-3 block border border-black bg-black px-6 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.26em] text-[var(--text)] transition hover:bg-transparent hover:text-black"
+                  className="mt-3 block border border-black bg-black px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-[var(--text)] transition hover:bg-transparent hover:text-black active:scale-95"
                 >
                   Assinar mensal
                 </a>
 
                 {/* Plano Anual */}
                 <div className="mt-5 border-2 border-black/50 bg-black/20 p-4 relative">
-                  <div className="absolute -top-3 right-4 bg-black px-2 py-0.5 font-mono-tech text-[9px] uppercase tracking-[0.2em] text-[var(--accent)] font-semibold">Mais econômico</div>
+                  <div className="absolute -top-3 right-4 bg-black px-2 py-0.5 font-mono-tech text-[9px] uppercase tracking-[0.2em] text-[var(--accent)] font-bold">Mais econômico</div>
                   <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/60">Plano Anual · 12 meses</div>
                   <div className="mt-1 text-3xl font-bold uppercase tracking-[-0.03em]">R$ 316,11<span className="text-base font-normal">/mês</span></div>
                   <div className="mt-1 font-mono-tech text-xs font-bold text-black/80">ou R$ 3.561,40 à vista</div>
@@ -962,15 +962,15 @@ export default function LandingPageMentoriaIA() {
                 </div>
 
                 <a
-                  href="https://pag.ae/81CEushnG"
-                  className="mt-3 block border-2 border-black bg-transparent px-6 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.26em] text-black transition hover:bg-black/10"
+                  href="https://pag.ae/81DHpnF-r"
+                  className="mt-3 block border-2 border-black bg-transparent px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-black transition hover:bg-black/10 active:scale-95"
                 >
                   Assinar anual
                 </a>
 
                 <a
                   href="https://wa.me/5548988549556?text=Quero%20mais%20informa%C3%A7%C3%B5es%20sobre%20a%20mentoria%20cont%C3%ADnua%20de%20IA"
-                  className="mt-3 block border border-black/30 px-6 py-4 text-center text-[11px] uppercase tracking-[0.26em] text-black transition hover:border-black hover:bg-black/5"
+                  className="mt-3 block border border-black/30 px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-black transition hover:border-black hover:bg-black/5 active:scale-95"
                 >
                   Falar com a equipe
                 </a>
