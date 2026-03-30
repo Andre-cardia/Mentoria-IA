@@ -222,10 +222,10 @@ export default function LandingPageMentoriaIA() {
             </div>
           </div>
           <a
-            href="https://pag.ae/81CEushnG"
+            href="#planos"
             className="border border-[var(--line-strong)] bg-[var(--accent)] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.24em] text-black transition hover:brightness-110 active:scale-95 animate-glow"
           >
-            Entrar agora
+            Ver planos
           </a>
         </div>
       </header>
@@ -261,16 +261,16 @@ export default function LandingPageMentoriaIA() {
                   </div>
                   <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                     <a
-                      href="https://pag.ae/81CEushnG"
+                      href="#planos"
                       className="bg-[var(--accent)] px-7 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-black transition hover:brightness-110 active:scale-95 animate-glow"
                     >
                       Quero entrar na mentoria
                     </a>
                     <a
-                      href="#planos"
+                      href="#arquitetura"
                       className="border border-[var(--line-strong)] bg-black/30 px-7 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] active:scale-95"
                     >
-                      Ver planos de acesso
+                      Conhecer o currículo
                     </a>
                   </div>
                 </div>
