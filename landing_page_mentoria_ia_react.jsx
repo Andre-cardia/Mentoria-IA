@@ -75,8 +75,8 @@ const pillars = [
 const proof = [
   { text: "2 encontros por semana" },
   { text: "Carga horária mínima de 40 horas" },
-  { text: "R$ 497,00 por mês", note: "1º lote · 30 vagas · até 03/04" },
-  { text: "Cancelamento com 30 dias de antecedência" },
+  { text: "2 modalidades de acesso", note: "Mensal ou Anual" },
+  { text: "Currículo vivo em atualização contínua" },
 ];
 
 function useTypeSequence(words, speed = 70) {
@@ -441,20 +441,21 @@ export default function LandingPageMentoriaIA() {
           </div>
         </section>
 
-        <section className="border-b border-[var(--line)] bg-[var(--bg-2)]">
+        <section id="planos" className="border-b border-[var(--line)] bg-[var(--bg-2)]">
           <div className="mx-auto max-w-[1600px] px-4 py-16 md:px-8 md:py-24">
             <div className="flex flex-col gap-6 border-b border-[var(--line)] pb-10 md:flex-row md:items-end md:justify-between">
               <div>
-                <div className="font-mono-tech text-[10px] uppercase tracking-[0.26em] text-[var(--accent)]">// Formato de acesso</div>
+                <div className="font-mono-tech text-[10px] uppercase tracking-[0.26em] text-[var(--accent)]">// Planos de acesso</div>
                 <h3 className="mt-4 max-w-4xl text-4xl uppercase leading-[0.92] tracking-[-0.05em] text-[var(--text)] md:text-6xl">
-                  Simples de entrar. Difícil de sair no mesmo nível.
+                  Escolha o formato que faz sentido para você.
                 </h3>
               </div>
               <p className="max-w-xl font-mono-tech text-sm leading-7 text-[var(--muted)]">
-                A proposta é recorrente porque evolução de verdade não acontece em fim de semana de workshop. Ela acontece em rotina, repertório e construção orientada.
+                Evolução de verdade não acontece em fim de semana de workshop. Ela acontece em rotina, repertório e construção orientada — com a flexibilidade do plano que você escolher.
               </p>
             </div>
 
+            {/* Stats gerais */}
             <div className="mt-10 grid grid-cols-1 gap-0 border border-[var(--line)] md:grid-cols-2 lg:grid-cols-4">
               {proof.map((item, index) => (
                 <div key={item.text} className="min-h-[220px] border-b border-[var(--line)] bg-black/30 p-6 md:p-8 lg:border-b-0 lg:border-r last:lg:border-r-0">
@@ -465,6 +466,95 @@ export default function LandingPageMentoriaIA() {
                   )}
                 </div>
               ))}
+            </div>
+
+            {/* Cards de planos */}
+            <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+              {/* Plano Mensal */}
+              <div className="relative border border-[var(--line)] bg-[var(--panel)] p-8 flex flex-col gap-6">
+                <div>
+                  <div className="font-mono-tech text-[10px] uppercase tracking-[0.26em] text-[var(--muted)]">// Plano 01</div>
+                  <div className="mt-3 text-3xl uppercase font-semibold tracking-[-0.04em] text-[var(--text)]">Mensal</div>
+                  <div className="mt-1 font-mono-tech text-xs uppercase tracking-[0.18em] text-[var(--muted)]">Flexibilidade máxima</div>
+                </div>
+
+                <div className="border border-[var(--line)] bg-black/30 p-5">
+                  <div className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-[var(--muted)]">Investimento</div>
+                  <div className="mt-2 text-5xl font-bold uppercase tracking-[-0.05em] text-[var(--text)]">
+                    R$ 497<span className="text-xl font-normal text-[var(--muted)]">,00/mês</span>
+                  </div>
+                  <div className="mt-2 font-mono-tech text-xs text-[var(--muted)]">1º lote · 30 vagas · válido até 03/04/2026</div>
+                </div>
+
+                <div className="space-y-3">
+                  {[
+                    ["Acesso", "Recorrente mensal — cancele quando quiser"],
+                    ["Cancelamento", "Com 30 dias de antecedência"],
+                    ["Encontros", "2 sessões ao vivo por semana"],
+                    ["Currículo", "Sempre atualizado conforme o mercado"],
+                  ].map(([k, v]) => (
+                    <div key={k} className="flex items-start justify-between gap-4 border-b border-[var(--line)] pb-3">
+                      <span className="font-mono-tech text-[10px] uppercase tracking-[0.2em] text-[var(--muted)] shrink-0">{k}</span>
+                      <span className="font-mono-tech text-[11px] text-right text-[var(--text)]">{v}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <a
+                  href="https://pag.ae/81CEushnG"
+                  className="mt-auto border border-[var(--line-strong)] bg-[var(--accent)] px-6 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.26em] text-black transition hover:brightness-110"
+                >
+                  Assinar plano mensal
+                </a>
+              </div>
+
+              {/* Plano Anual */}
+              <div className="relative border border-[var(--accent)] bg-[var(--panel)] p-8 flex flex-col gap-6">
+                {/* Badge destaque */}
+                <div className="absolute -top-3 left-8">
+                  <div className="bg-[var(--accent)] px-3 py-1 font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black font-semibold">
+                    Melhor custo-benefício
+                  </div>
+                </div>
+
+                <div>
+                  <div className="font-mono-tech text-[10px] uppercase tracking-[0.26em] text-[var(--accent)]">// Plano 02</div>
+                  <div className="mt-3 text-3xl uppercase font-semibold tracking-[-0.04em] text-[var(--text)]">Anual</div>
+                  <div className="mt-1 font-mono-tech text-xs uppercase tracking-[0.18em] text-[var(--muted)]">Compromisso com resultado</div>
+                </div>
+
+                <div className="border border-[var(--accent)]/40 bg-[var(--accent-soft)] p-5">
+                  <div className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-[var(--muted)]">Investimento</div>
+                  <div className="mt-2 text-5xl font-bold uppercase tracking-[-0.05em] text-[var(--text)]">
+                    R$ 316<span className="text-xl font-normal text-[var(--muted)]">,11/mês</span>
+                  </div>
+                  <div className="mt-2 font-mono-tech text-xs text-[var(--accent)]">12x de R$ 316,11 — ou R$ 3.561,40 à vista</div>
+                  <div className="mt-1 font-mono-tech text-[10px] text-[var(--muted)]">Economia de ~36% em relação ao mensal</div>
+                </div>
+
+                <div className="space-y-3">
+                  {[
+                    ["Acesso", "12 meses de mentoria completa"],
+                    ["Cancelamento", "Apenas nos primeiros 7 dias após a contratação"],
+                    ["Encontros", "2 sessões ao vivo por semana"],
+                    ["Currículo", "Sempre atualizado conforme o mercado"],
+                  ].map(([k, v]) => (
+                    <div key={k} className="flex items-start justify-between gap-4 border-b border-[var(--line)] pb-3">
+                      <span className="font-mono-tech text-[10px] uppercase tracking-[0.2em] text-[var(--muted)] shrink-0">{k}</span>
+                      <span className="font-mono-tech text-[11px] text-right text-[var(--text)]">{v}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <a
+                  href="https://pag.ae/81CEushnG"
+                  className="mt-auto border border-[var(--accent)] bg-[var(--accent)] px-6 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.26em] text-black transition hover:brightness-110 animate-glow"
+                >
+                  Assinar plano anual
+                </a>
+              </div>
+
             </div>
           </div>
         </section>
@@ -514,7 +604,7 @@ export default function LandingPageMentoriaIA() {
 
                 <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {[
-                    ["Letramento em IA", "Abstrato Ventures, FreedomAI (responsável técnico) e Invantion Center"],
+                    ["Letramento em IA", "Abstrato Ventures, FreedomAI e Inovation Center"],
                     ["Instrutor de IA", "CDL Florianópolis, AEMFLO São José e ACIC Criciúma"],
                     ["Docência", "Professor de pós-graduação em Informática para Gestão Pública"],
                     ["12+ anos", "Professor de Informática para Concursos Públicos"],
@@ -843,29 +933,48 @@ export default function LandingPageMentoriaIA() {
                 <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/70">// Próxima turma</div>
                 <div className="mt-2 text-2xl font-bold uppercase leading-tight tracking-[-0.03em]">14 de abril de 2026</div>
 
+                {/* Plano Mensal */}
                 <div className="mt-5 border border-black/25 bg-black/10 p-4">
-                  <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/60">1º lote · oferta limitada</div>
+                  <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/60">Plano Mensal · 1º lote</div>
                   <div className="mt-1 text-3xl font-bold uppercase tracking-[-0.03em]">R$ 497,00<span className="text-base font-normal">/mês</span></div>
                   <div className="mt-2 font-mono-tech text-xs leading-5 text-black/70">
                     Válido até <strong>03/04/2026</strong> ou ao encerrar as primeiras <strong>30 vagas</strong>.
-                    Após isso, o valor sobe.
+                    Cancelamento com 30 dias de antecedência.
                   </div>
                 </div>
 
-                <div className="mt-5 flex flex-col gap-3">
-                  <a
-                    href="https://pag.ae/81CEushnG"
-                    className="border border-black bg-black px-6 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.26em] text-[var(--text)] transition hover:bg-transparent hover:text-black"
-                  >
-                    Quero me inscrever
-                  </a>
-                  <a
-                    href="https://wa.me/5548988549556?text=Quero%20mais%20informa%C3%A7%C3%B5es%20sobre%20a%20mentoria%20cont%C3%ADnua%20de%20IA"
-                    className="border border-black/30 px-6 py-4 text-center text-[11px] uppercase tracking-[0.26em] text-black transition hover:border-black hover:bg-black/5"
-                  >
-                    Falar com a equipe
-                  </a>
+                <a
+                  href="https://pag.ae/81CEushnG"
+                  className="mt-3 block border border-black bg-black px-6 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.26em] text-[var(--text)] transition hover:bg-transparent hover:text-black"
+                >
+                  Assinar mensal
+                </a>
+
+                {/* Plano Anual */}
+                <div className="mt-5 border-2 border-black/50 bg-black/20 p-4 relative">
+                  <div className="absolute -top-3 right-4 bg-black px-2 py-0.5 font-mono-tech text-[9px] uppercase tracking-[0.2em] text-[var(--accent)] font-semibold">Mais econômico</div>
+                  <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/60">Plano Anual · 12 meses</div>
+                  <div className="mt-1 text-3xl font-bold uppercase tracking-[-0.03em]">R$ 316,11<span className="text-base font-normal">/mês</span></div>
+                  <div className="mt-1 font-mono-tech text-xs font-bold text-black/80">ou R$ 3.561,40 à vista</div>
+                  <div className="mt-2 font-mono-tech text-xs leading-5 text-black/70">
+                    Cancela em até <strong>7 dias</strong> após a contratação.
+                  </div>
                 </div>
+
+                <a
+                  href="https://pag.ae/81CEushnG"
+                  className="mt-3 block border-2 border-black bg-transparent px-6 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.26em] text-black transition hover:bg-black/10"
+                >
+                  Assinar anual
+                </a>
+
+                <a
+                  href="https://wa.me/5548988549556?text=Quero%20mais%20informa%C3%A7%C3%B5es%20sobre%20a%20mentoria%20cont%C3%ADnua%20de%20IA"
+                  className="mt-3 block border border-black/30 px-6 py-4 text-center text-[11px] uppercase tracking-[0.26em] text-black transition hover:border-black hover:bg-black/5"
+                >
+                  Falar com a equipe
+                </a>
+
                 <div className="mt-6 font-mono-tech text-xs leading-6 text-black/70">
                   Neural Hub<br />
                   Mentoria recorrente em grupo<br />
