@@ -10,6 +10,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: true, message: "planId é obrigatório" });
   }
 
+  console.log("[checkout] PAGBANK_TOKEN:", process.env.PAGBANK_TOKEN ? `${process.env.PAGBANK_TOKEN.slice(0, 8)}...` : "VAZIO");
+  console.log("[checkout] PAGBANK_ENV:", process.env.PAGBANK_ENV);
+
   try {
     const result = await createCheckout(planId);
     return res.json(result);

@@ -1,4 +1,8 @@
-import "dotenv/config";
+// dotenv só carrega em dev local — no Vercel as vars são injetadas automaticamente
+if (process.env.NODE_ENV !== "production") {
+  const { config } = await import("dotenv");
+  config();
+}
 
 const required = (key) => {
   const value = process.env[key];
