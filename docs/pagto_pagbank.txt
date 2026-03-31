@@ -1,0 +1,367 @@
+A ideia é simples:
+
+o usuário clica em Comprar no seu site;
+seu backend cria um checkout no PagBank;
+o backend recebe do PagBank um link PAY para pagamento;
+o frontend manda o usuário para esse link;
+quando ele termina o pagamento, o PagBank redireciona para
+https://mentoria.neuralhub.ia.br/obrigado.html usando redirect_url;
+em paralelo, o PagBank envia um webhook com o status real do pagamento, como PAID, WAITING ou IN_ANALYSIS.
+
+A documentação oficial confirma que:
+
+redirect_url é a URL de redirecionamento após a finalização do pagamento;
+return_url é apenas a URL de retorno à loja;
+notification_urls e payment_notification_urls podem ser enviados no payload;
+o link de pagamento vem em links[].href com rel = PAY.
+O que você vai precisar criar
+
+No seu projeto, você vai precisar de 3 coisas:
+
+uma rota backend para criar o checkout no PagBank;
+um botão no React para chamar essa rota;
+uma rota backend de webhook para receber a confirmação do PagBank.
+Estrutura mais segura
+
+Como seu site é React/TypeScript, não coloque o token do PagBank no frontend.
+
+Use esta lógica:
+
+Frontend React: exibe botão e redireciona o usuário.
+Backend Node/TypeScript: conversa com o PagBank usando seu token secreto.
+Passo 1 — pegar seu token do PagBank
+
+No painel do PagBank, você precisa obter o token da API da sua conta para autenticar as chamadas. A criação do checkout usa autenticação Bearer no endpoint de checkout.
+
+Você vai guardar esse token em uma variável de ambiente.
+
+Exemplo:
+
+PAGBANK_TOKEN=SEU_TOKEN_AQUI
+
+Se estiver testando em ambiente sandbox, use as credenciais e endpoint de sandbox. O endpoint mostrado na documentação para criar checkout em sandbox é https://sandbox.api.pagseguro.com/checkouts.
+
+Passo 2 — criar uma rota backend para gerar o link de pagamento
+
+Se seu projeto tiver backend em Node/Express, crie um arquivo como:
+
+// src/server.ts
+import express from "express";
+
+const app = express();
+app.use(express.json());
+
+app.post("/api/pagbank/checkout", async (req, res) => {
+  try {
+    const token = process.env.PAGBANK_TOKEN;
+
+    const payload = {
+      reference_id: `pedido-${Date.now()}`,
+      redirect_url: "https://mentoria.neuralhub.ia.br/obrigado.html",
+      return_url: "https://mentoria.neuralhub.ia.br/",
+      notification_urls: [
+        "https://mentoria.neuralhub.ia.br/api/pagbank/webhook"
+      ],
+      payment_notification_urls: [
+        "https://mentoria.neuralhub.ia.br/api/pagbank/webhook"
+      ],
+      items: [
+        {
+          reference_id: "mentoria-001",
+          name: "Mentoria NeuralHub",
+          quantity: 1,
+          unit_amount: 19900
+        }
+      ]
+    };
+
+    const response = await fetch("https://sandbox.api.pagseguro.com/checkouts", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return res.status(500).json({
+        error: true,
+        message: "Erro ao criar checkout no PagBank",
+        pagbank: data
+      });
+    }
+
+    const payLink = data?.links?.find((link: any) => link.rel === "PAY")?.href;
+
+    if (!payLink) {
+      return res.status(500).json({
+        error: true,
+        message: "PagBank não retornou o link de pagamento",
+        pagbank: data
+      });
+    }
+
+    return res.json({
+      ok: true,
+      checkoutId: data.id,
+      payLink
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      error: true,
+      message: error.message || "Erro interno"
+    });
+  }
+});
+
+app.post("/api/pagbank/webhook", async (req, res) => {
+  console.log("Webhook recebido do PagBank:", req.body);
+  return res.status(200).json({ ok: true });
+});
+
+app.listen(3001, () => {
+  console.log("Servidor rodando na porta 3001");
+});
+
+Esse código segue exatamente o fluxo documentado:
+
+cria checkout;
+envia redirect_url, return_url, notification_urls e payment_notification_urls;
+lê o link de pagamento em links[].href quando rel = PAY.
+Passo 3 — entender o valor do produto
+
+No exemplo acima, usei:
+
+unit_amount: 19900
+
+No PagBank, os valores normalmente são enviados em centavos.
+
+Então:
+
+1000 = R$ 10,00
+19900 = R$ 199,00
+
+Antes de publicar, ajuste isso para o valor real da sua mentoria.
+
+Passo 4 — criar o botão no React
+
+Agora, no frontend React/TypeScript, crie um componente como este:
+
+import { useState } from "react";
+
+export function BotaoComprar() {
+  const [loading, setLoading] = useState(false);
+
+  const iniciarCompra = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch("/api/pagbank/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.payLink) {
+        throw new Error(data?.message || "Erro ao criar pagamento");
+      }
+
+      window.location.href = data.payLink;
+    } catch (error) {
+      console.error(error);
+      alert("Não foi possível iniciar o pagamento.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button onClick={iniciarCompra} disabled={loading}>
+      {loading ? "Redirecionando..." : "Comprar agora"}
+    </button>
+  );
+}
+
+Esse botão:
+
+chama sua API /api/pagbank/checkout;
+recebe o link PAY;
+manda o usuário para a página de pagamento do PagBank.
+Passo 5 — criar sua página de obrigado
+
+Você já tem a URL:
+
+https://mentoria.neuralhub.ia.br/obrigado.html
+
+Ela vai ser usada em redirect_url.
+
+Nessa página, eu recomendo mostrar algo assim:
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Obrigado pela compra</title>
+</head>
+<body>
+  <h1>Obrigado pela sua compra!</h1>
+  <p>Recebemos sua solicitação e estamos confirmando o pagamento.</p>
+  <p>Em instantes você receberá as próximas instruções.</p>
+</body>
+</html>
+
+Isso é importante porque o PagBank pode enviar status como:
+
+PAID
+WAITING
+IN_ANALYSIS
+DECLINED
+CANCELED
+
+Ou seja: o usuário pode chegar na página de obrigado, mas o pagamento ainda pode estar em análise ou aguardando confirmação.
+
+Passo 6 — receber o webhook do PagBank
+
+O webhook é o que te dá a confirmação confiável.
+
+Na documentação, o PagBank informa que pode enviar notificações para os eventos de transação, incluindo PAID, WAITING, IN_ANALYSIS, DECLINED e CANCELED, via POST para as URLs que você configurar.
+
+Você já criou a rota:
+
+app.post("/api/pagbank/webhook", async (req, res) => {
+  console.log("Webhook recebido do PagBank:", req.body);
+  return res.status(200).json({ ok: true });
+});
+
+Agora você vai evoluir isso aos poucos.
+
+Exemplo:
+
+app.post("/api/pagbank/webhook", async (req, res) => {
+  const evento = req.body;
+
+  console.log("Webhook PagBank:", JSON.stringify(evento, null, 2));
+
+  const status = evento?.charges?.[0]?.status || evento?.status;
+
+  if (status === "PAID") {
+    console.log("Pagamento aprovado!");
+    // aqui você pode:
+    // - salvar no banco
+    // - liberar acesso
+    // - enviar e-mail
+    // - notificar no CRM
+  }
+
+  if (status === "WAITING") {
+    console.log("Pagamento aguardando confirmação.");
+  }
+
+  if (status === "IN_ANALYSIS") {
+    console.log("Pagamento em análise.");
+  }
+
+  if (status === "DECLINED" || status === "CANCELED") {
+    console.log("Pagamento não concluído.");
+  }
+
+  return res.status(200).json({ ok: true });
+});
+Passo 7 — testar primeiro em sandbox
+
+A própria documentação expõe o endpoint de sandbox para criação do checkout. Faça seus testes lá antes de ir para produção.
+
+Fluxo de teste:
+
+subir backend;
+subir frontend;
+clicar no botão;
+conferir se a API retorna payLink;
+abrir esse link;
+concluir o teste do pagamento;
+ver se o navegador vai para obrigado.html;
+ver se seu endpoint /api/pagbank/webhook recebeu a notificação.
+Passo 8 — quando trocar para produção
+
+Quando estiver funcionando:
+
+troque o endpoint de sandbox pelo endpoint de produção da sua conta;
+troque o token sandbox pelo token real;
+mantenha a mesma lógica de redirect_url, return_url e webhook.
+Passo 9 — erros mais comuns
+1. Colocar token no React
+
+Não faça isso. O token precisa ficar no backend.
+
+2. Usar só a página de obrigado como confirmação
+
+Não faça isso. O status real deve vir do webhook. O PagBank documenta vários estados de pagamento, não apenas aprovação.
+
+3. Webhook inacessível publicamente
+
+A URL do webhook precisa estar pública para o PagBank conseguir fazer POST nela.
+
+4. Não achar o link de pagamento
+
+Você precisa buscar no retorno da API o item de links cujo rel seja PAY. Isso está descrito no objeto checkout.
+
+Passo 10 — checklist final
+
+Você saberá que implementou certo quando isto estiver pronto:
+
+token do PagBank salvo no backend;
+rota POST /api/pagbank/checkout criada;
+payload com:
+redirect_url = https://mentoria.neuralhub.ia.br/obrigado.html
+return_url = https://mentoria.neuralhub.ia.br/
+notification_urls
+payment_notification_urls
+botão React chamando sua API;
+redirecionamento para o payLink;
+rota POST /api/pagbank/webhook funcionando;
+página obrigado.html publicada.
+O caminho mais fácil para você
+
+Como você disse que nunca fez isso, eu te recomendo esta ordem:
+
+criar a página obrigado.html;
+criar a rota backend /api/pagbank/checkout;
+testar essa rota direto no navegador/Postman;
+só depois ligar o botão React;
+por fim configurar o webhook.
+
+Assim você evita tentar tudo ao mesmo tempo.
+
+Exemplo final de payload
+
+Esse é um payload base bom para seu caso:
+
+{
+  "reference_id": "pedido-123",
+  "redirect_url": "https://mentoria.neuralhub.ia.br/obrigado.html",
+  "return_url": "https://mentoria.neuralhub.ia.br/",
+  "notification_urls": [
+    "https://mentoria.neuralhub.ia.br/api/pagbank/webhook"
+  ],
+  "payment_notification_urls": [
+    "https://mentoria.neuralhub.ia.br/api/pagbank/webhook"
+  ],
+  "items": [
+    {
+      "reference_id": "mentoria-001",
+      "name": "Mentoria NeuralHub",
+      "quantity": 1,
+      "unit_amount": 19900
+    }
+  ]
+}
+
+Esse uso está alinhado com os campos documentados no objeto checkout e no endpoint de criação do checkout.
+
+Posso montar agora a versão exata para o seu stack se você me disser qual backend você usa: Next.js, Express, Vite com API separada ou outro.

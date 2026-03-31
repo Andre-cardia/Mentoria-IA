@@ -137,6 +137,30 @@ export default function LandingPageMentoriaIA() {
     "CURRÍCULO VIVO",
   ]);
 
+  const [buyingPlan, setBuyingPlan] = useState(null);
+
+  const handleBuy = async (planId) => {
+    if (buyingPlan) return;
+    setBuyingPlan(planId);
+    try {
+      const response = await fetch("/api/pagbank/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planId }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.payLink) {
+        throw new Error(data?.message || `Erro ${response.status} ao criar pagamento`);
+      }
+      window.location.href = data.payLink;
+    } catch (err) {
+      console.error("[PagBank]", err);
+      alert("Não foi possível iniciar o pagamento. Tente novamente.");
+    } finally {
+      setBuyingPlan(null);
+    }
+  };
+
   return (
     <div
       className="min-h-screen bg-[var(--bg)] text-[var(--text)] selection:bg-[var(--accent)] selection:text-black"
@@ -501,12 +525,13 @@ export default function LandingPageMentoriaIA() {
                   ))}
                 </div>
 
-                <a
-                  href="https://buy.stripe.com/6oU00j3i19bIb316I40RG02"
-                  className="mt-auto border border-[var(--line-strong)] bg-black/40 px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] active:scale-95"
+                <button
+                  onClick={() => handleBuy("mensal")}
+                  disabled={!!buyingPlan}
+                  className="mt-auto border border-[var(--line-strong)] bg-black/40 px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Assinar plano mensal
-                </a>
+                  {buyingPlan === "mensal" ? "Aguarde..." : "Assinar plano mensal"}
+                </button>
               </div>
 
               {/* Plano Anual */}
@@ -547,12 +572,13 @@ export default function LandingPageMentoriaIA() {
                   ))}
                 </div>
 
-                <a
-                  href="https://pag.ae/81DHpnF-r"
-                  className="mt-auto border border-[var(--accent)] bg-[var(--accent)] px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-black transition hover:brightness-110 animate-glow active:scale-95"
+                <button
+                  onClick={() => handleBuy("anual")}
+                  disabled={!!buyingPlan}
+                  className="mt-auto border border-[var(--accent)] bg-[var(--accent)] px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-black transition hover:brightness-110 animate-glow active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Assinar plano anual
-                </a>
+                  {buyingPlan === "anual" ? "Aguarde..." : "Assinar plano anual"}
+                </button>
               </div>
 
             </div>
@@ -943,12 +969,13 @@ export default function LandingPageMentoriaIA() {
                   </div>
                 </div>
 
-                <a
-                  href="https://pag.ae/81CEushnG"
-                  className="mt-3 block border border-black bg-black px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-[var(--text)] transition hover:bg-transparent hover:text-black active:scale-95"
+                <button
+                  onClick={() => handleBuy("mensal")}
+                  disabled={!!buyingPlan}
+                  className="mt-3 block w-full border border-black bg-black px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-[var(--text)] transition hover:bg-transparent hover:text-black active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Assinar mensal
-                </a>
+                  {buyingPlan === "mensal" ? "Aguarde..." : "Assinar mensal"}
+                </button>
 
                 {/* Plano Anual */}
                 <div className="mt-5 border-2 border-black/50 bg-black/20 p-4 relative">
@@ -961,12 +988,13 @@ export default function LandingPageMentoriaIA() {
                   </div>
                 </div>
 
-                <a
-                  href="https://pag.ae/81DHpnF-r"
-                  className="mt-3 block border-2 border-black bg-transparent px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-black transition hover:bg-black/10 active:scale-95"
+                <button
+                  onClick={() => handleBuy("anual")}
+                  disabled={!!buyingPlan}
+                  className="mt-3 block w-full border-2 border-black bg-transparent px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-black transition hover:bg-black/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Assinar anual
-                </a>
+                  {buyingPlan === "anual" ? "Aguarde..." : "Assinar anual"}
+                </button>
 
                 <a
                   href="https://wa.me/5548988549556?text=Quero%20mais%20informa%C3%A7%C3%B5es%20sobre%20a%20mentoria%20cont%C3%ADnua%20de%20IA"
