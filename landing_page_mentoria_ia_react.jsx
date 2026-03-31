@@ -502,7 +502,7 @@ export default function LandingPageMentoriaIA() {
                 </div>
 
                 <a
-                  href="https://pag.ae/81CEushnG"
+                  href="https://buy.stripe.com/6oU00j3i19bIb316I40RG02"
                   className="mt-auto border border-[var(--line-strong)] bg-black/40 px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] active:scale-95"
                 >
                   Assinar plano mensal
