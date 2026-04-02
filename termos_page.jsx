@@ -174,12 +174,11 @@ export default function TermosPage() {
             <p className="mb-4">Reservamos o direito de remover conteúdo inapropriado, ofensivo ou que viole estes Termos.</p>
 
             <h2 className="mt-12 mb-4 text-2xl font-semibold uppercase tracking-[-0.02em] text-[var(--text)]">9. Mentorias e Aulas</h2>
-            <h3 className="mt-8 mb-3 text-xl font-semibold uppercase tracking-[-0.01em] text-[var(--text)]">9.1. Agendamento</h3>
-            <ul className="list-disc pl-6 mb-6 space-y-2 font-mono-tech text-sm text-[var(--muted)]">
-              <li>Mentorias e aulas devem ser agendadas com antecedência</li>
-              <li>Cancelamentos devem ser comunicados com no mínimo 24 horas de antecedência</li>
-              <li>Não comparecimento pode resultar em perda da sessão</li>
-            </ul>
+            <h3 className="mt-8 mb-3 text-xl font-semibold uppercase tracking-[-0.01em] text-[var(--text)]">9.1. Programação e Datas</h3>
+            <p className="mb-4">A definição, organização e eventual alteração do calendário das mentorias são de competência exclusiva da CONTRATADA, não cabendo ao CONTRATANTE qualquer ingerência sobre datas, horários ou periodicidade.</p>
+            <p className="mb-4">As sessões serão, em caráter ordinário, realizadas em dias previamente estipulados pela CONTRATADA, preferencialmente às terças e quintas-feiras, conforme cronograma previamente divulgado.</p>
+            <p className="mb-4">A CONTRATADA reserva-se o direito de alterar, remanejar, suspender ou reagendar as sessões, independentemente de anuência prévia do CONTRATANTE, nas hipóteses de feriados, casos fortuitos, força maior ou quaisquer outras circunstâncias que possam comprometer a realização regular das atividades.</p>
+            <p className="mb-4">Nesses casos, a CONTRATADA compromete-se a comunicar previamente os participantes, sempre que possível, não sendo tais alterações consideradas descumprimento contratual ou motivo para rescisão, reembolso ou indenização de qualquer natureza.</p>
 
             <h3 className="mt-8 mb-3 text-xl font-semibold uppercase tracking-[-0.01em] text-[var(--text)]">9.2. Gravação</h3>
             <ul className="list-disc pl-6 mb-6 space-y-2 font-mono-tech text-sm text-[var(--muted)]">

@@ -107,10 +107,15 @@ Reservamos o direito de remover conteúdo inapropriado, ofensivo ou que viole es
 
 ## 9. Mentorias e Aulas
 
-### 9.1. Agendamento
-- Mentorias e aulas devem ser agendadas com antecedência
-- Cancelamentos devem ser comunicados com no mínimo 24 horas de antecedência
-- Não comparecimento pode resultar em perda da sessão
+### 9.1. Programação e Datas
+
+A definição, organização e eventual alteração do calendário das mentorias são de competência exclusiva da CONTRATADA, não cabendo ao CONTRATANTE qualquer ingerência sobre datas, horários ou periodicidade.
+
+As sessões serão, em caráter ordinário, realizadas em dias previamente estipulados pela CONTRATADA, preferencialmente às terças e quintas-feiras, conforme cronograma previamente divulgado.
+
+A CONTRATADA reserva-se o direito de alterar, remanejar, suspender ou reagendar as sessões, independentemente de anuência prévia do CONTRATANTE, nas hipóteses de feriados, casos fortuitos, força maior ou quaisquer outras circunstâncias que possam comprometer a realização regular das atividades.
+
+Nesses casos, a CONTRATADA compromete-se a comunicar previamente os participantes, sempre que possível, não sendo tais alterações consideradas descumprimento contratual ou motivo para rescisão, reembolso ou indenização de qualquer natureza.
 
 ### 9.2. Gravação
 - Sessões de mentoria podem ser gravadas para fins de qualidade
