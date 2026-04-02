@@ -1007,7 +1007,8 @@ export default function LandingPageMentoriaIA() {
                   Neural Hub<br />
                   Mentoria recorrente em grupo<br />
                   Parque São Jorge, Florianópolis + online<br />
-                  Apoio: Innovation Center
+                  Apoio: Innovation Center<br />
+                  HAC Assessoria e Consultoria Ltda - CNPJ: 24.043.876/0001-83
                 </div>
               </div>
             </div>
