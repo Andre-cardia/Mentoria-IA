@@ -19,6 +19,8 @@ export default defineConfig({
         lead:     resolve(__dirname, 'lead.html'),
         brand:    resolve(__dirname, 'brand.html'),
         obrigado: resolve(__dirname, 'obrigado.html'),
+        privacidade: resolve(__dirname, 'privacidade.html'),
+        termos: resolve(__dirname, 'termos.html'),
       },
     },
   },

@@ -556,9 +556,17 @@ export default function LeadCaptureMentoriaIA() {
             <div className="h-2 w-2 bg-[var(--accent)]" />
             <span className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-[var(--muted)]">Neural Hub · Zero-to-Hero IA · 2026</span>
           </div>
-          <a href="/" className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-[var(--muted)] transition hover:text-[var(--accent)]">
-            Ver página completa do programa
-          </a>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <a href="/privacidade.html" className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-[var(--muted)] transition hover:text-[var(--accent)]">
+              Política de Privacidade
+            </a>
+            <a href="/termos.html" className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-[var(--muted)] transition hover:text-[var(--accent)]">
+              Termos de Uso
+            </a>
+            <a href="/" className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-[var(--muted)] transition hover:text-[var(--accent)]">
+              Ver página completa do programa
+            </a>
+          </div>
         </div>
       </footer>
     </div>

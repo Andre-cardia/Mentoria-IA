@@ -1008,7 +1008,12 @@ export default function LandingPageMentoriaIA() {
                   Mentoria recorrente em grupo<br />
                   Parque São Jorge, Florianópolis + online<br />
                   Apoio: Innovation Center<br />
-                  HAC Assessoria e Consultoria Ltda - CNPJ: 24.043.876/0001-83
+                  HAC Assessoria e Consultoria Ltda<br />
+                  CNPJ: 24.043.876/0001-83<br />
+                  <br />
+                  <a href="/privacidade.html" className="font-bold underline hover:text-black">Política de Privacidade</a>
+                  {" | "}
+                  <a href="/termos.html" className="font-bold underline hover:text-black">Termos de Uso</a>
                 </div>
               </div>
             </div>
