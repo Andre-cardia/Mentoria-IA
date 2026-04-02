@@ -3,7 +3,13 @@
     "allow": [
       "Bash(unzip -l \"d:\\\\GitHub\\\\Mentoria-IA/SKILLS/design-pattern.skill\")",
       "Bash(unzip -p \"d:\\\\GitHub\\\\Mentoria-IA/SKILLS/design-pattern.skill\" \"design-pattern/SKILL.md\")",
-      "Bash(npm install @supabase/supabase-js)"
+      "Bash(npm install @supabase/supabase-js)",
+      "Bash(ls -la d:/GitHub/Mentoria-IA/*.html)",
+      "Bash(find d:/GitHub/Mentoria-IA -maxdepth 2 -type f \\\\\\(-name *.ts -o -name *.js \\\\\\) ! -path */node_modules/* ! -path */.git/*)",
+      "Bash(npm install:*)",
+      "Bash(taskkill //PID 10880 //F)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //PID 37720 //F)"
     ]
   }
 }

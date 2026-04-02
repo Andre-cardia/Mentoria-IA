@@ -1,0 +1,126 @@
+========================================
+REQUEST — Sandbox
+========================================
+POST https://sandbox.api.pagseguro.com/checkouts
+Authorization: Bearer AB3D6B514666440E82543B7AA849BC92
+Content-Type: application/json
+
+{
+  "reference_id": "mensal-1774958476028",
+  "redirect_url": "https://mentoria.neuralhub.ia.br/obrigado.html",
+  "return_url": "https://mentoria.neuralhub.ia.br/",
+  "notification_urls": [
+    "https://mentoria.neuralhub.ia.br/api/pagbank/webhook"
+  ],
+  "payment_notification_urls": [
+    "https://mentoria.neuralhub.ia.br/api/pagbank/webhook"
+  ],
+  "items": [
+    {
+      "reference_id": "mensal-1774958476028",
+      "name": "Mentoria NeuralHub — Plano Mensal",
+      "quantity": 1,
+      "unit_amount": 49700
+    }
+  ]
+}
+
+========================================
+RESPONSE — Sandbox (HTTP 201 Created)
+========================================
+{
+  "id": "ORDE_EB7B5676-8C0A-4899-BFC0-3900E927712F",
+  "reference_id": "mensal-1774958476028",
+  "created_at": "2026-03-31T09:05:02.898-03:00",
+  "customer": {
+    "name": "ANDRE CARDIA",
+    "email": "andre.cardia@gmail.com",
+    "tax_id": "01865142719",
+    "phones": [
+      {
+        "type": "MOBILE",
+        "country": "55",
+        "area": "48",
+        "number": "988549556"
+      }
+    ]
+  },
+  "items": [
+    {
+      "reference_id": "mensal-1774958476028",
+      "name": "Mentoria NeuralHub — Plano Mensal",
+      "quantity": 1,
+      "unit_amount": 49700
+    }
+  ],
+  "charges": [
+    {
+      "id": "CHAR_BEF20A3D-40FF-488E-9E62-64424F8725DF",
+      "reference_id": "mensal-1774958476028",
+      "status": "PAID",
+      "created_at": "2026-03-31T09:05:03.483-03:00",
+      "paid_at": "2026-03-31T09:05:04.000-03:00",
+      "amount": {
+        "value": 49700,
+        "currency": "BRL",
+        "summary": {
+          "total": 49700,
+          "paid": 49700,
+          "refunded": 0
+        }
+      },
+      "payment_method": {
+        "type": "CREDIT_CARD",
+        "installments": 1,
+        "capture": true,
+        "card": {
+          "brand": "visa",
+          "first_digits": "411111",
+          "last_digits": "1111",
+          "exp_month": "12",
+          "exp_year": "2030"
+        }
+      }
+    }
+  ],
+  "notification_urls": [
+    "https://mentoria.neuralhub.ia.br/api/pagbank/webhook"
+  ],
+  "links": [
+    {
+      "rel": "SELF",
+      "href": "https://sandbox.api.pagseguro.com/orders/ORDE_EB7B5676-8C0A-4899-BFC0-3900E927712F",
+      "media": "application/json",
+      "type": "GET"
+    },
+    {
+      "rel": "PAY",
+      "href": "https://pagamento.sandbox.pagbank.com.br/pagamento?code=3bb62db8-2739-44a4-b52c-04c045900ba3",
+      "media": "application/json",
+      "type": "GET"
+    }
+  ]
+}
+
+========================================
+OBSERVAÇÃO
+========================================
+No ambiente sandbox o checkout funcionou perfeitamente:
+- Link de pagamento (rel=PAY) retornado com sucesso
+- Pagamento concluído via cartão Visa de teste
+- Webhook recebido com status PAID
+- Registro salvo no Supabase
+
+No ambiente de PRODUÇÃO, o mesmo request retorna:
+HTTP 401
+{
+  "error_messages": [
+    {
+      "error": "allowlist_access_required",
+      "description": "Allowlist access required. Contact PagBank."
+    }
+  ]
+}
+
+Conta: comercial@c4marketing.com.br
+Token de produção: d8c0e757-2db4-439e-814c-1023f22a09155663685c4c808eef8e3b4b81654abfc158f3-7775-4e82-b460-1a4f996970f0
