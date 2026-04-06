@@ -14,7 +14,9 @@ const AvisosPage       = lazy(() => import('./plataforma/pages/AvisosPage'));
 const AdminModulosPage = lazy(() => import('./plataforma/pages/admin/AdminModulosPage'));
 const AdminAulasPage   = lazy(() => import('./plataforma/pages/admin/AdminAulasPage'));
 const AdminMateriaisPage = lazy(() => import('./plataforma/pages/admin/AdminMateriaisPage'));
-const AdminAvisosPage  = lazy(() => import('./plataforma/pages/admin/AdminAvisosPage'));
+const AdminAvisosPage    = lazy(() => import('./plataforma/pages/admin/AdminAvisosPage'));
+const LessonPage         = lazy(() => import('./plataforma/pages/LessonPage'));
+const AdminProgressoPage = lazy(() => import('./plataforma/pages/admin/AdminProgressoPage'));
 
 const Fallback = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg)' }}>
@@ -33,15 +35,17 @@ createRoot(document.getElementById('root')).render(
 
             {/* Área do Aluno (autenticado) */}
             <Route path="/modulos"   element={<ProtectedRoute><ModulosPage /></ProtectedRoute>} />
+            <Route path="/modulos/:moduleId/aulas/:lessonId" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
             <Route path="/forum"     element={<ProtectedRoute><ForumPage /></ProtectedRoute>} />
             <Route path="/materiais" element={<ProtectedRoute><MateriaisPage /></ProtectedRoute>} />
             <Route path="/avisos"    element={<ProtectedRoute><AvisosPage /></ProtectedRoute>} />
 
             {/* Área de Admin */}
-            <Route path="/admin/modulos"   element={<AdminRoute><AdminModulosPage /></AdminRoute>} />
-            <Route path="/admin/aulas"     element={<AdminRoute><AdminAulasPage /></AdminRoute>} />
-            <Route path="/admin/materiais" element={<AdminRoute><AdminMateriaisPage /></AdminRoute>} />
-            <Route path="/admin/avisos"    element={<AdminRoute><AdminAvisosPage /></AdminRoute>} />
+            <Route path="/admin/modulos"    element={<AdminRoute><AdminModulosPage /></AdminRoute>} />
+            <Route path="/admin/aulas"      element={<AdminRoute><AdminAulasPage /></AdminRoute>} />
+            <Route path="/admin/materiais"  element={<AdminRoute><AdminMateriaisPage /></AdminRoute>} />
+            <Route path="/admin/avisos"     element={<AdminRoute><AdminAvisosPage /></AdminRoute>} />
+            <Route path="/admin/progresso"  element={<AdminRoute><AdminProgressoPage /></AdminRoute>} />
 
             {/* Redirect padrão */}
             <Route path="*" element={<Navigate to="/modulos" replace />} />

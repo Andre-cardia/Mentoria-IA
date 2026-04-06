@@ -12,7 +12,8 @@ Desenvolver uma plataforma web que permita ao mentor gerenciar e aos alunos cons
 
 | ID | Título | Status |
 |----|--------|--------|
-| 1.1 | Criação da Plataforma da Mentoria | Draft |
+| 1.1 | Criação da Plataforma da Mentoria | InReview |
+| 1.2 | Player de Vídeo e Progresso do Aluno | Draft |
 
 ## Requisitos Funcionais
 

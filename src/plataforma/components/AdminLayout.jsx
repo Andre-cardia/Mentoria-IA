@@ -2,9 +2,10 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ADMIN_NAV = [
-  { to: '/admin/modulos',   label: 'Módulos & Aulas' },
-  { to: '/admin/materiais', label: 'Materiais' },
-  { to: '/admin/avisos',    label: 'Avisos' },
+  { to: '/admin/modulos',    label: 'Módulos & Aulas' },
+  { to: '/admin/materiais',  label: 'Materiais' },
+  { to: '/admin/avisos',     label: 'Avisos' },
+  { to: '/admin/progresso',  label: 'Progresso' },
 ];
 
 const ALUNO_NAV = [

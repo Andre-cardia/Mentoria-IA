@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
+import { useLessonProgress } from '../hooks/useLessonProgress';
 
 export default function ModulosPage() {
   const [modules, setModules] = useState([]);
   const [openModule, setOpenModule] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const { isComplete, getModuleProgress, getTotalProgress } = useLessonProgress();
 
   useEffect(() => {
     async function load() {
@@ -30,13 +33,36 @@ export default function ModulosPage() {
     return `${m}:${String(s).padStart(2, '0')}`;
   }
 
+  const totalProgress = getTotalProgress(modules);
+
   return (
     <Layout>
       <div style={{ maxWidth: '800px' }}>
         <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
           Conteúdo
         </div>
-        <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '32px' }}>Módulos & Aulas</h1>
+        <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '16px' }}>Módulos & Aulas</h1>
+
+        {/* Progresso geral */}
+        {totalProgress.total > 0 && (
+          <div style={{ marginBottom: '32px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '.85rem' }}>
+              <span style={{ color: 'var(--muted)' }}>Progresso geral</span>
+              <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--accent)' }}>
+                {totalProgress.completed} / {totalProgress.total} aulas
+              </span>
+            </div>
+            <div style={{ height: '4px', background: 'var(--line)', borderRadius: '2px', overflow: 'hidden' }}>
+              <div style={{
+                height: '100%',
+                width: `${(totalProgress.completed / totalProgress.total) * 100}%`,
+                background: 'var(--accent)',
+                borderRadius: '2px',
+                transition: 'width .3s',
+              }} />
+            </div>
+          </div>
+        )}
 
         {loading && <p style={{ color: 'var(--muted)' }}>Carregando módulos...</p>}
         {error && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
@@ -70,14 +96,32 @@ export default function ModulosPage() {
                   )}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0, marginLeft: '16px' }}>
-                  <span style={{
-                    fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
-                    color: 'var(--muted)', background: 'rgba(255,255,255,.05)',
-                    border: '1px solid var(--line)', borderRadius: '3px',
-                    padding: '2px 10px',
-                  }}>
-                    {mod.lessons?.length ?? 0} aula{mod.lessons?.length !== 1 ? 's' : ''}
-                  </span>
+                  {(() => {
+                    const mp = getModuleProgress(mod.id, mod.lessons ?? []);
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                        <span style={{
+                          fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
+                          color: mp.completed > 0 ? 'var(--accent)' : 'var(--muted)',
+                          background: 'rgba(255,255,255,.05)',
+                          border: '1px solid var(--line)', borderRadius: '3px',
+                          padding: '2px 10px',
+                        }}>
+                          {mp.completed}/{mp.total} aula{mp.total !== 1 ? 's' : ''}
+                        </span>
+                        {mp.total > 0 && (
+                          <div style={{ width: '80px', height: '3px', background: 'var(--line)', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{
+                              height: '100%',
+                              width: `${(mp.completed / mp.total) * 100}%`,
+                              background: 'var(--accent)',
+                              borderRadius: '2px',
+                            }} />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                   <span style={{ color: 'var(--accent)', fontSize: '1rem' }}>
                     {openModule === mod.id ? '▲' : '▼'}
                   </span>
@@ -112,8 +156,20 @@ export default function ModulosPage() {
                           {idx + 1}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: 500, fontSize: '.95rem', color: 'var(--text)' }}>
-                            {lesson.title}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontWeight: 500, fontSize: '.95rem', color: 'var(--text)' }}>
+                              {lesson.title}
+                            </span>
+                            {isComplete(lesson.id) && (
+                              <span style={{
+                                fontFamily: 'Space Mono, monospace', fontSize: '.65rem',
+                                color: '#4ade80', background: 'rgba(34,197,94,.1)',
+                                border: '1px solid rgba(34,197,94,.25)', borderRadius: '3px',
+                                padding: '1px 6px',
+                              }}>
+                                ✓ Concluída
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
@@ -123,17 +179,16 @@ export default function ModulosPage() {
                             </span>
                           )}
                           {lesson.video_url && (
-                            <a href={lesson.video_url} target="_blank" rel="noopener noreferrer" style={{
-                              padding: '6px 16px', background: 'var(--accent)', color: '#000',
-                              borderRadius: '4px', fontFamily: 'Space Grotesk, sans-serif',
-                              fontWeight: 700, fontSize: '.8rem', textDecoration: 'none',
-                              transition: 'opacity .15s',
-                            }}
-                            onMouseOver={(e) => e.currentTarget.style.opacity = '.85'}
-                            onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+                            <Link
+                              to={`/modulos/${mod.id}/aulas/${lesson.id}`}
+                              style={{
+                                padding: '6px 16px', background: 'var(--accent)', color: '#000',
+                                borderRadius: '4px', fontFamily: 'Space Grotesk, sans-serif',
+                                fontWeight: 700, fontSize: '.8rem', textDecoration: 'none',
+                              }}
                             >
                               Assistir
-                            </a>
+                            </Link>
                           )}
                         </div>
                       </div>
