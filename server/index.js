@@ -3,6 +3,7 @@ import cors from "cors";
 import { fileURLToPath } from "url";
 import path from "path";
 import pagbankRoutes from "./routes/pagbank.js";
+import materialsRoutes from "./routes/materials.js";
 import { PORT } from "./config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,6 +15,9 @@ app.use(express.json());
 
 // Rotas da API de pagamento
 app.use("/api/pagbank", pagbankRoutes);
+
+// Rotas da plataforma — materiais (upload/download S3)
+app.use("/api/materials", materialsRoutes);
 
 // Em produção, servir o build estático do Vite
 if (process.env.NODE_ENV === "production") {

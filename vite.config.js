@@ -4,6 +4,13 @@ import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  test: {
+    environment: 'happy-dom',
+    globals: true,
+    setupFiles: './src/test/setup.js',
+    include: ['src/**/*.test.{js,jsx,ts,tsx}', 'server/**/*.test.{js,ts}'],
+    coverage: { provider: 'v8', reporter: ['text', 'html'] },
+  },
   server: {
     proxy: {
       "/api": {
@@ -21,6 +28,7 @@ export default defineConfig({
         obrigado: resolve(__dirname, 'obrigado.html'),
         privacidade: resolve(__dirname, 'privacidade.html'),
         termos: resolve(__dirname, 'termos.html'),
+        plataforma: resolve(__dirname, 'plataforma.html'),
       },
     },
   },

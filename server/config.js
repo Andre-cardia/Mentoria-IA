@@ -21,3 +21,9 @@ export const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "";
 export const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || "";
 
 export const PORT = process.env.PORT || 3001;
+
+// AWS S3 — Materiais da Plataforma
+export const AWS_BUCKET = process.env.AWS_BUCKET || "";
+export const AWS_REGION = process.env.AWS_REGION || "us-east-1";
+export const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID || "";
+export const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY || "";
