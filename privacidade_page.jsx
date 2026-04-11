@@ -15,6 +15,11 @@ export default function PrivacidadePage() {
         ["--muted"]: "#8b867c",
         ["--accent"]: "#ff6a00",
         ["--accent-soft"]: "rgba(255,106,0,.14)",
+        ["--green"]: "#84cc16",
+        ["--error"]: "#ef4444",
+        ["--error-soft"]: "rgba(239,68,68,.08)",
+        ["--warning"]: "#f59e0b",
+        ["--warning-soft"]: "rgba(245,158,11,.08)",
         fontFamily: '"Space Grotesk", "Arial Narrow", sans-serif',
       }}
     >
@@ -27,6 +32,20 @@ export default function PrivacidadePage() {
             linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
             linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px);
           background-size: 34px 34px;
+        }
+        :focus-visible {
+          outline: 2px solid var(--accent);
+          outline-offset: 2px;
+          border-radius: 2px;
+        }
+        :focus:not(:focus-visible) { outline: none; }
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+          }
         }
       `}</style>
 

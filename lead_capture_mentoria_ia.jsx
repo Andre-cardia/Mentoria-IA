@@ -135,7 +135,12 @@ export default function LeadCaptureMentoriaIA() {
     "--text": "#f5f2ea",
     "--muted": "#8b867c",
     "--accent": "#ff6a00",
+    "--accent-soft": "rgba(255,106,0,.14)",
     "--green": "#84cc16",
+    "--error": "#ef4444",
+    "--error-soft": "rgba(239,68,68,.08)",
+    "--warning": "#f59e0b",
+    "--warning-soft": "rgba(245,158,11,.08)",
     fontFamily: '"Space Grotesk", "Arial Narrow", sans-serif',
   };
 
@@ -210,6 +215,33 @@ export default function LeadCaptureMentoriaIA() {
           -webkit-box-shadow: 0 0 0 1000px #101010 inset !important;
           -webkit-text-fill-color: #f5f2ea !important;
           caret-color: #f5f2ea;
+        }
+        /* ── Focus visible ── */
+        :focus-visible {
+          outline: 2px solid var(--accent);
+          outline-offset: 2px;
+          border-radius: 2px;
+        }
+        :focus:not(:focus-visible) { outline: none; }
+        /* ── Input states ── */
+        .input-error-state { border-color: var(--error) !important; }
+        .input-error-msg {
+          font-family: "Space Mono", monospace;
+          font-size: 0.65rem;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--error);
+          margin-top: 4px;
+          display: block;
+        }
+        /* ── Reduced motion ── */
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+          }
         }
       `}</style>
 
@@ -448,7 +480,7 @@ export default function LeadCaptureMentoriaIA() {
                           )}
                         </button>
                         {submitError && (
-                          <div className="mt-3 border border-red-500/30 bg-red-500/10 p-3 font-mono-tech text-xs leading-5 text-red-400">
+                          <div className="mt-3 p-3 font-mono-tech text-xs leading-5" style={{border:'1px solid rgba(239,68,68,.3)',background:'rgba(239,68,68,.06)',color:'var(--error)',borderRadius:'4px'}}>
                             {submitError}
                           </div>
                         )}
@@ -588,11 +620,11 @@ function Field({ label, name, type = "text", value, onChange, error, placeholder
         onChange={onChange}
         placeholder={placeholder}
         className={`mt-2 w-full border bg-[var(--panel)] px-4 py-3 font-mono-tech text-sm text-[var(--text)] placeholder-[var(--muted)] outline-none transition focus:border-[var(--accent)] ${
-          error ? "border-red-500" : "border-[var(--line-strong)]"
+          error ? "input-error-state" : "border-[var(--line-strong)]"
         }`}
       />
       {error && (
-        <div className="mt-1 font-mono-tech text-[10px] uppercase tracking-[0.18em] text-red-400">{error}</div>
+        <span className="input-error-msg">✕ {error}</span>
       )}
     </div>
   );
@@ -610,7 +642,7 @@ function SelectField({ label, name, value, onChange, error, options }) {
           value={value}
           onChange={onChange}
           className={`w-full border bg-[var(--panel)] px-4 py-3 font-mono-tech text-sm text-[var(--text)] outline-none transition focus:border-[var(--accent)] appearance-none cursor-pointer ${
-            error ? "border-red-500" : "border-[var(--line-strong)]"
+            error ? "input-error-state" : "border-[var(--line-strong)]"
           } ${!value ? "text-[var(--muted)]" : ""}`}
         >
           <option value="" disabled className="text-[var(--muted)] bg-[var(--panel)]">Selecionar...</option>
@@ -625,7 +657,7 @@ function SelectField({ label, name, value, onChange, error, options }) {
         </div>
       </div>
       {error && (
-        <div className="mt-1 font-mono-tech text-[10px] uppercase tracking-[0.18em] text-red-400">{error}</div>
+        <span className="input-error-msg">✕ {error}</span>
       )}
     </div>
   );

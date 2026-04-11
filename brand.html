@@ -417,6 +417,100 @@
         padding: 32px 24px;
       }
     }
+
+    /* ─── Extended color tokens ─── */
+    :root {
+      --error:        #ef4444;
+      --error-soft:   rgba(239,68,68,.08);
+      --warning:      #f59e0b;
+      --warning-soft: rgba(245,158,11,.08);
+    }
+
+    /* ─── Input state variants ─── */
+    .input-error         { border-color: rgba(239,68,68,.5) !important; }
+    .input-error:focus   { border-color: var(--error) !important; }
+    .input-success       { border-color: rgba(132,204,22,.4) !important; }
+    .input-success:focus { border-color: var(--green) !important; }
+    .input-helper {
+      font-family: 'Space Mono', monospace;
+      font-size: .65rem;
+      margin-top: 6px;
+      display: block;
+    }
+    .error-msg   { color: var(--error); }
+    .success-msg { color: var(--green); }
+
+    /* ─── Spinner ─── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,106,0,.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    .spinner-sm { width: 13px; height: 13px; }
+    .spinner-lg { width: 28px; height: 28px; border-width: 3px; }
+
+    /* ─── Skeleton shimmer ─── */
+    @keyframes shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position:  600px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(
+        90deg,
+        var(--panel) 0%,
+        rgba(255,255,255,.06) 50%,
+        var(--panel) 100%
+      );
+      background-size: 1200px 100%;
+      animation: shimmer 1.6s ease-in-out infinite;
+      border-radius: 4px;
+    }
+
+    /* ─── Toast ─── */
+    .toast {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: 6px;
+      border: 1px solid;
+      font-size: .875rem;
+      line-height: 1.55;
+      max-width: 440px;
+    }
+    .toast-info    { background: var(--panel);             border-color: var(--line-strong); }
+    .toast-success { background: rgba(132,204,22,.06);     border-color: rgba(132,204,22,.3); }
+    .toast-warning { background: rgba(245,158,11,.06);     border-color: rgba(245,158,11,.3); }
+    .toast-error   { background: rgba(239,68,68,.06);      border-color: rgba(239,68,68,.3);  }
+
+    /* ─── Modal demo ─── */
+    .modal-demo-overlay {
+      background: rgba(0,0,0,.65);
+      border-radius: 8px;
+      padding: 48px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+    }
+    .modal-box {
+      background: var(--panel);
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      padding: 32px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    /* ─── WCAG helpers ─── */
+    .wcag-pass { color: var(--green); font-family: 'Space Mono', monospace; font-size: .7rem; }
+    .wcag-fail { color: var(--error); font-family: 'Space Mono', monospace; font-size: .7rem; }
+    .wcag-warn { color: var(--warning); font-family: 'Space Mono', monospace; font-size: .7rem; }
   </style>
 </head>
 <body>
@@ -432,7 +526,7 @@
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:24px;">
-      <span class="badge badge-accent">v1.0</span>
+      <span class="badge badge-accent">v1.1</span>
       <a href="/" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:.7rem;text-decoration:none;letter-spacing:.06em;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">← SITE PRINCIPAL</a>
     </div>
   </div>
@@ -463,6 +557,12 @@
       <div style="margin:12px 0;border-top:1px solid var(--line);"></div>
       <a class="nav-link" href="#voice">Voz & Tom</a>
       <a class="nav-link" href="#principles">Princípios</a>
+      <div style="margin:12px 0;border-top:1px solid var(--line);"></div>
+      <a class="nav-link" href="#form-states">Form States</a>
+      <a class="nav-link" href="#loading">Loading</a>
+      <a class="nav-link" href="#toasts">Toasts & Alerts</a>
+      <a class="nav-link" href="#modal">Modal</a>
+      <a class="nav-link" href="#accessibility">Acessibilidade</a>
     </nav>
   </aside>
 
@@ -495,7 +595,7 @@
             <div style="font-size:.875rem;color:var(--muted);">Animações</div>
           </div>
           <div class="stat-card">
-            <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:4px;">6</div>
+            <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:4px;">10</div>
             <div style="font-size:.875rem;color:var(--muted);">Componentes</div>
           </div>
         </div>
@@ -1445,6 +1545,260 @@
         </div>
       </section>
 
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ FORM STATES ════════ -->
+      <section id="form-states" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">16 — ESTADOS DE FORMULÁRIO</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Estados de Input</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Inputs precisam comunicar feedback de validação com clareza: erro, sucesso, loading e desabilitado.</p>
+
+        <div style="max-width:520px;display:flex;flex-direction:column;gap:20px;margin-bottom:32px;">
+          <!-- Error -->
+          <div>
+            <label style="display:block;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">E-mail *</label>
+            <input class="input-base input-error" type="email" value="emailinvalido" readonly />
+            <span class="input-helper error-msg">✕ Formato de e-mail inválido</span>
+          </div>
+          <!-- Success -->
+          <div>
+            <label style="display:block;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Nome *</label>
+            <input class="input-base input-success" type="text" value="André Cardia" readonly />
+            <span class="input-helper success-msg">✓ Campo validado com sucesso</span>
+          </div>
+          <!-- Disabled -->
+          <div>
+            <label style="display:block;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Código de acesso</label>
+            <input class="input-base" type="text" placeholder="Gerado automaticamente" disabled style="opacity:.4;cursor:not-allowed;" />
+            <span class="input-helper" style="color:var(--muted);">Campo preenchido pelo sistema</span>
+          </div>
+        </div>
+
+        <table class="token-table" style="border:1px solid var(--line);border-radius:8px;overflow:hidden;">
+          <thead>
+            <tr><th>Estado</th><th>Border</th><th>Mensagem auxiliar</th><th>Opacity</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">Default</td><td style="font-family:'Space Mono',monospace;font-size:.8rem;color:var(--muted);">--line-strong</td><td style="color:var(--muted);">—</td><td style="color:var(--muted);">1</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">Focus</td><td style="font-family:'Space Mono',monospace;font-size:.8rem;color:var(--muted);">--accent</td><td style="color:var(--muted);">—</td><td style="color:var(--muted);">1</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--error);">Error</td><td style="font-family:'Space Mono',monospace;font-size:.8rem;color:var(--muted);">rgba(239,68,68,.5)</td><td style="color:var(--error);font-size:.85rem;">✕ Mensagem de erro</td><td style="color:var(--muted);">1</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--green);">Success</td><td style="font-family:'Space Mono',monospace;font-size:.8rem;color:var(--muted);">rgba(132,204,22,.4)</td><td style="color:var(--green);font-size:.85rem;">✓ Campo validado</td><td style="color:var(--muted);">1</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--muted);">Disabled</td><td style="font-family:'Space Mono',monospace;font-size:.8rem;color:var(--muted);">--line-strong</td><td style="color:var(--muted);">Informativo neutro</td><td style="color:var(--muted);">.4</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ LOADING ════════ -->
+      <section id="loading" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">17 — LOADING STATES</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Spinners & Skeletons</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Spinners para ações pontuais. Skeletons para carregamento de blocos de conteúdo — evitam layout shift e transmitem estrutura antes dos dados chegarem.</p>
+
+        <!-- Spinners -->
+        <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Spinners</p>
+        <div class="component-frame" style="justify-content:flex-start;gap:40px;margin-bottom:8px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <div class="spinner spinner-sm"></div>
+            <p class="component-label" style="margin-top:0;">sm · 13px</p>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <div class="spinner"></div>
+            <p class="component-label" style="margin-top:0;">md · 18px</p>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <div class="spinner spinner-lg"></div>
+            <p class="component-label" style="margin-top:0;">lg · 28px</p>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <button class="btn-primary" style="pointer-events:none;gap:10px;">
+              <div class="spinner spinner-sm" style="border-top-color:#000;border-color:rgba(0,0,0,.2);"></div>
+              ENVIANDO...
+            </button>
+            <p class="component-label" style="margin-top:0;">Botão loading</p>
+          </div>
+        </div>
+        <p class="component-label" style="margin-bottom:32px;">border: 2px · border-top-color: --accent · animation: spin .7s linear infinite</p>
+
+        <!-- Skeletons -->
+        <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Skeleton Screens</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="card-base" style="display:flex;flex-direction:column;gap:12px;">
+            <div class="skeleton" style="height:11px;width:60px;"></div>
+            <div class="skeleton" style="height:20px;width:80%;"></div>
+            <div class="skeleton" style="height:13px;width:100%;"></div>
+            <div class="skeleton" style="height:13px;width:65%;"></div>
+          </div>
+          <div class="card-base" style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="skeleton" style="width:40px;height:40px;border-radius:50%;flex-shrink:0;"></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+                <div class="skeleton" style="height:13px;width:70%;"></div>
+                <div class="skeleton" style="height:11px;width:40%;"></div>
+              </div>
+            </div>
+            <div class="skeleton" style="height:13px;width:100%;"></div>
+            <div class="skeleton" style="height:13px;width:55%;"></div>
+          </div>
+        </div>
+        <p class="component-label" style="margin-top:12px;">background: shimmer gradient 1200px · animation: shimmer 1.6s ease-in-out infinite</p>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ TOASTS ════════ -->
+      <section id="toasts" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">18 — ALERTAS & NOTIFICAÇÕES</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Toasts & Alerts</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Feedback rápido e contextual. Toasts aparecem sobrepostos (canto inferior direito). Alerts inline substituem seções de conteúdo ou aparecem abaixo de formulários.</p>
+
+        <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Variantes</p>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px;">
+          <div class="toast toast-success">
+            <span style="color:var(--green);font-size:1.1rem;flex-shrink:0;margin-top:1px;">✓</span>
+            <div>
+              <p style="font-weight:600;margin-bottom:3px;">Inscrição confirmada</p>
+              <p style="color:var(--muted);font-size:.8rem;">Você receberá um e-mail de confirmação em breve.</p>
+            </div>
+          </div>
+          <div class="toast toast-error">
+            <span style="color:var(--error);font-size:1.1rem;flex-shrink:0;margin-top:1px;">✕</span>
+            <div>
+              <p style="font-weight:600;margin-bottom:3px;">Erro ao processar pagamento</p>
+              <p style="color:var(--muted);font-size:.8rem;">Verifique os dados do cartão e tente novamente.</p>
+            </div>
+          </div>
+          <div class="toast toast-warning">
+            <span style="color:var(--warning);font-size:1.1rem;flex-shrink:0;margin-top:1px;">⚠</span>
+            <div>
+              <p style="font-weight:600;margin-bottom:3px;">Apenas 3 vagas restantes</p>
+              <p style="color:var(--muted);font-size:.8rem;">Esta turma fecha em breve. Garanta sua vaga agora.</p>
+            </div>
+          </div>
+          <div class="toast toast-info">
+            <span style="color:var(--muted);font-size:1.1rem;flex-shrink:0;margin-top:1px;">ℹ</span>
+            <div>
+              <p style="font-weight:600;margin-bottom:3px;">Novos módulos disponíveis</p>
+              <p style="color:var(--muted);font-size:.8rem;">O Módulo 05 — Agentes Avançados foi liberado para acesso.</p>
+            </div>
+          </div>
+        </div>
+
+        <table class="token-table" style="border:1px solid var(--line);border-radius:8px;overflow:hidden;">
+          <thead>
+            <tr><th>Tipo</th><th>Background</th><th>Border</th><th>Ícone</th><th>Uso</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--green);">Success</td><td style="color:var(--muted);font-size:.85rem;">green .06</td><td style="color:var(--muted);font-size:.85rem;">green .3</td><td style="color:var(--green);">✓</td><td style="color:var(--muted);">Ação concluída</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--error);">Error</td><td style="color:var(--muted);font-size:.85rem;">red .06</td><td style="color:var(--muted);font-size:.85rem;">red .3</td><td style="color:var(--error);">✕</td><td style="color:var(--muted);">Erro crítico</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--warning);">Warning</td><td style="color:var(--muted);font-size:.85rem;">amber .06</td><td style="color:var(--muted);font-size:.85rem;">amber .3</td><td style="color:var(--warning);">⚠</td><td style="color:var(--muted);">Urgência / Atenção</td></tr>
+            <tr><td style="font-family:'Space Mono',monospace;color:var(--muted);">Info</td><td style="color:var(--muted);font-size:.85rem;">--panel</td><td style="color:var(--muted);font-size:.85rem;">--line-strong</td><td style="color:var(--muted);">ℹ</td><td style="color:var(--muted);">Informativo neutro</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ MODAL ════════ -->
+      <section id="modal" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">19 — MODAL & OVERLAYS</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Diálogos e Sobreposições</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Modais capturam atenção para ações críticas ou contextuais. Sempre com overlay escuro e foco no conteúdo central. Fechar com ESC ou clicar fora do modal deve ser sempre suportado.</p>
+
+        <!-- Modal demo -->
+        <div class="modal-demo-overlay" style="margin-bottom:24px;">
+          <div class="modal-box">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;">
+              <div>
+                <div class="badge badge-accent" style="margin-bottom:10px;">ACESSO EXCLUSIVO</div>
+                <h3 style="font-size:1.2rem;font-weight:700;line-height:1.25;">Garantir vaga no Lote 1</h3>
+              </div>
+              <button style="background:transparent;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:4px;line-height:1;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'" aria-label="Fechar">✕</button>
+            </div>
+            <p style="color:var(--muted);font-size:.9rem;line-height:1.65;margin-bottom:24px;">
+              Restam <strong style="color:var(--accent);">8 vagas</strong> no Lote 1. Após o preenchimento, as inscrições fecham e o preço sobe para o próximo lote.
+            </p>
+            <div style="display:flex;gap:12px;justify-content:flex-end;">
+              <button class="btn-ghost" style="padding:10px 20px;">Cancelar</button>
+              <button class="btn-primary" style="padding:10px 24px;animation:none;">GARANTIR VAGA →</button>
+            </div>
+          </div>
+        </div>
+        <p class="component-label">Overlay: rgba(0,0,0,.65) · Modal: --panel · border: --line-strong · border-radius: 8px · padding: 32px · max-width: 480px</p>
+
+        <!-- Anatomy -->
+        <div style="margin-top:32px;">
+          <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Anatomia do Modal</p>
+          <table class="token-table" style="border:1px solid var(--line);border-radius:8px;overflow:hidden;">
+            <thead><tr><th>Zona</th><th>Conteúdo</th><th>Regra</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">Header</td><td style="color:var(--muted);">Badge + Título + Botão fechar</td><td style="color:var(--muted);">Máx. 1 badge, título até H3</td></tr>
+              <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">Body</td><td style="color:var(--muted);">Descrição, formulário ou conteúdo</td><td style="color:var(--muted);">Scrollável se conteúdo longo</td></tr>
+              <tr><td style="font-family:'Space Mono',monospace;color:var(--accent);">Footer</td><td style="color:var(--muted);">Ações: Ghost (cancelar) + Primary (confirmar)</td><td style="color:var(--muted);">Máx. 2 botões, alinhados à direita</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <hr class="section-rule" style="margin-bottom:80px;">
+
+      <!-- ════════ ACCESSIBILITY ════════ -->
+      <section id="accessibility" style="margin-bottom:80px;">
+        <div class="section-eyebrow" style="margin-bottom:8px;">20 — ACESSIBILIDADE</div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Contraste & WCAG 2.1</h2>
+        <p style="color:var(--muted);margin-bottom:40px;">Referência: WCAG 2.1 AA exige mínimo 4.5:1 para texto normal e 3:1 para texto grande (≥18pt ou ≥14pt bold). AAA exige 7:1 e 4.5:1.</p>
+
+        <table class="token-table" style="border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:32px;">
+          <thead>
+            <tr><th>Par de Cores</th><th>Ratio</th><th>AA Normal</th><th>AA Large</th><th>AAA Normal</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-size:.85rem;">--text (#f5f2ea) sobre --bg (#060606)</td>
+              <td style="font-family:'Space Mono',monospace;font-size:.8rem;">18.3:1</td>
+              <td class="wcag-pass">✓ PASS</td><td class="wcag-pass">✓ PASS</td><td class="wcag-pass">✓ PASS</td>
+            </tr>
+            <tr>
+              <td style="font-size:.85rem;">--accent (#ff6a00) sobre --bg (#060606)</td>
+              <td style="font-family:'Space Mono',monospace;font-size:.8rem;">7.1:1</td>
+              <td class="wcag-pass">✓ PASS</td><td class="wcag-pass">✓ PASS</td><td class="wcag-pass">✓ PASS</td>
+            </tr>
+            <tr>
+              <td style="font-size:.85rem;">--text (#f5f2ea) sobre --panel (#101010)</td>
+              <td style="font-family:'Space Mono',monospace;font-size:.8rem;">16.9:1</td>
+              <td class="wcag-pass">✓ PASS</td><td class="wcag-pass">✓ PASS</td><td class="wcag-pass">✓ PASS</td>
+            </tr>
+            <tr>
+              <td style="font-size:.85rem;">--muted (#8b867c) sobre --bg (#060606)</td>
+              <td style="font-family:'Space Mono',monospace;font-size:.8rem;">5.6:1</td>
+              <td class="wcag-pass">✓ PASS</td><td class="wcag-pass">✓ PASS</td><td class="wcag-fail">✕ FAIL</td>
+            </tr>
+            <tr>
+              <td style="font-size:.85rem;">--muted (#8b867c) sobre --panel (#101010)</td>
+              <td style="font-family:'Space Mono',monospace;font-size:.8rem;">5.2:1</td>
+              <td class="wcag-pass">✓ PASS</td><td class="wcag-pass">✓ PASS</td><td class="wcag-fail">✕ FAIL</td>
+            </tr>
+            <tr>
+              <td style="font-size:.85rem;">#000 sobre --accent (#ff6a00)</td>
+              <td style="font-family:'Space Mono',monospace;font-size:.8rem;">7.1:1</td>
+              <td class="wcag-pass">✓ PASS</td><td class="wcag-pass">✓ PASS</td><td class="wcag-pass">✓ PASS</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="background:rgba(255,106,0,.04);border:1px solid rgba(255,106,0,.2);border-radius:8px;padding:24px;">
+          <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent);letter-spacing:.08em;margin-bottom:16px;">→ AÇÕES RECOMENDADAS</p>
+          <ul style="display:flex;flex-direction:column;gap:12px;list-style:none;padding:0;">
+            <li style="display:flex;gap:10px;font-size:.875rem;line-height:1.65;"><span style="color:var(--accent);flex-shrink:0;">1.</span> Use <code style="font-family:'Space Mono',monospace;font-size:.8rem;color:var(--accent);">--muted</code> apenas para texto de apoio com tamanho ≥ 18px ou 14px bold — evite em body text crítico.</li>
+            <li style="display:flex;gap:10px;font-size:.875rem;line-height:1.65;"><span style="color:var(--accent);flex-shrink:0;">2.</span> Para mensagens de erro e labels obrigatórias, prefira <code style="font-family:'Space Mono',monospace;font-size:.8rem;color:var(--accent);">--text</code> ou as cores semânticas <code style="font-family:'Space Mono',monospace;font-size:.8rem;color:var(--error);">--error</code> / <code style="font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);">--green</code>.</li>
+            <li style="display:flex;gap:10px;font-size:.875rem;line-height:1.65;"><span style="color:var(--accent);flex-shrink:0;">3.</span> Todos os elementos interativos precisam de <code style="font-family:'Space Mono',monospace;font-size:.8rem;color:var(--accent);">:focus-visible</code> com outline em laranja (#ff6a00).</li>
+            <li style="display:flex;gap:10px;font-size:.875rem;line-height:1.65;"><span style="color:var(--accent);flex-shrink:0;">4.</span> Touch targets mínimos: <strong>44×44px</strong> para mobile. Botões sm (padding reduzido) precisam de padding de toque invisível.</li>
+            <li style="display:flex;gap:10px;font-size:.875rem;line-height:1.65;"><span style="color:var(--accent);flex-shrink:0;">5.</span> Animações devem respeitar <code style="font-family:'Space Mono',monospace;font-size:.8rem;color:var(--accent);">prefers-reduced-motion</code> — desabilitar <code style="font-family:'Space Mono',monospace;font-size:.8rem;">glow</code>, <code style="font-family:'Space Mono',monospace;font-size:.8rem;">scan</code> e <code style="font-family:'Space Mono',monospace;font-size:.8rem;">marquee</code>.</li>
+          </ul>
+        </div>
+      </section>
+
     </div>
   </main>
 </div>
@@ -1456,7 +1810,7 @@
     <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);">Brand & Design System</span>
   </div>
   <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center;">
-    <span class="badge badge-neutral">v1.0 · 2025</span>
+    <span class="badge badge-neutral">v1.1 · 2025</span>
     <a href="/privacidade.html" style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-decoration:none;letter-spacing:.06em;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">POLÍTICA DE PRIVACIDADE</a>
     <a href="/termos.html" style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-decoration:none;letter-spacing:.06em;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">TERMOS DE USO</a>
     <a href="/" style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-decoration:none;letter-spacing:.06em;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">← VOLTAR AO SITE</a>
