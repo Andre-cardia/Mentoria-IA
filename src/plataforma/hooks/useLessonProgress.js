@@ -9,6 +9,8 @@ export function useLessonProgress() {
 
   // Carrega progresso do usuário atual
   useEffect(() => {
+    // Reseta imediatamente ao trocar de usuário — evita exibir dados do usuário anterior
+    setCompletedIds(new Set());
     if (!user) return;
 
     async function load() {

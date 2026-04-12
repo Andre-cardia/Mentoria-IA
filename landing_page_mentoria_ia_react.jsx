@@ -176,7 +176,6 @@ export default function LandingPageMentoriaIA() {
         ["--accent"]: "#ff6a00",
         ["--accent-soft"]: "rgba(255,106,0,.14)",
         ["--green"]: "#84cc16",
-        ["--accent-soft"]: "rgba(255,106,0,.14)",
         ["--error"]: "#ef4444",
         ["--error-soft"]: "rgba(239,68,68,.08)",
         ["--warning"]: "#f59e0b",

@@ -20,8 +20,9 @@ vi.mock('../../lib/supabase', () => ({
   },
 }));
 
+const mockUseAuth = vi.fn(() => ({ user: mockUser }));
 vi.mock('../context/AuthContext', () => ({
-  useAuth: vi.fn(() => ({ user: mockUser })),
+  useAuth: mockUseAuth,
 }));
 
 // ── Import após mocks ─────────────────────────────────────────
@@ -64,6 +65,24 @@ describe('useLessonProgress', () => {
 
     expect(progress.total).toBe(3);
     expect(progress.completed).toBe(0);
+  });
+
+  it('reseta completedIds ao trocar de usuário — não vaza progresso entre sessões', async () => {
+    // Usuário A com aula concluída
+    mockSelectResult = { data: [{ lesson_id: 'lesson-a' }], error: null };
+    mockUseAuth.mockReturnValue({ user: { id: 'user-a' } });
+
+    const { result, rerender } = renderHook(() => useLessonProgress());
+    await act(async () => {});
+    expect(result.current.isComplete('lesson-a')).toBe(true);
+
+    // Troca para usuário B sem aulas concluídas
+    mockSelectResult = { data: [], error: null };
+    mockUseAuth.mockReturnValue({ user: { id: 'user-b' } });
+
+    await act(async () => { rerender(); });
+
+    expect(result.current.isComplete('lesson-a')).toBe(false);
   });
 
   it('getTotalProgress conta aulas concluídas em múltiplos módulos', async () => {

@@ -1,7 +1,8 @@
 // dotenv só carrega em dev local — no Vercel as vars são injetadas automaticamente
 if (process.env.NODE_ENV !== "production") {
   const { config } = await import("dotenv");
-  config();
+  config();                                    // carrega .env (template/defaults)
+  config({ path: ".env.local", override: true }); // carrega .env.local (valores reais, maior prioridade)
 }
 
 const required = (key) => {

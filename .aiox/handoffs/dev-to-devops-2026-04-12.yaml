@@ -1,0 +1,59 @@
+from_agent: dev
+to_agent: devops
+last_command: develop
+timestamp: "2026-04-12T10:45:00Z"
+consumed: false
+
+context:
+  project: mentoria-ia
+  branch: master
+  epic: "Epic 1 — Mentoria Zero-to-Hero IA"
+
+stories_completed:
+  - id: "1.1"
+    title: "Criação da Plataforma da Mentoria"
+    status: Done
+    notes: "Todos os ACs validados localmente. Ambiente corrigido (vars VITE_, AWS)."
+  - id: "1.2"
+    title: "Player de Vídeo e Progresso do Aluno"
+    status: Done
+    notes: "Bug de estado (completedIds entre sessões) corrigido. RLS validada. 31/31 testes passando."
+
+next_story:
+  id: "1.3"
+  title: "Deploy de Produção e Validação End-to-End"
+  status: Ready
+  file: docs/stories/1.3.story.md
+  executor: "@devops"
+
+changes_to_commit:
+  - server/config.js          # dotenv carrega .env + .env.local
+  - vite.config.js            # dev rewrites replicando vercel.json
+  - src/plataforma/hooks/useLessonProgress.js  # reset de estado ao trocar usuário
+  - src/plataforma/__tests__/useLessonProgress.test.js  # novo teste de isolação de sessão
+  - landing_page_mentoria_ia_react.jsx  # bug accent-soft duplicado
+  - docs/stories/1.1.story.md  # status: Done
+  - docs/stories/1.2.story.md  # status: Done
+  - docs/prd/epic-1-mentoria-zero-to-hero-ia.md  # status atualizado
+
+environment:
+  env_local: "Todas as vars configuradas via vercel env pull"
+  migrations: "4 migrations prontas localmente — aplicar em produção via supabase db push"
+  vercel: "Projeto conectado — andre-cardias-projects-ec75851b/mentoria-ia"
+
+quality_gates:
+  tests: "31/31 passando"
+  build: "OK (1.60s)"
+  lint: "não configurado — sem script lint no package.json"
+
+blockers_resolved:
+  - "VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY com nomes errados"
+  - "AWS vars ausentes"
+  - "Dev server sem rewrites para /plataforma"
+
+pending_for_devops:
+  - "Commit de todos os arquivos modificados"
+  - "Push para origin/master"
+  - "supabase link + supabase db push (4 migrations)"
+  - "Configurar CORS S3 para *.vercel.app"
+  - "Executar story 1.3 completa (todas as tasks pendentes)"

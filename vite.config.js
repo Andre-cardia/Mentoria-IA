@@ -2,8 +2,27 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
+// Replica os rewrites do vercel.json para o dev server local
+const devRewrites = {
+  name: 'dev-rewrites',
+  configureServer(server) {
+    server.middlewares.use((req, _res, next) => {
+      if (req.url === '/plataforma' || req.url.startsWith('/plataforma/')) {
+        req.url = '/plataforma.html'
+      } else if (req.url === '/lead') {
+        req.url = '/lead.html'
+      } else if (req.url === '/brand') {
+        req.url = '/brand.html'
+      } else if (req.url === '/obrigado') {
+        req.url = '/obrigado.html'
+      }
+      next()
+    })
+  },
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), devRewrites],
   test: {
     environment: 'happy-dom',
     globals: true,
