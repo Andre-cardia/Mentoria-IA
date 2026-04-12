@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 
 const ADMIN_NAV = [
@@ -100,6 +101,8 @@ export default function AdminLayout({ children }) {
       <main style={{ flex: 1, minWidth: 0, padding: '40px', overflowY: 'auto' }}>
         {children}
       </main>
+
+      <Toaster position="bottom-right" richColors duration={3000} />
     </div>
   );
 }
