@@ -18,7 +18,7 @@ vi.mock('../../lib/supabase', () => ({
       insert: vi.fn(() => Promise.resolve({ error: null })),
       delete: vi.fn(() => ({
         eq: vi.fn(() => ({
-          eq: vi.fn(() => Promise.resolve({ error: null })),
+          eq: vi.fn(() => Promise.resolve({ error: null, status: 204, statusText: 'No Content', count: 1 })),
         })),
       })),
     })),

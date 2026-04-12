@@ -39,11 +39,14 @@ export function useLessonProgress() {
       if (completedIds.has(lessonId)) {
         // Optimistic remove
         setCompletedIds((prev) => { const next = new Set(prev); next.delete(lessonId); return next; });
-        const { error } = await supabase.from('lesson_progress').delete()
+        console.log('[toggle] DELETE user_id:', user.id, 'lesson_id:', lessonId);
+        const { error, status, statusText, count } = await supabase
+          .from('lesson_progress')
+          .delete()
           .eq('user_id', user.id)
           .eq('lesson_id', lessonId);
+        console.log('[toggle] DELETE result:', { error, status, statusText, count });
         if (error) {
-          // Rollback
           console.error('[toggleComplete] DELETE falhou:', error);
           setCompletedIds((prev) => new Set([...prev, lessonId]));
         }
@@ -52,7 +55,6 @@ export function useLessonProgress() {
         setCompletedIds((prev) => new Set([...prev, lessonId]));
         const { error } = await supabase.from('lesson_progress').insert({ user_id: user.id, lesson_id: lessonId });
         if (error) {
-          // Rollback
           console.error('[toggleComplete] INSERT falhou:', error);
           setCompletedIds((prev) => { const next = new Set(prev); next.delete(lessonId); return next; });
         }
