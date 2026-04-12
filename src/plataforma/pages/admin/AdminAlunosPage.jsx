@@ -125,6 +125,8 @@ function StudentForm({ initial = {}, onSave, onCancel, loading }) {
 // ── Página principal ──────────────────────────────────────────
 export default function AdminAlunosPage() {
   const [students, setStudents] = useState([]);
+  const [pendingRegistration, setPendingRegistration] = useState([]);
+  const [tab, setTab] = useState('enrolled'); // 'enrolled' | 'pending'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
@@ -138,18 +140,20 @@ export default function AdminAlunosPage() {
     const res = await fetch('/api/admin/students', { headers });
     const data = await res.json();
     if (!res.ok) { setError(data.error ?? 'Erro ao carregar'); }
-    else { setStudents(data.students); }
+    else { setStudents(data.students ?? []); setPendingRegistration(data.pendingRegistration ?? []); }
     setLoading(false);
   }, []);
 
   useEffect(() => { load(); }, [load]);
 
-  const filtered = students.filter(s =>
-    !search ||
-    s.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-    s.email?.toLowerCase().includes(search.toLowerCase()) ||
-    s.phone?.includes(search)
-  );
+  const filtered = tab === 'enrolled'
+    ? students.filter(s =>
+        !search ||
+        s.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+        s.email?.toLowerCase().includes(search.toLowerCase()) ||
+        s.phone?.includes(search)
+      )
+    : students;
 
   async function handleCreate({ full_name, email, password, phone, origin }) {
     setSaving(true); setActionError('');
@@ -162,6 +166,7 @@ export default function AdminAlunosPage() {
     setSaving(false);
     if (!res.ok) { setActionError(data.error ?? 'Erro ao criar aluno'); return; }
     setModal(null);
+    setTab('enrolled');
     load();
   }
 
@@ -213,6 +218,13 @@ export default function AdminAlunosPage() {
             <h1 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Alunos</h1>
             <p style={{ color: 'var(--muted)', fontSize: '.875rem', margin: '6px 0 0' }}>
               {students.length} aluno{students.length !== 1 ? 's' : ''} cadastrado{students.length !== 1 ? 's' : ''}
+              {pendingRegistration.length > 0 && (
+                <span style={{ marginLeft: '10px', fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
+                  color: '#fbbf24', background: 'rgba(251,191,36,.1)', border: '1px solid rgba(251,191,36,.25)',
+                  borderRadius: '3px', padding: '1px 7px' }}>
+                  {pendingRegistration.length} aguardando cadastro
+                </span>
+              )}
             </p>
           </div>
           <button
@@ -227,20 +239,51 @@ export default function AdminAlunosPage() {
           </button>
         </div>
 
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', borderBottom: '1px solid var(--line)', paddingBottom: '0' }}>
+          {[
+            { key: 'enrolled', label: 'Matriculados', count: students.length },
+            { key: 'pending',  label: 'Aguardando cadastro', count: pendingRegistration.length },
+          ].map(({ key, label, count }) => (
+            <button
+              key={key}
+              onClick={() => { setTab(key); setSearch(''); }}
+              style={{
+                padding: '8px 18px', background: 'transparent', border: 'none',
+                borderBottom: tab === key ? '2px solid var(--accent)' : '2px solid transparent',
+                color: tab === key ? 'var(--text)' : 'var(--muted)',
+                fontFamily: 'Space Grotesk, sans-serif', fontWeight: tab === key ? 600 : 400,
+                fontSize: '.875rem', cursor: 'pointer', marginBottom: '-1px',
+                transition: 'color .15s',
+              }}
+            >
+              {label}
+              {count > 0 && (
+                <span style={{
+                  marginLeft: '7px', fontFamily: 'Space Mono, monospace', fontSize: '.65rem',
+                  background: tab === key ? 'var(--accent-soft)' : 'var(--bg-2)',
+                  color: tab === key ? 'var(--accent)' : 'var(--muted)',
+                  border: `1px solid ${tab === key ? 'rgba(255,106,0,.25)' : 'var(--line)'}`,
+                  borderRadius: '3px', padding: '1px 6px',
+                }}>{count}</span>
+              )}
+            </button>
+          ))}
+        </div>
+
         {/* Search */}
         <input
           value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar por nome, e-mail ou telefone..."
+          placeholder={tab === 'enrolled' ? 'Buscar por nome, e-mail ou telefone...' : 'Buscar por e-mail...'}
           style={{ ...inputStyle, marginBottom: '20px', maxWidth: '400px' }}
         />
 
         {loading && <p style={{ color: 'var(--muted)' }}>Carregando...</p>}
         {error && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
 
-        {/* Tabela */}
-        {!loading && (
+        {/* Tabela — Matriculados */}
+        {!loading && tab === 'enrolled' && (
           <div style={{ border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden' }}>
-            {/* Header da tabela */}
             <div style={{
               display: 'grid', gridTemplateColumns: '1fr 1fr .8fr .8fr auto',
               padding: '10px 20px', background: 'var(--bg-2)',
@@ -289,14 +332,12 @@ export default function AdminAlunosPage() {
                     </span>
                   </div>
                   <div style={{ display: 'flex', gap: '6px' }}>
-                    {/* Editar */}
                     <button
                       onClick={() => { setActionError(''); setModal({ type: 'edit', student: s }); }}
                       title="Editar"
                       style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--muted)', cursor: 'pointer', fontSize: '.8rem' }}
                     >✏️</button>
 
-                    {/* Toggle status rápido */}
                     {s.status === 'active' && (
                       <button onClick={() => quickStatus(s, 'suspended')} title="Suspender"
                         style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: '#fbbf24', cursor: 'pointer', fontSize: '.8rem' }}>
@@ -322,7 +363,6 @@ export default function AdminAlunosPage() {
                       </button>
                     )}
 
-                    {/* Excluir */}
                     <button
                       onClick={() => { setActionError(''); setModal({ type: 'delete', student: s }); }}
                       title="Excluir permanentemente"
@@ -335,13 +375,87 @@ export default function AdminAlunosPage() {
             })}
           </div>
         )}
+
+        {/* Tabela — Aguardando cadastro */}
+        {!loading && tab === 'pending' && (() => {
+          const filteredPending = pendingRegistration.filter(p =>
+            !search || p.email?.toLowerCase().includes(search.toLowerCase())
+          );
+          return (
+            <div style={{ border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden' }}>
+              <div style={{
+                display: 'grid', gridTemplateColumns: '1.5fr .7fr .7fr .8fr auto',
+                padding: '10px 20px', background: 'var(--bg-2)',
+                borderBottom: '1px solid var(--line)',
+                fontFamily: 'Space Mono, monospace', fontSize: '.65rem',
+                color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.08em', gap: '12px',
+              }}>
+                <span>E-mail</span><span>Plano</span><span>Valor</span><span>Compra</span><span>Ação</span>
+              </div>
+
+              {filteredPending.length === 0 && (
+                <p style={{ padding: '24px 20px', color: 'var(--muted)', fontSize: '.875rem' }}>
+                  {search ? 'Nenhum comprador encontrado.' : 'Nenhum comprador sem cadastro.'}
+                </p>
+              )}
+
+              {filteredPending.map((p, i) => (
+                <div key={p.email} style={{
+                  display: 'grid', gridTemplateColumns: '1.5fr .7fr .7fr .8fr auto',
+                  padding: '14px 20px', gap: '12px', alignItems: 'center',
+                  borderBottom: i < filteredPending.length - 1 ? '1px solid var(--line)' : 'none',
+                  transition: 'background .15s',
+                }}
+                onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,.02)'}
+                onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+                >
+                  <div style={{ fontSize: '.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {p.email}
+                  </div>
+                  <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--muted)', textTransform: 'uppercase' }}>
+                    {p.plan}
+                  </div>
+                  <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--muted)' }}>
+                    {p.amount != null
+                      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.amount / 100)
+                      : '—'}
+                  </div>
+                  <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)' }}>
+                    {new Date(p.purchased_at).toLocaleDateString('pt-BR')}
+                  </div>
+                  <button
+                    onClick={() => {
+                      setActionError('');
+                      setModal({ type: 'create', prefillEmail: p.email });
+                    }}
+                    title="Criar conta para este comprador"
+                    style={{
+                      padding: '6px 12px', background: 'var(--accent-soft)',
+                      border: '1px solid rgba(255,106,0,.25)', borderRadius: '4px',
+                      color: 'var(--accent)', cursor: 'pointer',
+                      fontFamily: 'Space Grotesk, sans-serif', fontSize: '.8rem', fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Criar conta
+                  </button>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Modal — Criar */}
       {modal?.type === 'create' && (
         <Modal title="Novo aluno" onClose={() => setModal(null)}>
           {actionError && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
-          <StudentForm onSave={handleCreate} onCancel={() => setModal(null)} loading={saving} />
+          <StudentForm
+            initial={modal.prefillEmail ? { email: modal.prefillEmail } : {}}
+            onSave={handleCreate}
+            onCancel={() => setModal(null)}
+            loading={saving}
+          />
         </Modal>
       )}
 

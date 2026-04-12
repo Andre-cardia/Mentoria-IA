@@ -21,27 +21,49 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: "Acesso negado" });
   }
 
-  // GET — lista todos os alunos
+  // GET — lista alunos ou compradores sem cadastro
   if (req.method === "GET") {
-    const [profilesRes, usersRes] = await Promise.all([
+    const [profilesRes, usersRes, paymentsRes] = await Promise.all([
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
       supabase.auth.admin.listUsers({ perPage: 1000 }),
+      supabase.from("payments").select("email, reference_id, amount, created_at")
+        .eq("status", "PAID")
+        .not("email", "is", null)
+        .order("created_at", { ascending: false }),
     ]);
 
     if (profilesRes.error) {
       return res.status(500).json({ error: "Erro ao buscar perfis" });
     }
 
-    const emailMap = Object.fromEntries(
-      (usersRes.data?.users ?? []).map((u) => [u.id, u.email])
-    );
+    const authUsers = usersRes.data?.users ?? [];
+    const emailMap = Object.fromEntries(authUsers.map((u) => [u.id, u.email]));
+    const registeredEmails = new Set(authUsers.map((u) => u.email?.toLowerCase()));
 
+    // Alunos matriculados
     const students = profilesRes.data.map((p) => ({
       ...p,
       email: emailMap[p.user_id] ?? null,
     }));
 
-    return res.json({ students });
+    // Compradores PAID que não criaram conta
+    // Deduplica por email (um comprador pode ter mais de um pagamento)
+    const seenEmails = new Set();
+    const pendingRegistration = (paymentsRes.data ?? [])
+      .filter((p) => {
+        const email = p.email?.toLowerCase();
+        if (!email || registeredEmails.has(email) || seenEmails.has(email)) return false;
+        seenEmails.add(email);
+        return true;
+      })
+      .map((p) => ({
+        email: p.email,
+        plan: p.reference_id?.split("-")[0] ?? "—",
+        amount: p.amount,
+        purchased_at: p.created_at,
+      }));
+
+    return res.json({ students, pendingRegistration });
   }
 
   // POST — cria novo aluno (sem validação de pagamento)
