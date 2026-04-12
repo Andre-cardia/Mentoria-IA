@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { useLessonProgress } from '../hooks/useLessonProgress';
 
 const NAV_ITEMS = [
   { to: '/modulos',   label: 'Módulos & Aulas' },
@@ -24,6 +27,18 @@ const linkStyle = (isActive) => ({
 export default function Layout({ children }) {
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
+  const { getTotalProgress } = useLessonProgress();
+  const [modules, setModules] = useState([]);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('modules')
+      .select('id, lessons(id)')
+      .then(({ data }) => setModules(data ?? []));
+  }, [user]);
+
+  const progress = getTotalProgress(modules);
 
   async function handleSignOut() {
     await signOut();
@@ -91,6 +106,29 @@ export default function Layout({ children }) {
             </>
           )}
         </nav>
+
+        {/* Progresso */}
+        {progress.total > 0 && (
+          <div style={{ marginBottom: '16px', padding: '12px 14px', background: 'rgba(255,106,0,.05)', border: '1px solid rgba(255,106,0,.15)', borderRadius: '6px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.6rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                Progresso
+              </span>
+              <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)' }}>
+                {progress.completed}/{progress.total}
+              </span>
+            </div>
+            <div style={{ height: '3px', background: 'var(--line)', borderRadius: '2px', overflow: 'hidden' }}>
+              <div style={{
+                height: '100%',
+                width: `${(progress.completed / progress.total) * 100}%`,
+                background: 'var(--accent)',
+                borderRadius: '2px',
+                transition: 'width .3s',
+              }} />
+            </div>
+          </div>
+        )}
 
         {/* Footer do sidebar */}
         <div style={{ borderTop: '1px solid var(--line)', paddingTop: '16px' }}>
