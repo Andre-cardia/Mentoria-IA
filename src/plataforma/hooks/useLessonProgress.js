@@ -32,13 +32,21 @@ export function useLessonProgress() {
     [completedIds]
   );
 
-  const markComplete = useCallback(
+  const toggleComplete = useCallback(
     async (lessonId) => {
-      if (!user || completedIds.has(lessonId)) return;
+      if (!user) return;
       setMarking(true);
-      // Optimistic update
-      setCompletedIds((prev) => new Set([...prev, lessonId]));
-      await supabase.from('lesson_progress').insert({ user_id: user.id, lesson_id: lessonId });
+      if (completedIds.has(lessonId)) {
+        // Optimistic remove
+        setCompletedIds((prev) => { const next = new Set(prev); next.delete(lessonId); return next; });
+        await supabase.from('lesson_progress').delete()
+          .eq('user_id', user.id)
+          .eq('lesson_id', lessonId);
+      } else {
+        // Optimistic add
+        setCompletedIds((prev) => new Set([...prev, lessonId]));
+        await supabase.from('lesson_progress').insert({ user_id: user.id, lesson_id: lessonId });
+      }
       setMarking(false);
     },
     [user, completedIds]
@@ -63,5 +71,5 @@ export function useLessonProgress() {
     [completedIds]
   );
 
-  return { isComplete, markComplete, getModuleProgress, getTotalProgress, marking };
+  return { isComplete, toggleComplete, getModuleProgress, getTotalProgress, marking };
 }

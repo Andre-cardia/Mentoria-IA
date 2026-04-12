@@ -8,7 +8,7 @@ const mockUser = { id: 'user-123' };
 // Resultado padrão do SELECT — mutável por teste
 let mockSelectResult = { data: [], error: null };
 
-// Mock chainable: from().select().eq() → Promise
+// Mock chainable: from().select().eq() / from().insert() / from().delete().eq().eq()
 vi.mock('../../lib/supabase', () => ({
   supabase: {
     from: vi.fn(() => ({
@@ -16,6 +16,11 @@ vi.mock('../../lib/supabase', () => ({
         eq: vi.fn(() => Promise.resolve(mockSelectResult)),
       })),
       insert: vi.fn(() => Promise.resolve({ error: null })),
+      delete: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          eq: vi.fn(() => Promise.resolve({ error: null })),
+        })),
+      })),
     })),
   },
 }));
@@ -43,16 +48,29 @@ describe('useLessonProgress', () => {
     expect(result.current.isComplete('lesson-abc')).toBe(false);
   });
 
-  it('isComplete retorna true após markComplete (optimistic update)', async () => {
+  it('isComplete retorna true após toggleComplete (optimistic add)', async () => {
     mockSelectResult = { data: [], error: null };
     const { result } = renderHook(() => useLessonProgress());
     await act(async () => {});
 
     await act(async () => {
-      await result.current.markComplete('lesson-abc');
+      await result.current.toggleComplete('lesson-abc');
     });
 
     expect(result.current.isComplete('lesson-abc')).toBe(true);
+  });
+
+  it('isComplete retorna false após toggleComplete numa aula já concluída (optimistic remove)', async () => {
+    mockSelectResult = { data: [{ lesson_id: 'lesson-abc' }], error: null };
+    const { result } = renderHook(() => useLessonProgress());
+    await act(async () => {});
+    expect(result.current.isComplete('lesson-abc')).toBe(true);
+
+    await act(async () => {
+      await result.current.toggleComplete('lesson-abc');
+    });
+
+    expect(result.current.isComplete('lesson-abc')).toBe(false);
   });
 
   it('getModuleProgress retorna completed=0 quando nenhuma aula foi concluída', async () => {

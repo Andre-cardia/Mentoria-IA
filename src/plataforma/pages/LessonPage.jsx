@@ -11,7 +11,7 @@ export default function LessonPage() {
   const [module, setModule] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { isComplete, markComplete, marking } = useLessonProgress();
+  const { isComplete, toggleComplete, marking } = useLessonProgress();
   const [completed, setCompleted] = useState(false);
 
   useEffect(() => {
@@ -35,9 +35,9 @@ export default function LessonPage() {
     if (lessonId) setCompleted(isComplete(lessonId));
   }, [lessonId, isComplete]);
 
-  async function handleMarkComplete() {
-    await markComplete(lessonId);
-    setCompleted(true);
+  async function handleToggle() {
+    await toggleComplete(lessonId);
+    setCompleted(isComplete(lessonId));
   }
 
   function formatDuration(seconds) {
@@ -83,33 +83,24 @@ export default function LessonPage() {
 
             {/* Ação de progresso */}
             <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              {completed ? (
-                <div style={{
+              <button
+                onClick={handleToggle}
+                disabled={marking}
+                style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
-                  padding: '10px 20px',
-                  background: 'rgba(34,197,94,.1)', border: '1px solid rgba(34,197,94,.3)',
-                  borderRadius: '6px', color: '#4ade80',
-                  fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, fontSize: '.9rem',
-                }}>
-                  <span>✓</span> Aula concluída
-                </div>
-              ) : (
-                <button
-                  onClick={handleMarkComplete}
-                  disabled={marking}
-                  style={{
-                    padding: '10px 24px',
-                    background: 'var(--accent)', color: '#000',
-                    border: 'none', borderRadius: '6px',
-                    fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: '.9rem',
-                    cursor: marking ? 'not-allowed' : 'pointer',
-                    opacity: marking ? .6 : 1,
-                    transition: 'opacity .15s',
-                  }}
-                >
-                  {marking ? 'Salvando...' : 'Marcar como concluída'}
-                </button>
-              )}
+                  padding: '10px 24px',
+                  background: completed ? 'rgba(34,197,94,.1)' : 'var(--accent)',
+                  color: completed ? '#4ade80' : '#000',
+                  border: completed ? '1px solid rgba(34,197,94,.3)' : 'none',
+                  borderRadius: '6px',
+                  fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: '.9rem',
+                  cursor: marking ? 'not-allowed' : 'pointer',
+                  opacity: marking ? .6 : 1,
+                  transition: 'opacity .15s, background .2s',
+                }}
+              >
+                {marking ? 'Salvando...' : completed ? '✓ Desmarcar conclusão' : 'Marcar como concluída'}
+              </button>
 
               <Link
                 to="/modulos"
