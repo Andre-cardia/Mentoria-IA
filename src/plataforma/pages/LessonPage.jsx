@@ -37,7 +37,7 @@ export default function LessonPage() {
 
   async function handleToggle() {
     await toggleComplete(lessonId);
-    setCompleted(isComplete(lessonId));
+    // não chamar setCompleted aqui — o useEffect abaixo já atualiza via isComplete
   }
 
   function formatDuration(seconds) {
