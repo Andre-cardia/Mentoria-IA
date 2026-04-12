@@ -95,9 +95,11 @@ export default function Layout({ children }) {
                 Admin
               </div>
               {[
+                { to: '/admin/alunos',    label: 'Alunos' },
                 { to: '/admin/modulos',   label: 'Módulos & Aulas' },
                 { to: '/admin/materiais', label: 'Materiais' },
                 { to: '/admin/avisos',    label: 'Avisos' },
+                { to: '/admin/progresso', label: 'Progresso' },
               ].map(({ to, label }) => (
                 <NavLink key={to} to={to} style={({ isActive }) => linkStyle(isActive)}>
                   {label}
