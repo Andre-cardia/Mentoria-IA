@@ -39,13 +39,23 @@ export function useLessonProgress() {
       if (completedIds.has(lessonId)) {
         // Optimistic remove
         setCompletedIds((prev) => { const next = new Set(prev); next.delete(lessonId); return next; });
-        await supabase.from('lesson_progress').delete()
+        const { error } = await supabase.from('lesson_progress').delete()
           .eq('user_id', user.id)
           .eq('lesson_id', lessonId);
+        if (error) {
+          // Rollback
+          console.error('[toggleComplete] DELETE falhou:', error);
+          setCompletedIds((prev) => new Set([...prev, lessonId]));
+        }
       } else {
         // Optimistic add
         setCompletedIds((prev) => new Set([...prev, lessonId]));
-        await supabase.from('lesson_progress').insert({ user_id: user.id, lesson_id: lessonId });
+        const { error } = await supabase.from('lesson_progress').insert({ user_id: user.id, lesson_id: lessonId });
+        if (error) {
+          // Rollback
+          console.error('[toggleComplete] INSERT falhou:', error);
+          setCompletedIds((prev) => { const next = new Set(prev); next.delete(lessonId); return next; });
+        }
       }
       setMarking(false);
     },
