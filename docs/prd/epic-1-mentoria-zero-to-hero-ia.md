@@ -15,6 +15,7 @@ Desenvolver uma plataforma web que permita ao mentor gerenciar e aos alunos cons
 | 1.1 | Criação da Plataforma da Mentoria | Done |
 | 1.2 | Player de Vídeo e Progresso do Aluno | Done |
 | 1.3 | Deploy de Produção e Validação End-to-End | Done |
+| 1.4 | Cadastro, Validação de Pagamento e Perfil do Usuário | Done |
 
 ## Requisitos Funcionais
 
