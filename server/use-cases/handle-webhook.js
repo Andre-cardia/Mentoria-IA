@@ -21,9 +21,10 @@ export async function handleWebhook(body) {
   const referenceId = body?.reference_id ?? body?.charges?.[0]?.reference_id;
   const checkoutId = body?.id;
   const amount = body?.charges?.[0]?.amount?.value ?? null;
+  const email = body?.customer?.email ?? null;
 
   const label = STATUS_LABELS[status] ?? `Status desconhecido: ${status}`;
-  console.log(`[Webhook PagBank] ${label} — ref: ${referenceId}`);
+  console.log(`[Webhook PagBank] ${label} — ref: ${referenceId} — email: ${email ?? 'não informado'}`);
 
   if (referenceId && status) {
     await supabaseAdapter.savePayment({
@@ -31,6 +32,7 @@ export async function handleWebhook(body) {
       checkoutId,
       status,
       amount,
+      email,
       rawEvent: body,
     });
   }

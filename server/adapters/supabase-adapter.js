@@ -16,7 +16,7 @@ export class SupabaseAdapter {
    * @param {number} [params.amount]
    * @param {Object} params.rawEvent
    */
-  async savePayment({ referenceId, checkoutId, status, amount, rawEvent }) {
+  async savePayment({ referenceId, checkoutId, status, amount, email, rawEvent }) {
     if (!supabase) {
       console.warn("[SupabaseAdapter] SUPABASE_SERVICE_KEY não configurada — evento não salvo.");
       return;
@@ -27,6 +27,7 @@ export class SupabaseAdapter {
         checkout_id: checkoutId ?? null,
         status,
         amount: amount ?? null,
+        email: email ?? null,
         raw_event: rawEvent,
         updated_at: new Date().toISOString(),
       },
