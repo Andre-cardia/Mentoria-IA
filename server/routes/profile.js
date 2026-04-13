@@ -102,4 +102,58 @@ router.patch("/", async (req, res) => {
   }
 });
 
+/**
+ * POST /api/profile/update-avatar
+ * Persiste avatar_url no perfil — cria linha se não existir (suporte a admin).
+ * Body: { avatarUrl }
+ * Requer: Bearer token válido
+ */
+router.post("/update-avatar", async (req, res) => {
+  try {
+    if (!supabase) return res.status(503).json({ error: "Supabase não configurado" });
+
+    const auth = req.headers.authorization;
+    if (!auth?.startsWith("Bearer ")) return res.status(401).json({ error: "Unauthorized" });
+    const token = auth.slice(7);
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) return res.status(401).json({ error: "Token inválido" });
+
+    const { avatarUrl } = req.body;
+    if (!avatarUrl) return res.status(400).json({ error: "avatarUrl é obrigatório" });
+
+    const { data: existing } = await supabase
+      .from("profiles")
+      .select("user_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    let dbError;
+    if (existing) {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() })
+        .eq("user_id", user.id);
+      dbError = error;
+    } else {
+      const { error } = await supabase.from("profiles").insert({
+        user_id: user.id,
+        full_name: user.user_metadata?.full_name || user.email?.split("@")[0] || "Usuário",
+        avatar_url: avatarUrl,
+      });
+      dbError = error;
+    }
+
+    if (dbError) {
+      console.error("[profile/update-avatar]", dbError);
+      return res.status(500).json({ error: dbError.message });
+    }
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error("[profile/update-avatar]", err);
+    return res.status(500).json({ error: "Erro interno" });
+  }
+});
+
 export default router;

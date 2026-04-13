@@ -19,7 +19,7 @@ const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
  */
 router.post("/upload", async (req, res) => {
   try {
-    const { fileName, contentType, title, description } = req.body;
+    const { fileName, contentType, title, description, module_id } = req.body;
 
     if (!fileName || !contentType || !title) {
       return res.status(400).json({ error: "fileName, contentType e title são obrigatórios" });
@@ -36,6 +36,7 @@ router.post("/upload", async (req, res) => {
         title,
         description: description ?? null,
         s3_key: s3Key,
+        module_id: module_id || null,
       });
       if (error) {
         console.error("[materials/upload] Erro ao registrar no Supabase:", error);
