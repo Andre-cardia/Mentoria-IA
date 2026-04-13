@@ -7,6 +7,7 @@ import LessonTextContent from '../components/LessonTextContent';
 import LessonActivityContent from '../components/LessonActivityContent';
 import { useLessonProgress } from '../hooks/useLessonProgress';
 import LessonQA from '../components/LessonQA';
+import LessonQuiz from '../components/LessonQuiz';
 
 export default function LessonPage() {
   const { moduleId, lessonId } = useParams();
@@ -92,9 +93,7 @@ export default function LessonPage() {
               <LessonActivityContent content={lesson.content} />
             )}
             {lesson.lesson_type === 'quiz' && (
-              <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '32px', textAlign: 'center', color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.875rem' }}>
-                Quiz disponível em breve.
-              </div>
+              <LessonQuiz lessonId={lesson.id} />
             )}
 
             {/* Ação de progresso */}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../lib/supabase';
 import AdminLayout from '../../components/AdminLayout';
+import QuizBuilder from '../../components/QuizBuilder';
 
 const inputSx = {
   width: '100%', background: 'var(--panel-2)',
@@ -137,9 +138,9 @@ export default function AdminAulasPage() {
                   />
                 )}
 
-                {form.lesson_type === 'quiz' && (
+                {form.lesson_type === 'quiz' && !editing && (
                   <p style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)', margin: 0 }}>
-                    Quiz Builder disponível após salvar a aula (Story 3.2).
+                    Salve a aula primeiro para acessar o Quiz Builder.
                   </p>
                 )}
 
@@ -157,6 +158,13 @@ export default function AdminAulasPage() {
                   </button>
                 </div>
               </form>
+            )}
+
+            {/* Quiz Builder — visível ao editar aula do tipo quiz */}
+            {editing && form.lesson_type === 'quiz' && (
+              <div style={{ marginBottom: '24px' }}>
+                <QuizBuilder lessonId={editing} />
+              </div>
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
