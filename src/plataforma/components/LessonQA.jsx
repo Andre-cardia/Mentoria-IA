@@ -77,11 +77,11 @@ function QAItem({ item, isAdmin, currentUserId, onDelete, onMarkOfficial, onRepl
 
   return (
     <div style={{ display: 'flex', gap: '12px' }}>
-      <Avatar name={item.profiles?.full_name} />
+      <Avatar name={item.user_name} />
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '4px' }}>
           <span style={{ fontWeight: 600, fontSize: '.875rem', color: 'var(--text)' }}>
-            {item.profiles?.full_name || 'Usuário'}
+            {item.user_name || 'Usuário'}
           </span>
           {item.is_official && (
             <span style={{
@@ -167,31 +167,35 @@ export default function LessonQA({ lessonId }) {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
-  const [offset, setOffset] = useState(0);
+  const [currentOffset, setCurrentOffset] = useState(0);
   const [newQuestion, setNewQuestion] = useState('');
   const [saving, setSaving] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [displayName, setDisplayName] = useState('');
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         setCurrentUser(user);
         setIsAdmin((user.user_metadata?.role) === 'admin');
+        const name = user.user_metadata?.full_name
+          || user.user_metadata?.name
+          || user.email?.split('@')[0]
+          || 'Usuário';
+        setDisplayName(name);
       }
     });
   }, []);
 
   const fetchQuestions = useCallback(async (reset = false) => {
-    const start = reset ? 0 : offset;
+    const start = reset ? 0 : currentOffset;
     const { data, error } = await supabase
       .from('lesson_qa')
       .select(`
-        id, body, is_official, created_at, user_id,
-        profiles(full_name),
+        id, body, is_official, created_at, user_id, user_name,
         replies:lesson_qa!parent_id(
-          id, body, is_official, created_at, user_id,
-          profiles(full_name)
+          id, body, is_official, created_at, user_id, user_name
         )
       `)
       .eq('lesson_id', lessonId)
@@ -202,15 +206,35 @@ export default function LessonQA({ lessonId }) {
     if (!error && data) {
       setQuestions((prev) => reset ? data : [...prev, ...data]);
       setHasMore(data.length === PAGE_SIZE);
-      setOffset(start + data.length);
+      setCurrentOffset(start + data.length);
     }
     return data;
-  }, [lessonId, offset]);
+  }, [lessonId, currentOffset]);
 
   useEffect(() => {
     setLoading(true);
-    fetchQuestions(true).finally(() => setLoading(false));
-  }, [lessonId]); // eslint-disable-line react-hooks/exhaustive-deps
+    setCurrentOffset(0);
+    supabase
+      .from('lesson_qa')
+      .select(`
+        id, body, is_official, created_at, user_id, user_name,
+        replies:lesson_qa!parent_id(
+          id, body, is_official, created_at, user_id, user_name
+        )
+      `)
+      .eq('lesson_id', lessonId)
+      .is('parent_id', null)
+      .order('created_at', { ascending: true })
+      .range(0, PAGE_SIZE - 1)
+      .then(({ data, error }) => {
+        if (!error && data) {
+          setQuestions(data);
+          setHasMore(data.length === PAGE_SIZE);
+          setCurrentOffset(data.length);
+        }
+        setLoading(false);
+      });
+  }, [lessonId]);
 
   async function loadMore() {
     setLoadingMore(true);
@@ -224,11 +248,16 @@ export default function LessonQA({ lessonId }) {
     setSaving(true);
     const { data, error } = await supabase
       .from('lesson_qa')
-      .insert({ lesson_id: lessonId, user_id: currentUser.id, body: newQuestion.trim() })
-      .select(`id, body, is_official, created_at, user_id, profiles(full_name), replies:lesson_qa!parent_id(id, body, is_official, created_at, user_id, profiles(full_name))`)
+      .insert({
+        lesson_id: lessonId,
+        user_id: currentUser.id,
+        body: newQuestion.trim(),
+        user_name: displayName,
+      })
+      .select('id, body, is_official, created_at, user_id, user_name')
       .single();
     if (!error && data) {
-      setQuestions((prev) => [...prev, data]);
+      setQuestions((prev) => [...prev, { ...data, replies: [] }]);
       setNewQuestion('');
     }
     setSaving(false);
@@ -237,8 +266,14 @@ export default function LessonQA({ lessonId }) {
   async function handleReply(parentId, body) {
     const { data, error } = await supabase
       .from('lesson_qa')
-      .insert({ lesson_id: lessonId, user_id: currentUser.id, parent_id: parentId, body })
-      .select(`id, body, is_official, created_at, user_id, profiles(full_name)`)
+      .insert({
+        lesson_id: lessonId,
+        user_id: currentUser.id,
+        parent_id: parentId,
+        body,
+        user_name: displayName,
+      })
+      .select('id, body, is_official, created_at, user_id, user_name')
       .single();
     if (!error && data) {
       setQuestions((prev) => prev.map((q) =>
