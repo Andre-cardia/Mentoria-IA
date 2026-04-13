@@ -153,20 +153,20 @@ export default function MinhaContaPage() {
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path);
       const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
 
-      // 4. Persistir no perfil — usar .select() para verificar que a linha foi atualizada
-      const { data: updatedRows, error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() })
-        .eq('user_id', user.id)
-        .select('user_id');
-
-      if (updateError) {
-        console.error('[MinhaContaPage] profile update error:', updateError);
-        throw new Error(updateError.message || 'Erro ao salvar foto no perfil.');
-      }
-      if (!updatedRows || updatedRows.length === 0) {
-        console.error('[MinhaContaPage] profile update: 0 rows updated');
-        throw new Error('Não foi possível salvar a foto. Recarregue a página e tente novamente.');
+      // 4. Persistir no perfil via API (service key — suporta admin sem linha em profiles)
+      const { data: { session } } = await supabase.auth.getSession();
+      const updateRes = await fetch('/api/profile/update-avatar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ avatarUrl }),
+      });
+      if (!updateRes.ok) {
+        const body = await updateRes.json().catch(() => ({}));
+        console.error('[MinhaContaPage] profile update error:', body);
+        throw new Error(body.error || 'Erro ao salvar foto no perfil.');
       }
 
       setLocalProfile(p => ({ ...p, avatar_url: avatarUrl }));
