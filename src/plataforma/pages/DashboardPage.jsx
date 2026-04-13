@@ -135,18 +135,17 @@ function BlogCard({ post }) {
         {/* Cover */}
         <div style={{
           width: '100%', aspectRatio: '16/9', background: 'var(--panel-2)',
-          overflow: 'hidden', flexShrink: 0,
+          overflow: 'hidden', flexShrink: 0, position: 'relative',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          {post.cover_url ? (
+          {post.cover_url && (
             <img
               src={post.cover_url} alt={post.title}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', position: 'absolute', top: 0, left: 0 }}
+              onError={(e) => { e.target.style.display = 'none'; }}
             />
-          ) : (
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>
-              ✍️
-            </div>
           )}
+          <span style={{ fontSize: '2rem' }}>✍️</span>
         </div>
         {/* Info */}
         <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
