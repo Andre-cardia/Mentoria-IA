@@ -38,3 +38,12 @@ Thumbs.db
 .aiox/install-log.txt
 
 .env*.local
+
+# Backups automáticos
+*.backup.*
+.env.backup.*
+AGENTS.md.backup.*
+.claude/CLAUDE.md.backup.*
+
+# Supabase temp
+supabase/.temp/
