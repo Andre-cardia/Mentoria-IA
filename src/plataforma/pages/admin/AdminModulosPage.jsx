@@ -46,7 +46,7 @@ const btnDanger = {
   fontFamily: 'Space Mono, monospace', fontSize: '.7rem', cursor: 'pointer',
 };
 
-const EMPTY_MOD = { title: '', description: '' };
+const EMPTY_MOD = { title: '', subtitle: '', description: '' };
 const EMPTY_LESSON = { title: '', lesson_type: 'video', video_url: '', content: '', duration: '' };
 
 const LESSON_TYPES = [
@@ -214,7 +214,7 @@ export default function AdminModulosPage() {
   }
 
   function startEditMod(mod) {
-    setModForm({ title: mod.title, description: mod.description ?? '' });
+    setModForm({ title: mod.title, subtitle: mod.subtitle ?? '', description: mod.description ?? '' });
     setEditingModId(mod.id);
     if (openModule !== mod.id) toggleModule(mod.id);
   }
@@ -231,23 +231,25 @@ export default function AdminModulosPage() {
       if (editingModId === 'new') {
         const { error } = await supabase.from('modules').insert({
           title: modForm.title,
+          subtitle: modForm.subtitle || null,
           description: modForm.description || null,
           order: modules.length,
         });
         if (error) throw error;
-        toast.success('Módulo criado com sucesso');
+        toast.success('Curso criado com sucesso');
       } else {
         const { error } = await supabase.from('modules').update({
           title: modForm.title,
+          subtitle: modForm.subtitle || null,
           description: modForm.description || null,
         }).eq('id', editingModId);
         if (error) throw error;
-        toast.success('Módulo atualizado');
+        toast.success('Curso atualizado');
       }
       cancelModForm();
       await loadModules();
     } catch {
-      toast.error('Erro ao salvar módulo');
+      toast.error('Erro ao salvar curso');
     } finally {
       setSaving(false);
     }
@@ -256,7 +258,7 @@ export default function AdminModulosPage() {
   function confirmDeleteMod(mod) {
     setConfirmModal({
       isOpen: true,
-      title: 'Excluir módulo',
+      title: 'Excluir curso',
       message: `Excluir "${mod.title}" e todas as suas aulas? Esta ação não pode ser desfeita.`,
       onConfirm: () => deleteMod(mod.id),
     });
@@ -269,9 +271,9 @@ export default function AdminModulosPage() {
       if (error) throw error;
       setModules((p) => p.filter((m) => m.id !== id));
       if (openModule === id) setOpenModule(null);
-      toast.success('Módulo excluído');
+      toast.success('Curso excluído');
     } catch {
-      toast.error('Erro ao excluir módulo');
+      toast.error('Erro ao excluir curso');
     }
   }
 
@@ -290,7 +292,7 @@ export default function AdminModulosPage() {
 
     try {
       await persistModuleOrder(reordered);
-      toast.success('Ordem dos módulos salva');
+      toast.success('Ordem dos cursos salva');
     } catch {
       // Reverter
       setModules(modules);
@@ -461,17 +463,17 @@ export default function AdminModulosPage() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
           <div>
             <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>Admin</div>
-            <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>Módulos & Aulas</h1>
+            <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>Cursos & Aulas</h1>
           </div>
           {editingModId !== 'new' && (
-            <button style={btnPrimary} onClick={startNewMod}>+ Novo Módulo</button>
+            <button style={btnPrimary} onClick={startNewMod}>+ Novo Curso</button>
           )}
         </div>
 
         {/* Form inline — Novo Módulo */}
         {editingModId === 'new' && (
           <ModForm
-            title="Novo Módulo"
+            title="Novo Curso"
             form={modForm}
             onChange={setModForm}
             onSubmit={saveMod}
@@ -494,7 +496,7 @@ export default function AdminModulosPage() {
                       {editingModId === mod.id ? (
                         <div style={{ padding: '20px 20px 0' }}>
                           <ModForm
-                            title="Editar Módulo"
+                            title="Editar Curso"
                             form={modForm}
                             onChange={setModForm}
                             onSubmit={saveMod}
@@ -651,7 +653,7 @@ function ModForm({ title, form, onChange, onSubmit, onCancel, saving }) {
       </div>
       <input
         style={inputSx}
-        placeholder="Título do módulo"
+        placeholder="Título do curso"
         value={form.title}
         onChange={(e) => onChange((p) => ({ ...p, title: e.target.value }))}
         required
@@ -659,7 +661,13 @@ function ModForm({ title, form, onChange, onSubmit, onCancel, saving }) {
       />
       <input
         style={inputSx}
-        placeholder="Descrição (opcional)"
+        placeholder="Subtítulo (opcional)"
+        value={form.subtitle}
+        onChange={(e) => onChange((p) => ({ ...p, subtitle: e.target.value }))}
+      />
+      <input
+        style={inputSx}
+        placeholder="Sobre o curso (opcional)"
         value={form.description}
         onChange={(e) => onChange((p) => ({ ...p, description: e.target.value }))}
       />
