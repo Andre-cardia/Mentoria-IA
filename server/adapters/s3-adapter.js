@@ -11,7 +11,7 @@ const s3 = new S3Client({
 });
 
 const UPLOAD_EXPIRES_IN = 300;   // 5 min para upload
-const DOWNLOAD_EXPIRES_IN = 900; // 15 min para download
+const DOWNLOAD_EXPIRES_IN = 3600; // 1h para download (alinha com proxy cache max-age=3300)
 
 export class S3Adapter {
   /**
