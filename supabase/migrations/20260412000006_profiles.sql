@@ -12,12 +12,24 @@ CREATE TABLE IF NOT EXISTS profiles (
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
 -- Usuário lê e edita apenas o próprio perfil
-CREATE POLICY "perfil: usuario gerencia o proprio"
-  ON profiles FOR ALL
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'profiles' AND policyname = 'perfil: usuario gerencia o proprio'
+  ) THEN
+    CREATE POLICY "perfil: usuario gerencia o proprio"
+      ON profiles FOR ALL
+      USING (auth.uid() = user_id)
+      WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
 
 -- Admin lê todos os perfis
-CREATE POLICY "perfil: admin le todos"
-  ON profiles FOR SELECT
-  USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'profiles' AND policyname = 'perfil: admin le todos'
+  ) THEN
+    CREATE POLICY "perfil: admin le todos"
+      ON profiles FOR SELECT
+      USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+  END IF;
+END $$;
