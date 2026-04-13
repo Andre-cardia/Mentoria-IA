@@ -61,9 +61,10 @@ export default function MinhaContaPage() {
       .from('profiles')
       .select('full_name, phone, avatar_url')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
       .then(({ data, error }) => {
         if (error) { console.error('[MinhaContaPage] load:', error); return; }
+        if (!data) return;
         setLocalProfile(data);
         setFullName(data.full_name ?? '');
         setPhone(data.phone ?? '');
@@ -152,15 +153,20 @@ export default function MinhaContaPage() {
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path);
       const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
 
-      // 4. Persistir no perfil
-      const { error: updateError } = await supabase
+      // 4. Persistir no perfil — usar .select() para verificar que a linha foi atualizada
+      const { data: updatedRows, error: updateError } = await supabase
         .from('profiles')
         .update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() })
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .select('user_id');
 
       if (updateError) {
         console.error('[MinhaContaPage] profile update error:', updateError);
         throw new Error(updateError.message || 'Erro ao salvar foto no perfil.');
+      }
+      if (!updatedRows || updatedRows.length === 0) {
+        console.error('[MinhaContaPage] profile update: 0 rows updated');
+        throw new Error('Não foi possível salvar a foto. Recarregue a página e tente novamente.');
       }
 
       setLocalProfile(p => ({ ...p, avatar_url: avatarUrl }));
