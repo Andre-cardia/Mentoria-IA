@@ -22,8 +22,12 @@ const AdminAulasPage   = lazy(() => import('./plataforma/pages/admin/AdminAulasP
 const AdminMateriaisPage = lazy(() => import('./plataforma/pages/admin/AdminMateriaisPage'));
 const AdminAvisosPage    = lazy(() => import('./plataforma/pages/admin/AdminAvisosPage'));
 const LessonPage         = lazy(() => import('./plataforma/pages/LessonPage'));
-const AdminProgressoPage = lazy(() => import('./plataforma/pages/admin/AdminProgressoPage'));
-const MinhaContaPage     = lazy(() => import('./plataforma/pages/MinhaContaPage'));
+const AdminProgressoPage     = lazy(() => import('./plataforma/pages/admin/AdminProgressoPage'));
+const MinhaContaPage         = lazy(() => import('./plataforma/pages/MinhaContaPage'));
+const AdminBlogPage          = lazy(() => import('./plataforma/pages/admin/AdminBlogPage'));
+const AdminBlogEditorPage    = lazy(() => import('./plataforma/pages/admin/AdminBlogEditorPage'));
+const PlataformaBlogPage     = lazy(() => import('./plataforma/pages/PlataformaBlogPage'));
+const PlataformaBlogPostPage = lazy(() => import('./plataforma/pages/PlataformaBlogPostPage'));
 
 function LegacyLessonRedirect() {
   const { moduleId, lessonId } = useParams();
@@ -69,6 +73,13 @@ createRoot(document.getElementById('root')).render(
             <Route path="/admin/materiais"  element={<AdminRoute><AdminMateriaisPage /></AdminRoute>} />
             <Route path="/admin/avisos"     element={<AdminRoute><AdminAvisosPage /></AdminRoute>} />
             <Route path="/admin/progresso"  element={<AdminRoute><AdminProgressoPage /></AdminRoute>} />
+            <Route path="/admin/blog"                  element={<AdminRoute><AdminBlogPage /></AdminRoute>} />
+            <Route path="/admin/blog/novo"             element={<AdminRoute><AdminBlogEditorPage /></AdminRoute>} />
+            <Route path="/admin/blog/:id/editar"       element={<AdminRoute><AdminBlogEditorPage /></AdminRoute>} />
+
+            {/* Blog da plataforma (alunos autenticados) */}
+            <Route path="/blog"       element={<ProtectedRoute><ProfileGuard><PlataformaBlogPage /></ProfileGuard></ProtectedRoute>} />
+            <Route path="/blog/:slug" element={<ProtectedRoute><ProfileGuard><PlataformaBlogPostPage /></ProfileGuard></ProtectedRoute>} />
 
             {/* Redirect padrão */}
             <Route path="*" element={<Navigate to="/inicio" replace />} />

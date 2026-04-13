@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { to: '/forum',        label: 'Fórum' },
   { to: '/materiais',    label: 'Materiais' },
   { to: '/avisos',       label: 'Avisos' },
+  { to: '/blog',         label: 'Blog' },
   { to: '/minha-conta',  label: 'Minha Conta' },
 ];
 

@@ -5,6 +5,7 @@ import path from "path";
 import pagbankRoutes from "./routes/pagbank.js";
 import materialsRoutes from "./routes/materials.js";
 import profileRoutes from "./routes/profile.js";
+import blogRoutes from "./routes/blog.js";
 import { PORT } from "./config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -22,6 +23,9 @@ app.use("/api/materials", materialsRoutes);
 
 // Rotas da plataforma — perfil do aluno (avatar upload, dados)
 app.use("/api/profile", profileRoutes);
+
+// Rotas do blog (image upload)
+app.use("/api/blog", blogRoutes);
 
 // Em produção, servir o build estático do Vite
 if (process.env.NODE_ENV === "production") {

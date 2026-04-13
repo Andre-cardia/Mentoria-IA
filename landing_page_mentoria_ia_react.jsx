@@ -265,12 +265,17 @@ export default function LandingPageMentoriaIA() {
               <div className="text-xl font-semibold tracking-[-0.04em] text-[var(--text)] md:text-2xl">ZERO-TO-HERO IA</div>
             </div>
           </div>
-          <a
-            href="#planos"
-            className="border border-[var(--line-strong)] bg-[var(--accent)] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.24em] text-black transition hover:brightness-110 active:scale-95 animate-glow"
-          >
-            Ver planos
-          </a>
+          <div className="flex items-center gap-4">
+            <a href="/blog" className="text-[11px] uppercase tracking-[0.24em] text-[var(--muted)] hover:text-[var(--text)] transition">
+              Blog
+            </a>
+            <a
+              href="#planos"
+              className="border border-[var(--line-strong)] bg-[var(--accent)] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.24em] text-black transition hover:brightness-110 active:scale-95 animate-glow"
+            >
+              Ver planos
+            </a>
+          </div>
         </div>
       </header>
 

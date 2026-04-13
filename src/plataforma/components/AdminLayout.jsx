@@ -8,6 +8,7 @@ const ADMIN_NAV = [
   { to: '/admin/materiais',  label: 'Materiais' },
   { to: '/admin/avisos',     label: 'Avisos' },
   { to: '/admin/progresso',  label: 'Progresso' },
+  { to: '/admin/blog',       label: 'Blog' },
 ];
 
 const ALUNO_NAV = [
