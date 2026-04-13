@@ -6,7 +6,7 @@ import { useLessonProgress } from '../hooks/useLessonProgress';
 import Layout from '../components/Layout';
 import DashboardStats from '../components/DashboardStats';
 
-const WHATSAPP_URL = 'https://chat.whatsapp.com/'; // Substituir pelo link real do grupo
+const WHATSAPP_URL = 'https://chat.whatsapp.com/CzkXZ1ol61YC1zw5dUjy7v?mode=gi_t';
 
 const TYPE_LABEL = { video: 'Vídeo', text: 'Texto', activity: 'Atividade', quiz: 'Quiz' };
 
