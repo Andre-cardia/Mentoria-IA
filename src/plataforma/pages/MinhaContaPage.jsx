@@ -132,27 +132,36 @@ export default function MinhaContaPage() {
     setUploading(true);
 
     try {
-      // 1. Upload direto ao Supabase Storage (bucket "avatars")
       const ext = pendingFile.name.split('.').pop().toLowerCase();
       const path = `${user.id}/avatar.${ext}`;
 
+      // 1. Remover arquivo existente (ignorar erro — pode não existir)
+      await supabase.storage.from('avatars').remove([path]);
+
+      // 2. Upload limpo (sem upsert — arquivo foi removido acima)
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(path, pendingFile, { upsert: true, contentType: pendingFile.type });
+        .upload(path, pendingFile, { contentType: pendingFile.type });
 
-      if (uploadError) throw new Error(uploadError.message ?? 'Erro no upload');
+      if (uploadError) {
+        console.error('[MinhaContaPage] storage error:', uploadError);
+        throw new Error(uploadError.message || `Erro no upload (${uploadError.error || uploadError.statusCode || 'desconhecido'})`);
+      }
 
-      // 2. Obter URL pública (+ cache-bust)
+      // 3. Obter URL pública (+ cache-bust para forçar reload)
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path);
       const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
 
-      // 3. Persistir no perfil
+      // 4. Persistir no perfil
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() })
         .eq('user_id', user.id);
 
-      if (updateError) throw new Error(updateError.message ?? 'Erro ao salvar foto');
+      if (updateError) {
+        console.error('[MinhaContaPage] profile update error:', updateError);
+        throw new Error(updateError.message || 'Erro ao salvar foto no perfil.');
+      }
 
       setLocalProfile(p => ({ ...p, avatar_url: avatarUrl }));
       await refreshProfile();
@@ -160,7 +169,7 @@ export default function MinhaContaPage() {
       handleCancelAvatar();
     } catch (err) {
       console.error('[MinhaContaPage] avatar upload:', err);
-      toast.error(err.message ?? 'Erro ao enviar foto. Tente novamente.');
+      toast.error(err.message || 'Erro ao enviar foto. Tente novamente.');
     } finally {
       setUploading(false);
     }
