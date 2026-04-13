@@ -10,6 +10,19 @@ const WHATSAPP_URL = 'https://chat.whatsapp.com/'; // Substituir pelo link real 
 
 const TYPE_LABEL = { video: 'Vídeo', text: 'Texto', activity: 'Atividade', quiz: 'Quiz' };
 
+const TYPE_ICON = { text: '📄', activity: '✏️', quiz: '🧠' };
+
+function getVideoThumbnail(url) {
+  if (!url) return null;
+  // YouTube embed: youtube.com/embed/ID
+  const embedMatch = url.match(/youtube\.com\/embed\/([^?&/]+)/);
+  if (embedMatch) return `https://img.youtube.com/vi/${embedMatch[1]}/mqdefault.jpg`;
+  // YouTube watch: youtube.com/watch?v=ID ou youtu.be/ID
+  const watchMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^?&/]+)/);
+  if (watchMatch) return `https://img.youtube.com/vi/${watchMatch[1]}/mqdefault.jpg`;
+  return null;
+}
+
 function LessonTypeTag({ type }) {
   return (
     <span style={{
@@ -49,7 +62,7 @@ export default function DashboardPage() {
         supabase.from('modules').select('id, title, order, lessons(id, title, lesson_type, order, module_id)').order('order'),
         // 4 aulas mais recentes
         supabase.from('lessons')
-          .select('id, title, lesson_type, module_id, modules(title)')
+          .select('id, title, lesson_type, video_url, module_id, modules(title)')
           .order('created_at', { ascending: false })
           .limit(4),
         // Ranking semanal via RPC
@@ -134,33 +147,64 @@ export default function DashboardPage() {
                 </p>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
-                  {latestLessons.map((lesson) => (
-                    <Link
-                      key={lesson.id}
-                      to={`/modulos/${lesson.module_id}/aulas/${lesson.id}`}
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <div style={{
-                        background: 'var(--panel)', border: '1px solid var(--line)',
-                        borderRadius: '8px', padding: '16px',
-                        transition: 'border-color .15s',
-                        cursor: 'pointer',
-                      }}
-                      onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
-                      onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--line)'}
+                  {latestLessons.map((lesson) => {
+                    const thumb = getVideoThumbnail(lesson.video_url);
+                    const type = lesson.lesson_type ?? 'video';
+                    return (
+                      <Link
+                        key={lesson.id}
+                        to={`/modulos/${lesson.module_id}/aulas/${lesson.id}`}
+                        style={{ textDecoration: 'none' }}
                       >
-                        <div style={{ marginBottom: '8px' }}>
-                          <LessonTypeTag type={lesson.lesson_type ?? 'video'} />
+                        <div style={{
+                          background: 'var(--panel)', border: '1px solid var(--line)',
+                          borderRadius: '8px', overflow: 'hidden',
+                          transition: 'border-color .15s', cursor: 'pointer',
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
+                        onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--line)'}
+                        >
+                          {/* Thumbnail */}
+                          <div style={{
+                            width: '100%', aspectRatio: '16/9',
+                            background: 'var(--panel-2)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            overflow: 'hidden', position: 'relative',
+                          }}>
+                            {thumb ? (
+                              <img
+                                src={thumb}
+                                alt={lesson.title}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                              />
+                            ) : null}
+                            <div style={{
+                              display: thumb ? 'none' : 'flex',
+                              width: '100%', height: '100%', position: thumb ? 'absolute' : 'static',
+                              top: 0, left: 0,
+                              alignItems: 'center', justifyContent: 'center',
+                              fontSize: '2rem',
+                            }}>
+                              {TYPE_ICON[type] ?? '▶'}
+                            </div>
+                          </div>
+                          {/* Info */}
+                          <div style={{ padding: '12px 14px' }}>
+                            <div style={{ marginBottom: '6px' }}>
+                              <LessonTypeTag type={type} />
+                            </div>
+                            <div style={{ fontWeight: 600, fontSize: '.875rem', color: 'var(--text)', marginBottom: '4px', lineHeight: 1.3 }}>
+                              {lesson.title}
+                            </div>
+                            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.62rem', color: 'var(--muted)' }}>
+                              {lesson.modules?.title}
+                            </div>
+                          </div>
                         </div>
-                        <div style={{ fontWeight: 600, fontSize: '.9rem', color: 'var(--text)', marginBottom: '6px', lineHeight: 1.3 }}>
-                          {lesson.title}
-                        </div>
-                        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)' }}>
-                          {lesson.modules?.title}
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </section>

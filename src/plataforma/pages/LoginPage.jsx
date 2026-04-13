@@ -20,7 +20,7 @@ export default function LoginPage() {
       setError('Email ou senha inválidos.');
       return;
     }
-    navigate('/modulos', { replace: true });
+    navigate('/inicio', { replace: true });
   }
 
   return (
