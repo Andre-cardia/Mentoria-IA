@@ -6,6 +6,7 @@ import LessonPlayer from '../components/LessonPlayer';
 import LessonTextContent from '../components/LessonTextContent';
 import LessonActivityContent from '../components/LessonActivityContent';
 import { useLessonProgress } from '../hooks/useLessonProgress';
+import LessonQA from '../components/LessonQA';
 
 export default function LessonPage() {
   const { moduleId, lessonId } = useParams();
@@ -124,6 +125,9 @@ export default function LessonPage() {
                 ← Voltar aos módulos
               </Link>
             </div>
+
+            {/* Q&A — para todos os tipos de aula */}
+            <LessonQA lessonId={lesson.id} />
           </>
         )}
       </div>
