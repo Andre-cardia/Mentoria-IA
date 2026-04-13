@@ -10,6 +10,7 @@ import RegisterPage from './plataforma/pages/RegisterPage';
 import CompletarPerfilPage from './plataforma/pages/CompletarPerfilPage';
 
 // Lazy-load para code splitting
+const DashboardPage    = lazy(() => import('./plataforma/pages/DashboardPage'));
 const ModulosPage      = lazy(() => import('./plataforma/pages/ModulosPage'));
 const ForumPage        = lazy(() => import('./plataforma/pages/ForumPage'));
 const MateriaisPage    = lazy(() => import('./plataforma/pages/MateriaisPage'));
@@ -42,6 +43,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/completar-perfil" element={<ProtectedRoute><CompletarPerfilPage /></ProtectedRoute>} />
 
             {/* Área do Aluno (autenticado + perfil completo) */}
+            <Route path="/inicio"    element={<ProtectedRoute><ProfileGuard><DashboardPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/modulos"   element={<ProtectedRoute><ProfileGuard><ModulosPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/modulos/:moduleId/aulas/:lessonId" element={<ProtectedRoute><ProfileGuard><LessonPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/forum"     element={<ProtectedRoute><ProfileGuard><ForumPage /></ProfileGuard></ProtectedRoute>} />
@@ -57,7 +59,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/admin/progresso"  element={<AdminRoute><AdminProgressoPage /></AdminRoute>} />
 
             {/* Redirect padrão */}
-            <Route path="*" element={<Navigate to="/modulos" replace />} />
+            <Route path="*" element={<Navigate to="/inicio" replace />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

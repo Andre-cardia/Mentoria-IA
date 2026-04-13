@@ -81,5 +81,5 @@ export function useLessonProgress() {
     [completedIds]
   );
 
-  return { isComplete, toggleComplete, getModuleProgress, getTotalProgress, marking };
+  return { isComplete, toggleComplete, getModuleProgress, getTotalProgress, marking, completedIds };
 }

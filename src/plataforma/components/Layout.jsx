@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLessonProgress } from '../hooks/useLessonProgress';
 
 const NAV_ITEMS = [
+  { to: '/inicio',    label: 'Início' },
   { to: '/modulos',   label: 'Módulos & Aulas' },
   { to: '/forum',     label: 'Fórum' },
   { to: '/materiais', label: 'Materiais' },
