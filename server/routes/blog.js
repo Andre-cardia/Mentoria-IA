@@ -1,39 +1,29 @@
 import { randomUUID } from "crypto";
 import { Router } from "express";
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { createClient } from "@supabase/supabase-js";
-import {
-  AWS_BUCKET,
-  AWS_REGION,
-  AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY,
-  SUPABASE_URL,
-  SUPABASE_SERVICE_KEY,
-} from "../config.js";
+import { S3Adapter } from "../adapters/s3-adapter.js";
+import { SUPABASE_URL, SUPABASE_SERVICE_KEY } from "../config.js";
 
 const router = Router();
+const s3 = new S3Adapter();
 
-function makeS3() {
-  return new S3Client({
-    region: AWS_REGION || "us-east-1",
-    credentials: {
-      accessKeyId: AWS_ACCESS_KEY_ID,
-      secretAccessKey: AWS_SECRET_ACCESS_KEY,
-    },
-  });
-}
+const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
+  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+  : null;
 
 // POST /api/blog/image-upload
 router.post("/image-upload", async (req, res) => {
   try {
+    if (!supabase) {
+      return res.status(503).json({ error: "Supabase não configurado" });
+    }
+
     const authHeader = req.headers.authorization ?? "";
     const token = authHeader.replace("Bearer ", "").trim();
     if (!token) return res.status(401).json({ error: "Unauthorized" });
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
     const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
-    if (authErr || !user) return res.status(401).json({ error: "Invalid token" });
+    if (authErr || !user) return res.status(401).json({ error: "Token inválido" });
 
     const role = user.user_metadata?.role;
     if (role !== "admin") return res.status(403).json({ error: "Forbidden" });
@@ -47,22 +37,18 @@ router.post("/image-upload", async (req, res) => {
     const ext = fileName.split(".").pop();
     const s3Key = `${prefix}/${randomUUID()}.${ext}`;
 
-    const uploadUrl = await getSignedUrl(
-      makeS3(),
-      new PutObjectCommand({ Bucket: AWS_BUCKET, Key: s3Key, ContentType: contentType }),
-      { expiresIn: 300 }
-    );
-
+    const uploadUrl = await s3.getUploadUrl(s3Key, contentType);
     const imageUrl = `/api/blog/image/${s3Key}`;
+
     return res.json({ uploadUrl, imageUrl });
   } catch (err) {
     console.error("[blog/image-upload]", err);
-    return res.status(500).json({ error: "Erro interno ao gerar URL de upload" });
+    return res.status(500).json({ error: err.message ?? "Erro interno" });
   }
 });
 
-// GET /api/blog/image/:prefix/:filename
-// Proxy que gera presigned GET e redireciona
+// GET /api/blog/image/*
+// Proxy: gera presigned GET URL e redireciona
 router.get("/image/*", async (req, res) => {
   try {
     const s3Key = req.params[0];
@@ -70,17 +56,12 @@ router.get("/image/*", async (req, res) => {
       return res.status(403).json({ error: "Acesso negado" });
     }
 
-    const url = await getSignedUrl(
-      makeS3(),
-      new GetObjectCommand({ Bucket: AWS_BUCKET, Key: s3Key }),
-      { expiresIn: 3600 }
-    );
-
+    const url = await s3.getDownloadUrl(s3Key);
     res.setHeader("Cache-Control", "public, max-age=3300, stale-while-revalidate=300");
     return res.redirect(302, url);
   } catch (err) {
     console.error("[blog/image]", err);
-    return res.status(500).json({ error: "Erro ao gerar URL" });
+    return res.status(500).json({ error: err.message ?? "Erro ao gerar URL" });
   }
 });
 
