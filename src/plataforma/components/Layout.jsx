@@ -5,11 +5,12 @@ import { useAuth } from '../context/AuthContext';
 import { useLessonProgress } from '../hooks/useLessonProgress';
 
 const NAV_ITEMS = [
-  { to: '/inicio',    label: 'Início' },
-  { to: '/modulos',   label: 'Módulos & Aulas' },
-  { to: '/forum',     label: 'Fórum' },
-  { to: '/materiais', label: 'Materiais' },
-  { to: '/avisos',    label: 'Avisos' },
+  { to: '/inicio',       label: 'Início' },
+  { to: '/modulos',      label: 'Módulos & Aulas' },
+  { to: '/forum',        label: 'Fórum' },
+  { to: '/materiais',    label: 'Materiais' },
+  { to: '/avisos',       label: 'Avisos' },
+  { to: '/minha-conta',  label: 'Minha Conta' },
 ];
 
 const linkStyle = (isActive) => ({
@@ -25,8 +26,13 @@ const linkStyle = (isActive) => ({
   transition: 'color .15s, background .15s',
 });
 
+function getInitials(name) {
+  if (!name) return '?';
+  return name.trim().split(' ').filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');
+}
+
 export default function Layout({ children }) {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const { getTotalProgress } = useLessonProgress();
   const [modules, setModules] = useState([]);
@@ -135,8 +141,28 @@ export default function Layout({ children }) {
 
         {/* Footer do sidebar */}
         <div style={{ borderTop: '1px solid var(--line)', paddingTop: '16px' }}>
-          <div style={{ fontSize: '.8rem', color: 'var(--muted)', marginBottom: '10px', paddingLeft: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {user?.email}
+          {/* Avatar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', paddingLeft: '4px' }}>
+            {profile?.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt="avatar"
+                style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+              />
+            ) : (
+              <div style={{
+                width: '32px', height: '32px', borderRadius: '50%',
+                background: 'var(--accent-soft)', border: '1px solid var(--accent)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontFamily: 'Space Mono, monospace', fontWeight: 700, fontSize: '.65rem',
+                color: 'var(--accent)', flexShrink: 0,
+              }}>
+                {getInitials(profile?.full_name)}
+              </div>
+            )}
+            <div style={{ fontSize: '.8rem', color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+              {user?.email}
+            </div>
           </div>
           <button onClick={handleSignOut} style={{
             width: '100%', padding: '8px 14px',

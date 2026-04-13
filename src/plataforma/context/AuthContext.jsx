@@ -6,17 +6,36 @@ export const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
+
+  async function loadProfile(userId) {
+    if (!userId) { setProfile(null); return; }
+    const { data } = await supabase
+      .from('profiles')
+      .select('full_name, phone, avatar_url')
+      .eq('user_id', userId)
+      .single();
+    setProfile(data ?? null);
+  }
+
+  async function refreshProfile() {
+    if (user) await loadProfile(user.id);
+  }
 
   useEffect(() => {
     // Sessão inicial
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+      const u = session?.user ?? null;
+      setUser(u);
       setLoading(false);
+      loadProfile(u?.id);
     });
 
     // Listener de mudanças de auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const u = session?.user ?? null;
+      setUser(u);
+      loadProfile(u?.id);
     });
 
     return () => subscription.unsubscribe();
@@ -30,7 +49,7 @@ export function AuthProvider({ children }) {
   const isAdmin = user?.user_metadata?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAdmin, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, loading, isAdmin, profile, refreshProfile, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

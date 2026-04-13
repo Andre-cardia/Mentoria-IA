@@ -22,6 +22,7 @@ const AdminMateriaisPage = lazy(() => import('./plataforma/pages/admin/AdminMate
 const AdminAvisosPage    = lazy(() => import('./plataforma/pages/admin/AdminAvisosPage'));
 const LessonPage         = lazy(() => import('./plataforma/pages/LessonPage'));
 const AdminProgressoPage = lazy(() => import('./plataforma/pages/admin/AdminProgressoPage'));
+const MinhaContaPage     = lazy(() => import('./plataforma/pages/MinhaContaPage'));
 
 const Fallback = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg)' }}>
@@ -49,6 +50,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/forum"     element={<ProtectedRoute><ProfileGuard><ForumPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/materiais" element={<ProtectedRoute><ProfileGuard><MateriaisPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/avisos"    element={<ProtectedRoute><ProfileGuard><AvisosPage /></ProfileGuard></ProtectedRoute>} />
+            <Route path="/minha-conta" element={<ProtectedRoute><ProfileGuard><MinhaContaPage /></ProfileGuard></ProtectedRoute>} />
 
             {/* Área de Admin */}
             <Route path="/admin/alunos"     element={<AdminRoute><AdminAlunosPage /></AdminRoute>} />
