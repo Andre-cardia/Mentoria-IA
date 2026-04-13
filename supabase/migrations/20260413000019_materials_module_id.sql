@@ -1,0 +1,2 @@
+ALTER TABLE materials
+  ADD COLUMN IF NOT EXISTS module_id uuid REFERENCES modules(id) ON DELETE SET NULL;

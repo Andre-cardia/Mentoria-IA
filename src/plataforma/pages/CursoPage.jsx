@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 import { useLessonProgress } from '../hooks/useLessonProgress';
+import { useAuth } from '../context/AuthContext';
 
 function formatDuration(seconds) {
   if (!seconds) return null;
@@ -14,9 +15,12 @@ function formatDuration(seconds) {
 export default function CursoPage() {
   const { moduleId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [mod, setMod] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [materials, setMaterials] = useState([]);
+  const [downloadingId, setDownloadingId] = useState(null);
   const { isComplete, getModuleProgress } = useLessonProgress();
 
   useEffect(() => {
@@ -33,6 +37,39 @@ export default function CursoPage() {
     }
     load();
   }, [moduleId]);
+
+  useEffect(() => {
+    if (!moduleId) return;
+    supabase
+      .from('materials')
+      .select('id, title, description, file_size')
+      .eq('module_id', moduleId)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => setMaterials(data ?? []));
+  }, [moduleId]);
+
+  async function handleDownload(id) {
+    setDownloadingId(id);
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      const res = await fetch(`/api/materials/${id}/download`, {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      const { downloadUrl } = await res.json();
+      window.open(downloadUrl, '_blank');
+    } catch (err) {
+      console.error('[CursoPage] download error:', err);
+    } finally {
+      setDownloadingId(null);
+    }
+  }
+
+  function formatSize(bytes) {
+    if (!bytes) return '';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
 
   const lessons = mod?.lessons ?? [];
   const firstLesson = lessons[0] ?? null;
@@ -97,7 +134,7 @@ export default function CursoPage() {
             )}
 
             {/* Conteúdo do Curso */}
-            <div>
+            <div style={{ marginBottom: materials.length > 0 ? '36px' : 0 }}>
               <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: '0 0 12px 0', paddingBottom: '10px', borderBottom: '1px solid var(--line)' }}>
                 Conteúdo do Curso
               </h2>
@@ -158,6 +195,66 @@ export default function CursoPage() {
                 </div>
               )}
             </div>
+
+            {/* Materiais do Curso */}
+            {materials.length > 0 && (
+              <div>
+                <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: '0 0 12px 0', paddingBottom: '10px', borderBottom: '1px solid var(--line)' }}>
+                  Materiais do Curso
+                </h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {materials.map((m) => (
+                    <div
+                      key={m.id}
+                      style={{
+                        background: 'var(--panel-2)', border: '1px solid var(--line)',
+                        borderRadius: '6px', padding: '16px 20px',
+                        display: 'flex', alignItems: 'center', gap: '16px',
+                        transition: 'border-color .2s, background .2s',
+                      }}
+                      onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--line-strong)'; e.currentTarget.style.background = 'var(--panel)'; }}
+                      onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--line)'; e.currentTarget.style.background = 'var(--panel-2)'; }}
+                    >
+                      <div style={{
+                        width: '36px', height: '36px', flexShrink: 0,
+                        background: 'var(--accent-soft)', border: '1px solid rgba(255,106,0,.25)',
+                        borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)',
+                      }}>
+                        FILE
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '2px' }}>{m.title}</div>
+                        {m.description && <div style={{ fontSize: '.85rem', color: 'var(--muted)' }}>{m.description}</div>}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
+                        {m.file_size && (
+                          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)' }}>
+                            {formatSize(m.file_size)}
+                          </span>
+                        )}
+                        <button
+                          onClick={() => handleDownload(m.id)}
+                          disabled={downloadingId === m.id}
+                          style={{
+                            padding: '7px 16px', background: 'transparent',
+                            border: '1px solid var(--line-strong)', borderRadius: '4px',
+                            color: downloadingId === m.id ? 'var(--muted)' : 'var(--text)',
+                            fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, fontSize: '.82rem',
+                            cursor: downloadingId === m.id ? 'not-allowed' : 'pointer',
+                            transition: 'border-color .15s, background .15s',
+                          }}
+                          onMouseOver={(e) => { if (downloadingId !== m.id) { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.background = 'var(--accent-soft)'; }}}
+                          onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--line-strong)'; e.currentTarget.style.background = 'transparent'; }}
+                        >
+                          {downloadingId === m.id ? 'Gerando link...' : 'Download'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>

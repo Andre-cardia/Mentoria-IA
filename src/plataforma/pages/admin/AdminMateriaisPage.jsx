@@ -11,16 +11,24 @@ const inputSx = {
 
 export default function AdminMateriaisPage() {
   const [materials, setMaterials] = useState([]);
-  const [form, setForm] = useState({ title: '', description: '' });
+  const [modules, setModules] = useState([]);
+  const [form, setForm] = useState({ title: '', description: '', module_id: '' });
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState('');
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => { loadMaterials(); }, []);
+  useEffect(() => {
+    loadMaterials();
+    supabase.from('modules').select('id, title').order('order', { ascending: true })
+      .then(({ data }) => setModules(data ?? []));
+  }, []);
 
   async function loadMaterials() {
-    const { data } = await supabase.from('materials').select('*').order('created_at', { ascending: false });
+    const { data } = await supabase
+      .from('materials')
+      .select('*, modules(title)')
+      .order('created_at', { ascending: false });
     setMaterials(data ?? []);
   }
 
@@ -32,7 +40,6 @@ export default function AdminMateriaisPage() {
     try {
       const session = (await supabase.auth.getSession()).data.session;
 
-      // 1. Obter presigned URL do servidor
       setUploadProgress('Gerando URL de upload...');
       const res = await fetch('/api/materials/upload', {
         method: 'POST',
@@ -45,13 +52,13 @@ export default function AdminMateriaisPage() {
           contentType: file.type || 'application/octet-stream',
           title: form.title.trim(),
           description: form.description.trim() || undefined,
+          module_id: form.module_id || undefined,
         }),
       });
 
       if (!res.ok) throw new Error('Falha ao obter URL de upload');
       const { uploadUrl } = await res.json();
 
-      // 2. Upload direto para o S3
       setUploadProgress('Enviando arquivo para S3...');
       const uploadRes = await fetch(uploadUrl, {
         method: 'PUT',
@@ -62,7 +69,7 @@ export default function AdminMateriaisPage() {
       if (!uploadRes.ok) throw new Error('Falha no upload para S3');
 
       setUploadProgress('Concluído!');
-      setForm({ title: '', description: '' });
+      setForm({ title: '', description: '', module_id: '' });
       setFile(null);
       setShowForm(false);
       await loadMaterials();
@@ -107,6 +114,21 @@ export default function AdminMateriaisPage() {
             <input style={inputSx} placeholder="Título do material" value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} required />
             <input style={inputSx} placeholder="Descrição (opcional)" value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
 
+            {/* Seletor de curso */}
+            <div>
+              <label style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Curso</label>
+              <select
+                style={{ ...inputSx, cursor: 'pointer' }}
+                value={form.module_id}
+                onChange={(e) => setForm((p) => ({ ...p, module_id: e.target.value }))}
+              >
+                <option value="">Conteúdo Extra</option>
+                {modules.map((mod) => (
+                  <option key={mod.id} value={mod.id}>{mod.title}</option>
+                ))}
+              </select>
+            </div>
+
             {/* File input estilizado */}
             <div>
               <label style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Arquivo</label>
@@ -150,7 +172,18 @@ export default function AdminMateriaisPage() {
                 FILE
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '2px' }}>{m.title}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px', flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--text)' }}>{m.title}</span>
+                  <span style={{
+                    fontFamily: 'Space Mono, monospace', fontSize: '.6rem', textTransform: 'uppercase',
+                    background: m.module_id ? 'var(--accent-soft)' : 'var(--panel-2)',
+                    border: `1px solid ${m.module_id ? 'rgba(255,106,0,.3)' : 'var(--line)'}`,
+                    color: m.module_id ? 'var(--accent)' : 'var(--muted)',
+                    borderRadius: '3px', padding: '2px 7px',
+                  }}>
+                    {m.module_id ? (m.modules?.title ?? 'Curso') : 'Conteúdo Extra'}
+                  </span>
+                </div>
                 {m.description && <div style={{ fontSize: '.85rem', color: 'var(--muted)' }}>{m.description}</div>}
               </div>
               <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)', flexShrink: 0 }}>{formatSize(m.file_size)}</span>
