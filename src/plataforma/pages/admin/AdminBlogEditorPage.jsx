@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
-import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import slugify from 'slugify';
 import { toast } from 'sonner';
@@ -65,12 +64,16 @@ function ImageModal({ onClose, onInsert, getToken }) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ fileName: file.name, contentType: file.type, type: 'image' }),
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error ?? `HTTP ${res.status}`);
+      }
       const { uploadUrl, imageUrl } = await res.json();
-      if (!uploadUrl) throw new Error('Sem URL de upload');
-      await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+      const putRes = await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+      if (!putRes.ok) throw new Error('Falha no envio para S3');
       onInsert(imageUrl);
-    } catch {
-      toast.error('Falha no upload da imagem');
+    } catch (err) {
+      toast.error(`Falha no upload: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -147,6 +150,7 @@ export default function AdminBlogEditorPage() {
   const [coverUrl, setCoverUrl] = useState('');
   const [coverPreview, setCoverPreview] = useState('');
   const [uploadingCover, setUploadingCover] = useState(false);
+  const coverInputRef = useRef(null);
   const [selectedTags, setSelectedTags] = useState([]);
   const [allTags, setAllTags] = useState([]);
   const [newTagInput, setNewTagInput] = useState('');
@@ -157,9 +161,9 @@ export default function AdminBlogEditorPage() {
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      // StarterKit v3 já inclui Link — configure aqui para não duplicar
+      StarterKit.configure({ link: { openOnClick: false } }),
       Image,
-      Link.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: 'Escreva seu artigo aqui...' }),
     ],
     content: '',
@@ -232,15 +236,21 @@ export default function AdminBlogEditorPage() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ fileName: file.name, contentType: file.type, type: 'cover' }),
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error ?? `HTTP ${res.status}`);
+      }
       const { uploadUrl, imageUrl } = await res.json();
-      await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+      const putRes = await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+      if (!putRes.ok) throw new Error('Falha no envio para S3');
       setCoverUrl(imageUrl);
       setCoverPreview(imageUrl);
       toast.success('Cover carregado.');
-    } catch {
-      toast.error('Falha no upload do cover');
+    } catch (err) {
+      toast.error(`Falha no upload: ${err.message}`);
     } finally {
       setUploadingCover(false);
+      if (coverInputRef.current) coverInputRef.current.value = '';
     }
   }
 
@@ -358,7 +368,11 @@ export default function AdminBlogEditorPage() {
               <img src={coverPreview} alt="cover" style={{ width: '100%', maxHeight: '220px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--line)' }} />
               <button
                 type="button"
-                onClick={() => { setCoverUrl(''); setCoverPreview(''); }}
+                onClick={() => {
+                  setCoverUrl('');
+                  setCoverPreview('');
+                  if (coverInputRef.current) coverInputRef.current.value = '';
+                }}
                 style={{
                   position: 'absolute', top: '8px', right: '8px',
                   background: 'rgba(0,0,0,.6)', color: '#fff', border: 'none',
@@ -370,6 +384,7 @@ export default function AdminBlogEditorPage() {
             </div>
           )}
           <input
+            ref={coverInputRef}
             type="file" accept="image/jpeg,image/png,image/webp"
             onChange={handleCoverUpload} disabled={uploadingCover}
             style={{ color: 'var(--text)', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem' }}
