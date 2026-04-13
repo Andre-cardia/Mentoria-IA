@@ -3,12 +3,12 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { generateHTML } from '@tiptap/html';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
-import LinkExt from '@tiptap/extension-link';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 import CommentSection from '../../components/CommentSection';
 
-const tiptapExtensions = [StarterKit, Image, LinkExt];
+// Link já incluso no StarterKit v3 — não importar separadamente
+const tiptapExtensions = [StarterKit, Image];
 
 function fmtDate(d) {
   if (!d) return '';

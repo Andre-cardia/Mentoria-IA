@@ -4,11 +4,11 @@ import { Helmet } from 'react-helmet-async';
 import { generateHTML } from '@tiptap/html';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
-import Link from '@tiptap/extension-link';
 import { supabase } from '../lib/supabase';
 import CommentSection from '../components/CommentSection';
 
-const tiptapExtensions = [StarterKit, Image, Link];
+// Link já incluso no StarterKit v3 — não importar separadamente
+const tiptapExtensions = [StarterKit, Image];
 
 function fmtDate(d) {
   if (!d) return '';
