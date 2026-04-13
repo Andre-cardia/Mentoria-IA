@@ -1,3 +1,10 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(supabase migration:*)",
+      "Bash(npx supabase:*)",
+      "Bash(ls d:/GitHub/Mentoria-IA/docs/stories/*.story.md)"
+    ]
+  },
   "language": "portuguese"
 }
