@@ -47,7 +47,14 @@ const btnDanger = {
 };
 
 const EMPTY_MOD = { title: '', description: '' };
-const EMPTY_LESSON = { title: '', video_url: '', duration: '' };
+const EMPTY_LESSON = { title: '', lesson_type: 'video', video_url: '', content: '', duration: '' };
+
+const LESSON_TYPES = [
+  { value: 'video',    label: 'Vídeo' },
+  { value: 'text',     label: 'Texto / Leitura' },
+  { value: 'activity', label: 'Atividade' },
+  { value: 'quiz',     label: 'Quiz' },
+];
 
 // ─── Utilitários DnD ────────────────────────────────────────────────────────
 
@@ -301,7 +308,9 @@ export default function AdminModulosPage() {
       const { error } = await supabase.from('lessons').insert({
         module_id: moduleId,
         title: lessonForm.title,
-        video_url: lessonForm.video_url || null,
+        lesson_type: lessonForm.lesson_type,
+        video_url: lessonForm.lesson_type === 'video' ? (lessonForm.video_url || null) : null,
+        content: ['text', 'activity'].includes(lessonForm.lesson_type) ? (lessonForm.content || null) : null,
         duration: lessonForm.duration ? Number(lessonForm.duration) : null,
         order: currentLessons.length,
       });
@@ -321,7 +330,9 @@ export default function AdminModulosPage() {
     setEditingLessonId(lesson.id);
     setLessonEditForm({
       title: lesson.title,
+      lesson_type: lesson.lesson_type ?? 'video',
       video_url: lesson.video_url ?? '',
+      content: lesson.content ?? '',
       duration: lesson.duration != null ? String(lesson.duration) : '',
     });
   }
@@ -336,7 +347,9 @@ export default function AdminModulosPage() {
     try {
       const { error } = await supabase.from('lessons').update({
         title: lessonEditForm.title,
-        video_url: lessonEditForm.video_url || null,
+        lesson_type: lessonEditForm.lesson_type,
+        video_url: lessonEditForm.lesson_type === 'video' ? (lessonEditForm.video_url || null) : null,
+        content: ['text', 'activity'].includes(lessonEditForm.lesson_type) ? (lessonEditForm.content || null) : null,
         duration: lessonEditForm.duration ? Number(lessonEditForm.duration) : null,
       }).eq('id', editingLessonId);
       if (error) throw error;
@@ -386,7 +399,9 @@ export default function AdminModulosPage() {
         .from('lessons')
         .insert({
           title: `${lesson.title} (cópia)`,
+          lesson_type: lesson.lesson_type ?? 'video',
           video_url: lesson.video_url,
+          content: lesson.content,
           duration: lesson.duration,
           module_id: moduleId,
           order: lesson.order + 1,
@@ -541,7 +556,18 @@ export default function AdminModulosPage() {
                                         <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: '10px', background: 'rgba(255,255,255,.02)' }}>
                                           <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)', textTransform: 'uppercase' }}>Editando aula</div>
                                           <input style={inputSx} placeholder="Título da aula" value={lessonEditForm.title} onChange={(e) => setLessonEditForm((p) => ({ ...p, title: e.target.value }))} required />
-                                          <input style={inputSx} placeholder="URL do vídeo (opcional)" value={lessonEditForm.video_url} onChange={(e) => setLessonEditForm((p) => ({ ...p, video_url: e.target.value }))} />
+                                          <select style={{ ...inputSx, cursor: 'pointer' }} value={lessonEditForm.lesson_type} onChange={(e) => setLessonEditForm((p) => ({ ...p, lesson_type: e.target.value }))}>
+                                            {LESSON_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                                          </select>
+                                          {lessonEditForm.lesson_type === 'video' && (
+                                            <input style={inputSx} placeholder="URL do vídeo (opcional)" value={lessonEditForm.video_url} onChange={(e) => setLessonEditForm((p) => ({ ...p, video_url: e.target.value }))} />
+                                          )}
+                                          {['text', 'activity'].includes(lessonEditForm.lesson_type) && (
+                                            <textarea style={{ ...inputSx, minHeight: '100px', resize: 'vertical', lineHeight: '1.6' }} placeholder={lessonEditForm.lesson_type === 'activity' ? 'Instruções da atividade...' : 'Conteúdo da aula...'} value={lessonEditForm.content} onChange={(e) => setLessonEditForm((p) => ({ ...p, content: e.target.value }))} />
+                                          )}
+                                          {lessonEditForm.lesson_type === 'quiz' && (
+                                            <p style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)', margin: 0 }}>Quiz Builder disponível na Story 3.2.</p>
+                                          )}
                                           <input style={{ ...inputSx, maxWidth: '220px' }} placeholder="Duração (segundos)" type="number" value={lessonEditForm.duration} onChange={(e) => setLessonEditForm((p) => ({ ...p, duration: e.target.value }))} />
                                           <div style={{ display: 'flex', gap: '8px' }}>
                                             <button style={btnPrimary} onClick={() => updateLesson(mod.id)} disabled={saving || !lessonEditForm.title}>{saving ? 'Salvando...' : 'Salvar'}</button>
@@ -561,7 +587,18 @@ export default function AdminModulosPage() {
                             <form onSubmit={(e) => saveLesson(e, mod.id)} style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid var(--line)', background: 'rgba(255,255,255,.02)' }}>
                               <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)', textTransform: 'uppercase' }}>Nova Aula</div>
                               <input style={inputSx} placeholder="Título da aula" value={lessonForm.title} onChange={(e) => setLessonForm((p) => ({ ...p, title: e.target.value }))} required />
-                              <input style={inputSx} placeholder="URL do vídeo (opcional)" value={lessonForm.video_url} onChange={(e) => setLessonForm((p) => ({ ...p, video_url: e.target.value }))} />
+                              <select style={{ ...inputSx, cursor: 'pointer' }} value={lessonForm.lesson_type} onChange={(e) => setLessonForm((p) => ({ ...p, lesson_type: e.target.value }))}>
+                                {LESSON_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                              </select>
+                              {lessonForm.lesson_type === 'video' && (
+                                <input style={inputSx} placeholder="URL do vídeo (opcional)" value={lessonForm.video_url} onChange={(e) => setLessonForm((p) => ({ ...p, video_url: e.target.value }))} />
+                              )}
+                              {['text', 'activity'].includes(lessonForm.lesson_type) && (
+                                <textarea style={{ ...inputSx, minHeight: '100px', resize: 'vertical', lineHeight: '1.6' }} placeholder={lessonForm.lesson_type === 'activity' ? 'Instruções da atividade...' : 'Conteúdo da aula...'} value={lessonForm.content} onChange={(e) => setLessonForm((p) => ({ ...p, content: e.target.value }))} required />
+                              )}
+                              {lessonForm.lesson_type === 'quiz' && (
+                                <p style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)', margin: 0 }}>Quiz Builder disponível na Story 3.2.</p>
+                              )}
                               <input style={{ ...inputSx, maxWidth: '220px' }} placeholder="Duração (segundos)" type="number" value={lessonForm.duration} onChange={(e) => setLessonForm((p) => ({ ...p, duration: e.target.value }))} />
                               <div style={{ display: 'flex', gap: '8px' }}>
                                 <button type="submit" style={btnPrimary} disabled={saving}>{saving ? 'Salvando...' : 'Adicionar Aula'}</button>
