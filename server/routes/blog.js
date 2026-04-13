@@ -47,9 +47,10 @@ router.post("/image-upload", async (req, res) => {
   }
 });
 
-// GET /api/blog/image/*
+// GET /api/blog/image/<prefix>/<filename>
 // Proxy: gera presigned GET URL e redireciona
-router.get("/image/*", async (req, res) => {
+// Regex porque path-to-regexp v8+ (Node 24) não suporta wildcard "*" sem nome
+router.get(/^\/image\/(.+)$/, async (req, res) => {
   try {
     const s3Key = req.params[0];
     if (!s3Key || (!s3Key.startsWith("blog-images/") && !s3Key.startsWith("blog-covers/"))) {
