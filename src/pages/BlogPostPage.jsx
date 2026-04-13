@@ -107,6 +107,10 @@ export default function BlogPostPage() {
   const pageTitle = post.seo_title ?? post.title;
   const pageUrl = window.location.href;
   const htmlContent = post.content_json ? generateHTML(post.content_json, tiptapExtensions) : '';
+  // cover_url pode ser relativa (/api/blog/image/...) — OG precisa de URL absoluta
+  const ogImage = post.cover_url
+    ? (post.cover_url.startsWith('/') ? window.location.origin + post.cover_url : post.cover_url)
+    : null;
 
   return (
     <>
@@ -115,7 +119,7 @@ export default function BlogPostPage() {
         {post.seo_description && <meta name="description" content={post.seo_description} />}
         <meta property="og:title" content={pageTitle} />
         {post.seo_description && <meta property="og:description" content={post.seo_description} />}
-        {post.cover_url && <meta property="og:image" content={post.cover_url} />}
+        {ogImage && <meta property="og:image" content={ogImage} />}
         <meta property="og:url" content={pageUrl} />
         <meta property="og:type" content="article" />
       </Helmet>

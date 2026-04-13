@@ -51,7 +51,8 @@ export default async function handler(req, res) {
     { expiresIn: 300 }
   );
 
-  const imageUrl = `https://${process.env.AWS_BUCKET}.s3.${process.env.AWS_REGION || "us-east-1"}.amazonaws.com/${s3Key}`;
+  // URL permanente via proxy — não expira, redireciona para presigned GET
+  const imageUrl = `/api/blog/image/${s3Key}`;
 
   return res.status(200).json({ uploadUrl, imageUrl });
 }
