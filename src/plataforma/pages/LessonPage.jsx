@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 import LessonPlayer from '../components/LessonPlayer';
+import LessonTextContent from '../components/LessonTextContent';
+import LessonActivityContent from '../components/LessonActivityContent';
 import { useLessonProgress } from '../hooks/useLessonProgress';
 
 export default function LessonPage() {
@@ -17,7 +19,7 @@ export default function LessonPage() {
   useEffect(() => {
     async function load() {
       const [lessonRes, moduleRes] = await Promise.all([
-        supabase.from('lessons').select('id, title, video_url, duration').eq('id', lessonId).single(),
+        supabase.from('lessons').select('id, title, video_url, duration, lesson_type, content').eq('id', lessonId).single(),
         supabase.from('modules').select('id, title').eq('id', moduleId).single(),
       ]);
       if (lessonRes.error || moduleRes.error) {
@@ -78,8 +80,21 @@ export default function LessonPage() {
               </div>
             </div>
 
-            {/* Player */}
-            <LessonPlayer videoUrl={lesson.video_url} />
+            {/* Conteúdo principal — renderização por tipo */}
+            {(!lesson.lesson_type || lesson.lesson_type === 'video') && (
+              <LessonPlayer videoUrl={lesson.video_url} />
+            )}
+            {lesson.lesson_type === 'text' && (
+              <LessonTextContent content={lesson.content} />
+            )}
+            {lesson.lesson_type === 'activity' && (
+              <LessonActivityContent content={lesson.content} />
+            )}
+            {lesson.lesson_type === 'quiz' && (
+              <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '32px', textAlign: 'center', color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.875rem' }}>
+                Quiz disponível em breve.
+              </div>
+            )}
 
             {/* Ação de progresso */}
             <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
