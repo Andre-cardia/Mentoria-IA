@@ -14,8 +14,8 @@ function StatCard({ label, value, accent }) {
       display: 'flex', flexDirection: 'column', gap: '4px',
     }}>
       <span style={{
-        fontFamily: 'Space Mono, monospace', fontSize: '.55rem',
-        textTransform: 'uppercase', letterSpacing: '.12em', color: 'var(--muted)',
+        fontFamily: 'Space Mono, monospace', fontSize: '.65rem',
+        textTransform: 'uppercase', letterSpacing: '.1em', color: 'var(--muted)',
       }}>
         {label}
       </span>
@@ -40,7 +40,7 @@ export default function DashboardStats({ userName, completed, total, diasEstudan
       {/* Saudação + barra */}
       <div style={{ flex: '1 1 260px' }}>
         <div style={{
-          fontFamily: 'Space Mono, monospace', fontSize: '.65rem',
+          fontFamily: 'Space Mono, monospace', fontSize: '.75rem',
           textTransform: 'uppercase', letterSpacing: '.14em',
           color: 'var(--accent)', marginBottom: '6px',
         }}>
