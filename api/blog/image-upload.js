@@ -27,6 +27,13 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Garante que o bucket existe (cria na primeira vez, ignora se já existir)
+    await supabase.storage.createBucket("blog-images", {
+      public: true,
+      allowedMimeTypes: ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"],
+      fileSizeLimit: 5242880,
+    }).catch(() => {});
+
     const prefix = type === "cover" ? "blog-covers" : "blog-images";
     const ext = fileName.split(".").pop();
     const filePath = `${prefix}/${randomUUID()}.${ext}`;
