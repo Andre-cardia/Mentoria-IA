@@ -1,6 +1,6 @@
 import { StrictMode, lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { AuthProvider } from './plataforma/context/AuthContext';
 import ProtectedRoute from './plataforma/components/ProtectedRoute';
 import AdminRoute from './plataforma/components/AdminRoute';
@@ -11,7 +11,8 @@ import CompletarPerfilPage from './plataforma/pages/CompletarPerfilPage';
 
 // Lazy-load para code splitting
 const DashboardPage    = lazy(() => import('./plataforma/pages/DashboardPage'));
-const ModulosPage      = lazy(() => import('./plataforma/pages/ModulosPage'));
+const CursosPage       = lazy(() => import('./plataforma/pages/CursosPage'));
+const CursoPage        = lazy(() => import('./plataforma/pages/CursoPage'));
 const ForumPage        = lazy(() => import('./plataforma/pages/ForumPage'));
 const MateriaisPage    = lazy(() => import('./plataforma/pages/MateriaisPage'));
 const AvisosPage       = lazy(() => import('./plataforma/pages/AvisosPage'));
@@ -23,6 +24,11 @@ const AdminAvisosPage    = lazy(() => import('./plataforma/pages/admin/AdminAvis
 const LessonPage         = lazy(() => import('./plataforma/pages/LessonPage'));
 const AdminProgressoPage = lazy(() => import('./plataforma/pages/admin/AdminProgressoPage'));
 const MinhaContaPage     = lazy(() => import('./plataforma/pages/MinhaContaPage'));
+
+function LegacyLessonRedirect() {
+  const { moduleId, lessonId } = useParams();
+  return <Navigate to={`/cursos/${moduleId}/aulas/${lessonId}`} replace />;
+}
 
 const Fallback = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg)' }}>
@@ -45,8 +51,12 @@ createRoot(document.getElementById('root')).render(
 
             {/* Área do Aluno (autenticado + perfil completo) */}
             <Route path="/inicio"    element={<ProtectedRoute><ProfileGuard><DashboardPage /></ProfileGuard></ProtectedRoute>} />
-            <Route path="/modulos"   element={<ProtectedRoute><ProfileGuard><ModulosPage /></ProfileGuard></ProtectedRoute>} />
-            <Route path="/modulos/:moduleId/aulas/:lessonId" element={<ProtectedRoute><ProfileGuard><LessonPage /></ProfileGuard></ProtectedRoute>} />
+            <Route path="/cursos"    element={<ProtectedRoute><ProfileGuard><CursosPage /></ProfileGuard></ProtectedRoute>} />
+            <Route path="/cursos/:moduleId" element={<ProtectedRoute><ProfileGuard><CursoPage /></ProfileGuard></ProtectedRoute>} />
+            <Route path="/cursos/:moduleId/aulas/:lessonId" element={<ProtectedRoute><ProfileGuard><LessonPage /></ProfileGuard></ProtectedRoute>} />
+            {/* Redirecionamentos de rotas legadas */}
+            <Route path="/modulos" element={<Navigate to="/cursos" replace />} />
+            <Route path="/modulos/:moduleId/aulas/:lessonId" element={<LegacyLessonRedirect />} />
             <Route path="/forum"     element={<ProtectedRoute><ProfileGuard><ForumPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/materiais" element={<ProtectedRoute><ProfileGuard><MateriaisPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/avisos"    element={<ProtectedRoute><ProfileGuard><AvisosPage /></ProfileGuard></ProtectedRoute>} />

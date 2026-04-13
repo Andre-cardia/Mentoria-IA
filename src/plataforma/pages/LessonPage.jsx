@@ -56,9 +56,9 @@ export default function LessonPage() {
       <div style={{ maxWidth: '860px' }}>
         {/* Breadcrumb */}
         <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '.85rem', color: 'var(--muted)' }}>
-          <Link to="/modulos" style={{ color: 'var(--muted)', textDecoration: 'none' }}>Módulos</Link>
+          <Link to="/cursos" style={{ color: 'var(--muted)', textDecoration: 'none' }}>Cursos</Link>
           <span>›</span>
-          {module && <span style={{ color: 'var(--muted)' }}>{module.title}</span>}
+          {module && <Link to={`/cursos/${moduleId}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{module.title}</Link>}
           <span>›</span>
           {lesson && <span style={{ color: 'var(--text)' }}>{lesson.title}</span>}
         </div>
@@ -118,10 +118,10 @@ export default function LessonPage() {
               </button>
 
               <Link
-                to="/modulos"
+                to={`/cursos/${moduleId}`}
                 style={{ color: 'var(--muted)', fontSize: '.875rem', textDecoration: 'none' }}
               >
-                ← Voltar aos módulos
+                ← Voltar ao curso
               </Link>
             </div>
 

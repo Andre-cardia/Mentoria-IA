@@ -6,7 +6,7 @@ import { useLessonProgress } from '../hooks/useLessonProgress';
 
 const NAV_ITEMS = [
   { to: '/inicio',       label: 'Início' },
-  { to: '/modulos',      label: 'Cursos & Aulas' },
+  { to: '/cursos',       label: 'Cursos & Aulas' },
   { to: '/forum',        label: 'Fórum' },
   { to: '/materiais',    label: 'Materiais' },
   { to: '/avisos',       label: 'Avisos' },
