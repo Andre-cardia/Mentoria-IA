@@ -128,40 +128,31 @@ export default function MinhaContaPage() {
   }
 
   async function handleConfirmAvatar() {
-    if (!pendingFile) return;
+    if (!pendingFile || !user) return;
     setUploading(true);
 
     try {
-      // 1. Obter presigned URL
-      const session = await supabase.auth.getSession();
-      const token = session.data.session?.access_token;
+      // 1. Upload direto ao Supabase Storage (bucket "avatars")
+      const ext = pendingFile.name.split('.').pop().toLowerCase();
+      const path = `${user.id}/avatar.${ext}`;
 
-      const presignRes = await fetch('/api/profile/avatar-upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ fileName: pendingFile.name, contentType: pendingFile.type }),
-      });
-      if (!presignRes.ok) {
-        const err = await presignRes.json();
-        throw new Error(err.error ?? 'Erro ao gerar URL de upload');
-      }
-      const { uploadUrl, avatarUrl } = await presignRes.json();
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, pendingFile, { upsert: true, contentType: pendingFile.type });
 
-      // 2. Upload direto ao S3
-      const s3Res = await fetch(uploadUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': pendingFile.type },
-        body: pendingFile,
-      });
-      if (!s3Res.ok) throw new Error('Falha no upload para S3');
+      if (uploadError) throw new Error(uploadError.message ?? 'Erro no upload');
 
-      // 3. Persistir avatar_url no perfil
-      const patchRes = await fetch('/api/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ avatar_url: avatarUrl }),
-      });
-      if (!patchRes.ok) throw new Error('Falha ao salvar URL do avatar');
+      // 2. Obter URL pública (+ cache-bust)
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path);
+      const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      // 3. Persistir no perfil
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() })
+        .eq('user_id', user.id);
+
+      if (updateError) throw new Error(updateError.message ?? 'Erro ao salvar foto');
 
       setLocalProfile(p => ({ ...p, avatar_url: avatarUrl }));
       await refreshProfile();

@@ -9,9 +9,11 @@ export default function AdminProgressoPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [profileMap, setProfileMap] = useState({});
+
   useEffect(() => {
     async function load() {
-      const [progressRes, modulesRes] = await Promise.all([
+      const [progressRes, modulesRes, profilesRes] = await Promise.all([
         supabase
           .from('lesson_progress')
           .select(`
@@ -26,6 +28,7 @@ export default function AdminProgressoPage() {
           `)
           .order('completed_at', { ascending: false }),
         supabase.from('modules').select('id, title').order('order', { ascending: true }),
+        supabase.from('profiles').select('user_id, full_name'),
       ]);
 
       if (progressRes.error) {
@@ -34,6 +37,11 @@ export default function AdminProgressoPage() {
         setRows(progressRes.data ?? []);
       }
       if (!modulesRes.error) setModules(modulesRes.data ?? []);
+      if (!profilesRes.error && profilesRes.data) {
+        const map = {};
+        profilesRes.data.forEach((p) => { map[p.user_id] = p.full_name; });
+        setProfileMap(map);
+      }
       setLoading(false);
     }
     load();
@@ -98,7 +106,7 @@ export default function AdminProgressoPage() {
                 fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
                 letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--muted)',
               }}>
-                <span>Aluno (user_id)</span>
+                <span>Aluno</span>
                 <span>Aula</span>
                 <span>Módulo</span>
                 <span>Concluída em</span>
@@ -119,8 +127,8 @@ export default function AdminProgressoPage() {
                       fontSize: '.875rem', alignItems: 'center',
                     }}
                   >
-                    <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {row.user_id?.slice(0, 8)}…
+                    <span style={{ fontSize: '.875rem', color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {profileMap[row.user_id] ?? row.user_id?.slice(0, 8) + '…'}
                     </span>
                     <span style={{ color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {row.lessons?.title ?? '—'}
