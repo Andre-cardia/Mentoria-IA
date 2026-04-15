@@ -51,16 +51,29 @@ export default function CommentSection({ postId, loginHref = '/plataforma/login'
     if (content.trim().length < 10) { toast.error('Comentário deve ter pelo menos 10 caracteres.'); return; }
     if (!user) return;
     setSending(true);
+
+    // Garante que o token JWT está válido antes do INSERT (evita falha de RLS por sessão expirada)
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+      setSending(false);
+      toast.error('Sessão expirada. Faça login novamente.');
+      return;
+    }
+
     const user_name = profile?.full_name ?? user.email;
     const { error } = await supabase.from('post_comments').insert({
       post_id: postId,
-      user_id: user.id,
+      user_id: session.user.id,
       user_name,
       content: content.trim(),
       status: 'pending',
     });
     setSending(false);
-    if (error) { toast.error('Erro ao enviar comentário.'); return; }
+    if (error) {
+      console.error('[CommentSection] erro ao inserir comentário:', error);
+      toast.error(`Erro ao enviar comentário: ${error.message}`);
+      return;
+    }
     toast.success('Comentário enviado! Aguardando moderação.');
     setContent('');
   }
