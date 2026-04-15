@@ -66,7 +66,7 @@ export default function CommentSection({ postId, loginHref = '/plataforma/login'
       user_id: session.user.id,
       user_name,
       content: content.trim(),
-      status: 'pending',
+      status: 'approved',
     });
     setSending(false);
     if (error) {
@@ -74,7 +74,8 @@ export default function CommentSection({ postId, loginHref = '/plataforma/login'
       toast.error(`Erro ao enviar comentário: ${error.message}`);
       return;
     }
-    toast.success('Comentário enviado! Aguardando moderação.');
+    toast.success('Comentário publicado!');
+    loadComments();
     setContent('');
   }
 
