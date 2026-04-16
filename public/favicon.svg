@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&amp;display=swap');
+    </style>
+  </defs>
+  <rect width="36" height="36" rx="4" fill="#ff6a00" />
+  <text x="50%" y="50%" dy=".35em" fill="#000000" font-family="'Space Mono', 'Courier New', monospace" font-weight="bold" font-size="22px" text-anchor="middle">M</text>
+</svg>
