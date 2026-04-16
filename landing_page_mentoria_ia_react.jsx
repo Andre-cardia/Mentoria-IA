@@ -270,10 +270,10 @@ export default function LandingPageMentoriaIA() {
               Blog
             </a>
             <a
-              href="#planos"
+              href="https://mentoria.neuralhub.ia.br/plataforma/"
               className="border border-[var(--line-strong)] bg-[var(--accent)] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.24em] text-black transition hover:brightness-110 active:scale-95 animate-glow"
             >
-              Ver planos
+              Acessar plataforma!
             </a>
           </div>
         </div>
