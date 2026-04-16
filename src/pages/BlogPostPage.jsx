@@ -152,14 +152,14 @@ export default function BlogPostPage() {
           </div>
         </header>
 
-        {/* Cover image */}
-        {post.cover_url && (
-          <div style={{ width: '100%', height: '360px', overflow: 'hidden' }}>
-            <img src={post.cover_url} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          </div>
-        )}
-
         <div style={{ maxWidth: '740px', margin: '0 auto', padding: '40px 24px 80px' }}>
+          {/* Cover image */}
+          {post.cover_url && (
+            <div style={{ width: '100%', height: '360px', overflow: 'hidden', borderRadius: '8px', marginBottom: '32px' }}>
+              <img src={post.cover_url} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          )}
+
           {/* Breadcrumb */}
           <nav style={{ marginBottom: '24px', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', color: 'var(--muted)' }}>
             <a href="/blog" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Blog</a>

@@ -95,14 +95,14 @@ export default function PlataformaBlogPostPage() {
 
   return (
     <Layout>
-      {/* Cover hero */}
-      {post.cover_url && (
-        <div style={{ width: '100%', height: '300px', overflow: 'hidden' }}>
-          <img src={post.cover_url} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        </div>
-      )}
-
       <div style={{ maxWidth: '740px', margin: '0 auto', padding: '36px 24px 80px' }}>
+        {/* Cover hero */}
+        {post.cover_url && (
+          <div style={{ width: '100%', height: '300px', overflow: 'hidden', borderRadius: '8px', marginBottom: '28px' }}>
+            <img src={post.cover_url} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+        )}
+
         {/* Breadcrumb */}
         <nav style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', color: 'var(--muted)' }}>
           <Link to="/blog" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Blog</Link>
