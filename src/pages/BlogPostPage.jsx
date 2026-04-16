@@ -6,6 +6,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import { supabase } from '../lib/supabase';
 import CommentSection from '../components/CommentSection';
+import '../styles/blog-prose.css';
 
 // Link já incluso no StarterKit v3 — não importar separadamente
 const tiptapExtensions = [StarterKit, Image];
@@ -198,23 +199,13 @@ export default function BlogPostPage() {
 
           {/* Article body */}
           <div
+            className="blog-prose"
             dangerouslySetInnerHTML={{ __html: htmlContent }}
             style={{
               fontFamily: 'Space Grotesk, sans-serif', fontSize: '1.05rem',
               lineHeight: 1.8, color: 'var(--text)',
             }}
           />
-          <style>{`
-            .blog-content h1 { font-size: 1.9rem; margin: 1.2em 0 .5em; font-weight: 700; }
-            .blog-content h2 { font-size: 1.5rem; margin: 1.2em 0 .5em; font-weight: 600; }
-            .blog-content h3 { font-size: 1.15rem; margin: 1em 0 .4em; font-weight: 600; }
-            .blog-content ul, .blog-content ol { padding-left: 1.6em; margin: .6em 0; }
-            .blog-content li { margin: .3em 0; }
-            .blog-content blockquote { border-left: 3px solid var(--accent); padding-left: 1em; color: var(--muted); margin: 1em 0; }
-            .blog-content img { max-width: 100%; border-radius: 6px; margin: .8em 0; }
-            .blog-content a { color: var(--accent); }
-            .blog-content p { margin: .6em 0; }
-          `}</style>
 
           {/* Share buttons */}
           <ShareButtons title={post.title} url={pageUrl} />

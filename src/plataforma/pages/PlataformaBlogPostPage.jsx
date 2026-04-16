@@ -6,6 +6,7 @@ import Image from '@tiptap/extension-image';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 import CommentSection from '../../components/CommentSection';
+import '../../styles/blog-prose.css';
 
 // Link já incluso no StarterKit v3 — não importar separadamente
 const tiptapExtensions = [StarterKit, Image];
@@ -139,21 +140,13 @@ export default function PlataformaBlogPostPage() {
 
         {/* Article body */}
         <div
+          className="blog-prose"
           dangerouslySetInnerHTML={{ __html: htmlContent }}
           style={{
             fontFamily: 'Space Grotesk, sans-serif', fontSize: '1.05rem',
             lineHeight: 1.8, color: 'var(--text)',
           }}
         />
-        <style>{`
-          .tiptap-plataforma h1 { font-size: 1.9rem; margin: 1.2em 0 .5em; }
-          .tiptap-plataforma h2 { font-size: 1.5rem; margin: 1.2em 0 .5em; }
-          .tiptap-plataforma h3 { font-size: 1.15rem; margin: 1em 0 .4em; }
-          .tiptap-plataforma ul, .tiptap-plataforma ol { padding-left: 1.6em; margin: .6em 0; }
-          .tiptap-plataforma blockquote { border-left: 3px solid var(--accent); padding-left: 1em; color: var(--muted); margin: 1em 0; }
-          .tiptap-plataforma img { max-width: 100%; border-radius: 6px; margin: .8em 0; }
-          .tiptap-plataforma a { color: var(--accent); }
-        `}</style>
 
         {/* Share */}
         <ShareButtons title={post.title} url={pageUrl} />
