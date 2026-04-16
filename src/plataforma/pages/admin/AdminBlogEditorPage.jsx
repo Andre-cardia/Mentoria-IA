@@ -145,7 +145,7 @@ export default function AdminBlogEditorPage() {
 
   const [form, setForm] = useState({
     title: '', slug: '', status: 'draft', visibility: 'public',
-    published_at: '', seo_title: '', seo_description: '',
+    published_at: '', seo_title: '', seo_description: '', featured: false,
   });
   const [coverUrl, setCoverUrl] = useState('');
   const [coverPreview, setCoverPreview] = useState('');
@@ -203,6 +203,7 @@ export default function AdminBlogEditorPage() {
         published_at: data.published_at ? data.published_at.slice(0, 16) : '',
         seo_title: data.seo_title ?? '',
         seo_description: data.seo_description ?? '',
+        featured: data.featured ?? false,
       });
       setCoverUrl(data.cover_url ?? '');
       setCoverPreview(data.cover_url ?? '');
@@ -287,6 +288,13 @@ export default function AdminBlogEditorPage() {
     setSaving(true);
     try {
       const content_json = editor ? editor.getJSON() : null;
+      const effectiveStatus = publishNow ? 'published' : form.status;
+      const featured = form.featured && effectiveStatus === 'published';
+
+      if (featured) {
+        await supabase.from('posts').update({ featured: false }).eq('featured', true);
+      }
+
       const payload = {
         title: form.title.trim(),
         slug: form.slug.trim(),
@@ -294,11 +302,12 @@ export default function AdminBlogEditorPage() {
         cover_url: coverUrl || null,
         author_id: user.id,
         author_name: user.user_metadata?.full_name ?? user.email,
-        status: publishNow ? 'published' : form.status,
+        status: effectiveStatus,
         visibility: form.visibility,
         published_at: publishNow ? new Date().toISOString() : (form.published_at || null),
         seo_title: form.seo_title.trim() || null,
         seo_description: form.seo_description.trim() || null,
+        featured,
       };
 
       let postId = id;
@@ -442,6 +451,23 @@ export default function AdminBlogEditorPage() {
               />
             </div>
           )}
+          <div>
+            <label style={{ display: 'block', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', color: 'var(--muted)', marginBottom: '6px' }}>Destaque</label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', color: 'var(--text)' }}>
+              <input
+                type="checkbox"
+                checked={form.featured}
+                onChange={(e) => setForm((f) => ({ ...f, featured: e.target.checked }))}
+                style={{ accentColor: 'var(--accent)', width: 16, height: 16 }}
+              />
+              Destacar no Blog
+            </label>
+            {form.featured && form.status === 'draft' && (
+              <span style={{ display: 'block', fontSize: '.75rem', color: 'var(--warning)', marginTop: 4, fontFamily: 'Space Grotesk, sans-serif' }}>
+                Post precisa estar publicado para ser destaque
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Tags */}

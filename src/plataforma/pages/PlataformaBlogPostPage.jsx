@@ -6,6 +6,8 @@ import Image from '@tiptap/extension-image';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 import CommentSection from '../../components/CommentSection';
+import BlogSidebar from '../../components/blog/BlogSidebar';
+import InlinePromo from '../../components/blog/InlinePromo';
 import '../../styles/blog-prose.css';
 
 // Link já incluso no StarterKit v3 — não importar separadamente
@@ -95,65 +97,89 @@ export default function PlataformaBlogPostPage() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: '740px', margin: '0 auto', padding: '36px 24px 80px' }}>
-        {/* Cover hero */}
-        {post.cover_url && (
-          <div style={{ width: '100%', height: '300px', overflow: 'hidden', borderRadius: '8px', marginBottom: '28px' }}>
-            <img src={post.cover_url} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <div className="plat-blogpost-layout" style={{ maxWidth: '1060px', margin: '0 auto', padding: '36px 24px 80px', display: 'grid', gridTemplateColumns: '1fr 280px', gap: '40px' }}>
+        {/* Article column */}
+        <div>
+          {/* Cover hero */}
+          {post.cover_url && (
+            <div style={{ width: '100%', height: '300px', overflow: 'hidden', borderRadius: '8px', marginBottom: '28px' }}>
+              <img src={post.cover_url} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          )}
+
+          {/* Breadcrumb */}
+          <nav style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', color: 'var(--muted)' }}>
+            <Link to="/blog" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Blog</Link>
+            <span style={{ margin: '0 8px' }}>›</span>
+            <span>{post.title}</span>
+          </nav>
+
+          {/* Tags */}
+          {post.post_tags?.length > 0 && (
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
+              {post.post_tags.map((pt, i) => pt.tags && (
+                <span key={i} style={{
+                  fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--accent)',
+                  background: 'var(--accent-soft)', borderRadius: '3px', padding: '2px 8px',
+                }}>
+                  {pt.tags.name}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <h1 style={{
+            fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700,
+            fontSize: 'clamp(1.5rem, 4vw, 2.2rem)', lineHeight: 1.2,
+            color: 'var(--text)', margin: '0 0 14px',
+          }}>
+            {post.title}
+          </h1>
+
+          <div style={{ display: 'flex', gap: '14px', marginBottom: '28px', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', color: 'var(--muted)' }}>
+            {post.author_name && <span>{post.author_name}</span>}
+            <span>•</span>
+            <span>{fmtDate(post.published_at)}</span>
           </div>
-        )}
 
-        {/* Breadcrumb */}
-        <nav style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', color: 'var(--muted)' }}>
-          <Link to="/blog" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Blog</Link>
-          <span style={{ margin: '0 8px' }}>›</span>
-          <span>{post.title}</span>
-        </nav>
+          {/* Article body */}
+          <div
+            className="blog-prose"
+            dangerouslySetInnerHTML={{ __html: htmlContent }}
+            style={{
+              fontFamily: 'Space Grotesk, sans-serif', fontSize: '1.05rem',
+              lineHeight: 1.8, color: 'var(--text)',
+            }}
+          />
 
-        {/* Tags */}
-        {post.post_tags?.length > 0 && (
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
-            {post.post_tags.map((pt, i) => pt.tags && (
-              <span key={i} style={{
-                fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--accent)',
-                background: 'var(--accent-soft)', borderRadius: '3px', padding: '2px 8px',
-              }}>
-                {pt.tags.name}
-              </span>
-            ))}
-          </div>
-        )}
+          {/* Inline promo */}
+          <InlinePromo
+            title="Mentoria Zero-to-Hero IA"
+            description="Aprenda a construir com IA de verdade. 2 encontros por semana."
+            cta="Ver planos"
+            href="/#planos"
+            badge="A partir de R$ 497/mês"
+          />
 
-        <h1 style={{
-          fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700,
-          fontSize: 'clamp(1.5rem, 4vw, 2.2rem)', lineHeight: 1.2,
-          color: 'var(--text)', margin: '0 0 14px',
-        }}>
-          {post.title}
-        </h1>
+          {/* Share */}
+          <ShareButtons title={post.title} url={pageUrl} />
 
-        <div style={{ display: 'flex', gap: '14px', marginBottom: '28px', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', color: 'var(--muted)' }}>
-          {post.author_name && <span>{post.author_name}</span>}
-          <span>•</span>
-          <span>{fmtDate(post.published_at)}</span>
+          {/* Comments */}
+          <CommentSection postId={post.id} loginHref="/login" />
         </div>
 
-        {/* Article body */}
-        <div
-          className="blog-prose"
-          dangerouslySetInnerHTML={{ __html: htmlContent }}
-          style={{
-            fontFamily: 'Space Grotesk, sans-serif', fontSize: '1.05rem',
-            lineHeight: 1.8, color: 'var(--text)',
-          }}
-        />
-
-        {/* Share */}
-        <ShareButtons title={post.title} url={pageUrl} />
-
-        {/* Comments */}
-        <CommentSection postId={post.id} loginHref="/login" />
+        {/* Sidebar */}
+        <div style={{ position: 'sticky', top: 80, alignSelf: 'start' }}>
+          <BlogSidebar excludePostId={post.id} />
+        </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .plat-blogpost-layout { grid-template-columns: 1fr !important; }
+          .plat-blogpost-layout > div:last-child { position: static !important; }
+        }
+      `}</style>
     </Layout>
   );
 }
