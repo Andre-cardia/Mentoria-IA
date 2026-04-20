@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { createCheckout } from "../use-cases/create-checkout.js";
 import { handleWebhook } from "../use-cases/handle-webhook.js";
+import {
+  getPagBankSignature,
+  isPagBankWebhookVerificationEnabled,
+  verifyPagBankWebhookSignature,
+} from "../lib/pagbank-webhook.js";
 
 const router = Router();
 
@@ -29,6 +34,18 @@ router.post("/checkout", async (req, res) => {
 // POST /api/pagbank/webhook
 // Recebe notificações de status do PagBank
 router.post("/webhook", async (req, res) => {
+  if (isPagBankWebhookVerificationEnabled()) {
+    const verification = verifyPagBankWebhookSignature(
+      req.rawBody,
+      getPagBankSignature(req)
+    );
+
+    if (!verification.ok) {
+      console.warn("[/webhook] assinatura inválida:", verification.reason);
+      return res.status(401).json({ error: true, message: "Invalid webhook signature" });
+    }
+  }
+
   try {
     await handleWebhook(req.body);
   } catch (err) {
