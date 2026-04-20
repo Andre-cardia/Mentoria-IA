@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 import { useLessonProgress } from '../hooks/useLessonProgress';
-import { useAuth } from '../context/AuthContext';
 
 function formatDuration(seconds) {
   if (!seconds) return null;
@@ -16,7 +16,6 @@ function formatDuration(seconds) {
 export default function CursoPage() {
   const { moduleId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [mod, setMod] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -139,7 +138,10 @@ export default function CursoPage() {
                 <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: '0 0 12px 0', paddingBottom: '10px', borderBottom: '1px solid var(--line)' }}>
                   Sobre o Curso
                 </h2>
-                <p style={{ color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>{mod.description}</p>
+                <div
+                  style={{ color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(mod.description) }}
+                />
               </div>
             )}
 
