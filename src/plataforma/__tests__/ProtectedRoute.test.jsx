@@ -1,12 +1,22 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
+
+const authState = {
+  user: null,
+  loading: false,
+  isAdmin: false,
+  signIn: vi.fn(),
+  signOut: vi.fn(),
+};
+
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => authState,
+}));
+
 import ProtectedRoute from '../components/ProtectedRoute';
 import AdminRoute from '../components/AdminRoute';
-import { AuthContext } from '../context/AuthContext';
 
-// Expor o context para testes — precisamos exportá-lo do AuthContext
-// Usamos um helper wrapper que injeta o context diretamente
 function buildAuthContext(overrides = {}) {
   return {
     user: null,
@@ -19,18 +29,15 @@ function buildAuthContext(overrides = {}) {
 }
 
 function renderWithAuth(ui, authValue, initialPath = '/') {
+  Object.assign(authState, buildAuthContext(authValue));
+
   return render(
     <MemoryRouter initialEntries={[initialPath]}>
-      <AuthContext.Provider value={authValue}>
-        {ui}
-      </AuthContext.Provider>
+      {ui}
     </MemoryRouter>
   );
 }
 
-// ──────────────────────────────────────────────
-// ProtectedRoute
-// ──────────────────────────────────────────────
 describe('ProtectedRoute', () => {
   it('redireciona para /login quando usuário não está autenticado', () => {
     renderWithAuth(
@@ -38,7 +45,7 @@ describe('ProtectedRoute', () => {
         <Route path="/" element={<ProtectedRoute><div>Conteúdo Protegido</div></ProtectedRoute>} />
         <Route path="/login" element={<div>Página de Login</div>} />
       </Routes>,
-      buildAuthContext({ user: null })
+      { user: null }
     );
     expect(screen.getByText('Página de Login')).toBeInTheDocument();
     expect(screen.queryByText('Conteúdo Protegido')).not.toBeInTheDocument();
@@ -50,7 +57,7 @@ describe('ProtectedRoute', () => {
         <Route path="/" element={<ProtectedRoute><div>Conteúdo Protegido</div></ProtectedRoute>} />
         <Route path="/login" element={<div>Página de Login</div>} />
       </Routes>,
-      buildAuthContext({ user: { email: 'aluno@test.com', user_metadata: {} } })
+      { user: { email: 'aluno@test.com', user_metadata: {} } }
     );
     expect(screen.getByText('Conteúdo Protegido')).toBeInTheDocument();
   });
@@ -60,15 +67,12 @@ describe('ProtectedRoute', () => {
       <Routes>
         <Route path="/" element={<ProtectedRoute><div>Conteúdo</div></ProtectedRoute>} />
       </Routes>,
-      buildAuthContext({ loading: true })
+      { loading: true }
     );
     expect(screen.getByText('Carregando...')).toBeInTheDocument();
   });
 });
 
-// ──────────────────────────────────────────────
-// AdminRoute
-// ──────────────────────────────────────────────
 describe('AdminRoute', () => {
   it('redireciona para /login quando não autenticado', () => {
     renderWithAuth(
@@ -76,7 +80,7 @@ describe('AdminRoute', () => {
         <Route path="/" element={<AdminRoute><div>Painel Admin</div></AdminRoute>} />
         <Route path="/login" element={<div>Login</div>} />
       </Routes>,
-      buildAuthContext({ user: null, isAdmin: false })
+      { user: null, isAdmin: false }
     );
     expect(screen.getByText('Login')).toBeInTheDocument();
     expect(screen.queryByText('Painel Admin')).not.toBeInTheDocument();
@@ -89,7 +93,7 @@ describe('AdminRoute', () => {
         <Route path="/login" element={<div>Login</div>} />
         <Route path="/modulos" element={<div>Área do Aluno</div>} />
       </Routes>,
-      buildAuthContext({ user: { email: 'aluno@test.com' }, isAdmin: false })
+      { user: { email: 'aluno@test.com' }, isAdmin: false }
     );
     expect(screen.getByText('Área do Aluno')).toBeInTheDocument();
     expect(screen.queryByText('Painel Admin')).not.toBeInTheDocument();
@@ -102,7 +106,7 @@ describe('AdminRoute', () => {
         <Route path="/login" element={<div>Login</div>} />
         <Route path="/modulos" element={<div>Área do Aluno</div>} />
       </Routes>,
-      buildAuthContext({ user: { email: 'admin@test.com' }, isAdmin: true })
+      { user: { email: 'admin@test.com' }, isAdmin: true }
     );
     expect(screen.getByText('Painel Admin')).toBeInTheDocument();
   });
@@ -112,7 +116,7 @@ describe('AdminRoute', () => {
       <Routes>
         <Route path="/" element={<AdminRoute><div>Admin</div></AdminRoute>} />
       </Routes>,
-      buildAuthContext({ loading: true })
+      { loading: true }
     );
     expect(screen.getByText('Verificando permissões...')).toBeInTheDocument();
   });

@@ -7,15 +7,30 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
+  const [profileError, setProfileError] = useState(null);
 
   async function loadProfile(userId) {
-    if (!userId) { setProfile(null); return; }
-    const { data } = await supabase
+    if (!userId) {
+      setProfile(null);
+      setProfileError(null);
+      return;
+    }
+
+    const { data, error } = await supabase
       .from('profiles')
       .select('full_name, phone, avatar_url')
       .eq('user_id', userId)
       .maybeSingle();
+
+    if (error) {
+      console.error('[AuthContext] erro ao carregar perfil:', error);
+      setProfile(null);
+      setProfileError(error.message ?? 'Erro ao carregar perfil.');
+      return;
+    }
+
     setProfile(data ?? null);
+    setProfileError(null);
   }
 
   async function refreshProfile() {
@@ -49,7 +64,7 @@ export function AuthProvider({ children }) {
   const isAdmin = user?.user_metadata?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAdmin, profile, refreshProfile, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, loading, isAdmin, profile, profileError, refreshProfile, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

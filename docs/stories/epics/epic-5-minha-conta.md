@@ -122,3 +122,4 @@ Entregar ao aluno autonomia completa sobre sua identidade na plataforma: **dados
 |------|--------|------|
 | 2026-04-13 | @pm (Morgan) | Epic criado — escopo definido, stories esboçadas, decisões técnicas sinalizadas para @architect |
 | 2026-04-13 | @architect (Aria) | Decisões de arquitetura resolvidas — S3 para avatar, 2MB/JPEG+PNG+WebP, CSS-only resize, rotas servidor definidas |
+| 2026-04-16 | Codex | Manutenção posterior: `ProfileGuard` e `AuthContext` endurecidos para diferenciar erro temporário de leitura versus perfil ausente; testes de perfil ampliados |
