@@ -1,6 +1,9 @@
-import { createClient } from "@supabase/supabase-js";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import {
+  createServiceSupabaseClient,
+  requireAuthenticatedUser,
+} from "../../../server/lib/auth.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -14,10 +17,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const supabase = createClient(
-      process.env.VITE_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_KEY
-    );
+    const supabase = createServiceSupabaseClient();
+    const user = await requireAuthenticatedUser(req, res, { supabase });
+    if (!user) return;
 
     const { data, error } = await supabase
       .from("materials")

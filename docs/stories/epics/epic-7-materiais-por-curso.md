@@ -3,7 +3,7 @@ id: "7"
 title: "Materiais por Curso"
 status: Ready
 created_at: "2026-04-13"
-updated_at: "2026-04-13"
+updated_at: "2026-04-16"
 ---
 
 # Epic 7 — Materiais por Curso
@@ -70,6 +70,13 @@ Atualmente, todos os materiais são listados em uma única fila plana sem qualqu
 - [ ] CursoPage exibe seção "Materiais do Curso" para materiais vinculados
 - [ ] Material de curso excluído mantém vínculo `null` (não é excluído)
 - [ ] `npm test` passa sem regressões
+
+## Change Log
+
+| Data | Agente | Ação |
+|------|--------|------|
+| 2026-04-13 | @pm (Morgan) | Epic criada com escopo de materiais por curso |
+| 2026-04-16 | Codex | Manutenção posterior: autenticação adicionada aos endpoints de materiais, UX de erro de download ajustada em `MateriaisPage` e `CursoPage`, testes ampliados |
 
 ---
 *Epic criado por Morgan (PM) — 2026-04-13*

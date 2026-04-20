@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+process.env.VITE_SUPABASE_URL = 'https://fake.supabase.co';
+process.env.SUPABASE_SERVICE_KEY = 'fake-service-key';
+
 // ── Mocks ────────────────────────────────────────────────────
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => mockSupabase),
@@ -25,6 +28,9 @@ const mockSupabase = {
   select: vi.fn(() => mockSupabase),
   eq: vi.fn(() => mockSupabase),
   single: vi.fn(),
+  auth: {
+    getUser: vi.fn(),
+  },
 };
 
 // ── Import após mocks ─────────────────────────────────────────
@@ -41,13 +47,52 @@ function buildApp() {
 
 // ── Testes ───────────────────────────────────────────────────
 describe('POST /api/materials/upload', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'admin-user', user_metadata: { role: 'admin' } } },
+      error: null,
+    });
+  });
 
   it('retorna 400 quando campos obrigatórios estão ausentes', async () => {
     const app = buildApp();
-    const res = await request(app).post('/api/materials/upload').send({});
+    const res = await request(app)
+      .post('/api/materials/upload')
+      .set('Authorization', 'Bearer valid-token')
+      .send({});
     expect(res.status).toBe(400);
     expect(res.body.error).toMatch(/obrigatórios/i);
+  });
+
+  it('retorna 401 sem token de autenticação', async () => {
+    const app = buildApp();
+    const res = await request(app).post('/api/materials/upload').send({
+      fileName: 'aula1.pdf',
+      contentType: 'application/pdf',
+      title: 'Aula 1',
+    });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('retorna 403 para usuário sem role admin', async () => {
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'student-user', user_metadata: { role: 'student' } } },
+      error: null,
+    });
+
+    const app = buildApp();
+    const res = await request(app)
+      .post('/api/materials/upload')
+      .set('Authorization', 'Bearer valid-token')
+      .send({
+        fileName: 'aula1.pdf',
+        contentType: 'application/pdf',
+        title: 'Aula 1',
+      });
+
+    expect(res.status).toBe(403);
   });
 
   it('retorna uploadUrl e s3Key quando payload válido', async () => {
@@ -55,11 +100,14 @@ describe('POST /api/materials/upload', () => {
     mockSupabase.insert.mockResolvedValue({ error: null });
 
     const app = buildApp();
-    const res = await request(app).post('/api/materials/upload').send({
-      fileName: 'aula1.pdf',
-      contentType: 'application/pdf',
-      title: 'Aula 1 — Introdução',
-    });
+    const res = await request(app)
+      .post('/api/materials/upload')
+      .set('Authorization', 'Bearer valid-token')
+      .send({
+        fileName: 'aula1.pdf',
+        contentType: 'application/pdf',
+        title: 'Aula 1 — Introdução',
+      });
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('uploadUrl');
@@ -73,24 +121,42 @@ describe('POST /api/materials/upload', () => {
     mockSupabase.insert.mockResolvedValue({ error: new Error('DB error') });
 
     const app = buildApp();
-    const res = await request(app).post('/api/materials/upload').send({
-      fileName: 'doc.pdf',
-      contentType: 'application/pdf',
-      title: 'Documento',
-    });
+    const res = await request(app)
+      .post('/api/materials/upload')
+      .set('Authorization', 'Bearer valid-token')
+      .send({
+        fileName: 'doc.pdf',
+        contentType: 'application/pdf',
+        title: 'Documento',
+      });
 
     expect(res.status).toBe(500);
   });
 });
 
 describe('GET /api/materials/:id/download', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'student-user', user_metadata: { role: 'student' } } },
+      error: null,
+    });
+  });
+
+  it('retorna 401 sem token de autenticação', async () => {
+    const app = buildApp();
+    const res = await request(app).get('/api/materials/valid-uuid/download');
+
+    expect(res.status).toBe(401);
+  });
 
   it('retorna 404 quando material não encontrado', async () => {
     mockSupabase.single.mockResolvedValue({ data: null, error: new Error('not found') });
 
     const app = buildApp();
-    const res = await request(app).get('/api/materials/nonexistent-id/download');
+    const res = await request(app)
+      .get('/api/materials/nonexistent-id/download')
+      .set('Authorization', 'Bearer valid-token');
     expect(res.status).toBe(404);
     expect(res.body.error).toMatch(/não encontrado/i);
   });
@@ -103,7 +169,9 @@ describe('GET /api/materials/:id/download', () => {
     mockS3.getDownloadUrl.mockResolvedValue('https://s3.amazonaws.com/fake-download-url?X-Amz=abc');
 
     const app = buildApp();
-    const res = await request(app).get('/api/materials/valid-uuid/download');
+    const res = await request(app)
+      .get('/api/materials/valid-uuid/download')
+      .set('Authorization', 'Bearer valid-token');
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('downloadUrl');

@@ -1,15 +1,13 @@
 import { Router } from "express";
 import { randomUUID } from "crypto";
-import { createClient } from "@supabase/supabase-js";
 import { S3Adapter } from "../adapters/s3-adapter.js";
-import { SUPABASE_URL, SUPABASE_SERVICE_KEY } from "../config.js";
+import {
+  createServiceSupabaseClient,
+  requireAuthenticatedUser,
+} from "../lib/auth.js";
 
 const router = Router();
 const s3 = new S3Adapter();
-
-const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
-  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-  : null;
 
 /**
  * POST /api/materials/upload
@@ -19,6 +17,13 @@ const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
  */
 router.post("/upload", async (req, res) => {
   try {
+    const supabase = createServiceSupabaseClient();
+    const user = await requireAuthenticatedUser(req, res, {
+      supabase,
+      requireAdmin: true,
+    });
+    if (!user) return;
+
     const { fileName, contentType, title, description, module_id } = req.body;
 
     if (!fileName || !contentType || !title) {
@@ -31,17 +36,15 @@ router.post("/upload", async (req, res) => {
     const uploadUrl = await s3.getUploadUrl(s3Key, contentType);
 
     // Registra o material no Supabase (sem file_size ainda — será atualizado após upload se necessário)
-    if (supabase) {
-      const { error } = await supabase.from("materials").insert({
-        title,
-        description: description ?? null,
-        s3_key: s3Key,
-        module_id: module_id || null,
-      });
-      if (error) {
-        console.error("[materials/upload] Erro ao registrar no Supabase:", error);
-        return res.status(500).json({ error: "Erro ao registrar material" });
-      }
+    const { error } = await supabase.from("materials").insert({
+      title,
+      description: description ?? null,
+      s3_key: s3Key,
+      module_id: module_id || null,
+    });
+    if (error) {
+      console.error("[materials/upload] Erro ao registrar no Supabase:", error);
+      return res.status(500).json({ error: "Erro ao registrar material" });
     }
 
     return res.json({ uploadUrl, s3Key });
@@ -59,10 +62,9 @@ router.post("/upload", async (req, res) => {
 router.get("/:id/download", async (req, res) => {
   try {
     const { id } = req.params;
-
-    if (!supabase) {
-      return res.status(503).json({ error: "Supabase não configurado" });
-    }
+    const supabase = createServiceSupabaseClient();
+    const user = await requireAuthenticatedUser(req, res, { supabase });
+    if (!user) return;
 
     const { data, error } = await supabase
       .from("materials")

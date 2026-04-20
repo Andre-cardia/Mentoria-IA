@@ -1,12 +1,22 @@
 import { randomUUID } from "crypto";
-import { createClient } from "@supabase/supabase-js";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import {
+  createServiceSupabaseClient,
+  requireAuthenticatedUser,
+} from "../../server/lib/auth.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  const supabase = createServiceSupabaseClient();
+  const user = await requireAuthenticatedUser(req, res, {
+    supabase,
+    requireAdmin: true,
+  });
+  if (!user) return;
 
   const { fileName, contentType, title, description, module_id } = req.body;
 
@@ -34,11 +44,6 @@ export default async function handler(req, res) {
         ContentType: contentType,
       }),
       { expiresIn: 300 }
-    );
-
-    const supabase = createClient(
-      process.env.VITE_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_KEY
     );
 
     const { error } = await supabase.from("materials").insert({

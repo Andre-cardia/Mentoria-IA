@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 
@@ -37,10 +38,19 @@ export default function MateriaisPage() {
       const res = await fetch(`/api/materials/${material.id}/download`, {
         headers: { Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}` },
       });
-      const { downloadUrl } = await res.json();
-      window.open(downloadUrl, '_blank');
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Não foi possível gerar o link de download.');
+      }
+      if (!data.downloadUrl) {
+        throw new Error('Link de download não disponível no momento.');
+      }
+
+      window.open(data.downloadUrl, '_blank');
     } catch (err) {
       console.error('Erro ao baixar material:', err);
+      toast.error(err.message || 'Erro ao baixar material.');
     } finally {
       setDownloading(null);
     }

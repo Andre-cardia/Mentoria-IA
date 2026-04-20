@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 import { useLessonProgress } from '../hooks/useLessonProgress';
@@ -55,10 +56,19 @@ export default function CursoPage() {
       const res = await fetch(`/api/materials/${id}/download`, {
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
-      const { downloadUrl } = await res.json();
-      window.open(downloadUrl, '_blank');
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Não foi possível gerar o link de download.');
+      }
+      if (!data.downloadUrl) {
+        throw new Error('Link de download não disponível no momento.');
+      }
+
+      window.open(data.downloadUrl, '_blank');
     } catch (err) {
       console.error('[CursoPage] download error:', err);
+      toast.error(err.message || 'Erro ao baixar material.');
     } finally {
       setDownloadingId(null);
     }
