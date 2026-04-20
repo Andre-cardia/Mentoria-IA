@@ -9,6 +9,9 @@ import { toast } from 'sonner';
 import { supabase } from '../../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import AdminLayout from '../../components/AdminLayout';
+import { Iframe } from '../../components/extensions/Iframe';
+import EmbedModal from '../../components/EmbedModal';
+import '../../components/RichTextEditor.css';
 
 const inputSx = {
   width: '100%', background: 'var(--panel-2)', border: '1px solid var(--line-strong)',
@@ -155,6 +158,7 @@ export default function AdminBlogEditorPage() {
   const [allTags, setAllTags] = useState([]);
   const [newTagInput, setNewTagInput] = useState('');
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showEmbedModal, setShowEmbedModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(isEdit);
   const [slugManual, setSlugManual] = useState(false);
@@ -164,6 +168,7 @@ export default function AdminBlogEditorPage() {
       // StarterKit v3 já inclui Link — configure aqui para não duplicar
       StarterKit.configure({ link: { openOnClick: false } }),
       Image,
+      Iframe,
       Placeholder.configure({ placeholder: 'Escreva seu artigo aqui...' }),
     ],
     content: '',
@@ -260,6 +265,13 @@ export default function AdminBlogEditorPage() {
     setShowImageModal(false);
   }
 
+  function handleInsertEmbed(embedConfig) {
+    if (editor) {
+      editor.chain().focus().setIframe(embedConfig).run();
+      setShowEmbedModal(false);
+    }
+  }
+
   async function handleAddTag() {
     const name = newTagInput.trim();
     if (!name) return;
@@ -354,6 +366,12 @@ export default function AdminBlogEditorPage() {
           onClose={() => setShowImageModal(false)}
           onInsert={handleInsertImage}
           getToken={getToken}
+        />
+      )}
+      {showEmbedModal && (
+        <EmbedModal
+          onClose={() => setShowEmbedModal(false)}
+          onInsert={handleInsertEmbed}
         />
       )}
 
@@ -554,6 +572,7 @@ export default function AdminBlogEditorPage() {
               active={editor?.isActive('link')} title="Link"
             >🔗</ToolbarButton>
             <ToolbarButton onClick={() => setShowImageModal(true)} title="Imagem">🖼</ToolbarButton>
+            <ToolbarButton onClick={() => setShowEmbedModal(true)} title="Incorporar YouTube, LinkedIn ou X">🎬</ToolbarButton>
             <ToolbarButton onClick={() => editor?.chain().focus().toggleBlockquote().run()} active={editor?.isActive('blockquote')} title="Citação">" "</ToolbarButton>
           </div>
 

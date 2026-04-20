@@ -17,6 +17,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { supabase } from '../../../lib/supabase';
 import AdminLayout from '../../components/AdminLayout';
 import ConfirmModal from '../../components/ConfirmModal';
+import RichTextEditor from '../../components/RichTextEditor';
 
 // ─── Estilos base ────────────────────────────────────────────────────────────
 
@@ -665,12 +666,23 @@ function ModForm({ title, form, onChange, onSubmit, onCancel, saving }) {
         value={form.subtitle}
         onChange={(e) => onChange((p) => ({ ...p, subtitle: e.target.value }))}
       />
-      <input
-        style={inputSx}
-        placeholder="Sobre o curso (opcional)"
-        value={form.description}
-        onChange={(e) => onChange((p) => ({ ...p, description: e.target.value }))}
-      />
+      <div>
+        <label style={{
+          display: 'block',
+          marginBottom: '6px',
+          fontFamily: 'Space Grotesk, sans-serif',
+          fontSize: '.85rem',
+          color: 'var(--muted)'
+        }}>
+          Sobre o curso (opcional)
+        </label>
+        <RichTextEditor
+          value={form.description}
+          onChange={(html) => onChange((p) => ({ ...p, description: html }))}
+          placeholder="Descreva os objetivos, o que será aprendido, pré-requisitos..."
+          minHeight="180px"
+        />
+      </div>
       <div style={{ display: 'flex', gap: '10px' }}>
         <button type="submit" style={btnPrimary} disabled={saving || !form.title}>
           {saving ? 'Salvando...' : 'Salvar'}

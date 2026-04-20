@@ -9,9 +9,11 @@ import CommentSection from '../../components/CommentSection';
 import BlogSidebar from '../../components/blog/BlogSidebar';
 import InlinePromo from '../../components/blog/InlinePromo';
 import '../../styles/blog-prose.css';
+import { Iframe } from '../components/extensions/Iframe';
+import '../components/RichTextEditor.css';
 
 // Link já incluso no StarterKit v3 — não importar separadamente
-const tiptapExtensions = [StarterKit, Image];
+const tiptapExtensions = [StarterKit, Image, Iframe];
 
 function fmtDate(d) {
   if (!d) return '';
