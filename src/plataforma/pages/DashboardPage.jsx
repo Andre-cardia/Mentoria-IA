@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLessonProgress } from '../hooks/useLessonProgress';
 import Layout from '../components/Layout';
 import DashboardStats from '../components/DashboardStats';
+import AdminAnnouncements from '../components/AdminAnnouncements';
 
 const WHATSAPP_URL = 'https://chat.whatsapp.com/CzkXZ1ol61YC1zw5dUjy7v?mode=gi_t';
 
@@ -249,6 +250,9 @@ export default function DashboardPage() {
               total={progress.total}
               diasEstudando={diasEstudando}
             />
+
+            {/* ── Avisos do Administrador ───────────────────────── */}
+            <AdminAnnouncements />
 
             {/* ── Continue Assistindo ───────────────────────────── */}
             <section style={{ marginBottom: '44px' }}>
