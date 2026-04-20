@@ -13,7 +13,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({
+  verify: (req, _res, buf) => {
+    if (buf?.length) {
+      req.rawBody = buf.toString("utf8");
+    }
+  },
+}));
 
 // Rotas da API de pagamento
 app.use("/api/pagbank", pagbankRoutes);
