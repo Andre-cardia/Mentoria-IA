@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 
@@ -117,7 +118,10 @@ export default function MateriaisPage() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '2px' }}>{m.title}</div>
                       {m.description && (
-                        <div style={{ fontSize: '.85rem', color: 'var(--muted)' }}>{m.description}</div>
+                        <div
+                          style={{ fontSize: '.85rem', color: 'var(--muted)' }}
+                          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(m.description) }}
+                        />
                       )}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>

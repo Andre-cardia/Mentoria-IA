@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 import { useLessonProgress } from '../hooks/useLessonProgress';
@@ -92,7 +93,10 @@ export default function ModulosPage() {
                     {mod.title}
                   </div>
                   {mod.description && (
-                    <div style={{ fontSize: '.875rem', color: 'var(--muted)' }}>{mod.description}</div>
+                    <div
+                      style={{ fontSize: '.875rem', color: 'var(--muted)' }}
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(mod.description) }}
+                    />
                   )}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0, marginLeft: '16px' }}>
