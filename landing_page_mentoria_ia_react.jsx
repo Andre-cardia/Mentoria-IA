@@ -517,50 +517,11 @@ export default function LandingPageMentoriaIA() {
               ))}
             </div>
 
-            {/* Cards de planos */}
-            <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
-
-              {/* Plano Mensal */}
-              <div className="relative border border-[var(--line)] bg-[var(--panel)] p-8 flex flex-col gap-6">
-                <div>
-                  <div className="font-mono-tech text-[10px] uppercase tracking-[0.26em] text-[var(--muted)]">// Plano 01</div>
-                  <div className="mt-3 text-3xl uppercase font-semibold tracking-[-0.04em] text-[var(--text)]">Mensal</div>
-                  <div className="mt-1 font-mono-tech text-xs uppercase tracking-[0.18em] text-[var(--muted)]">Flexibilidade máxima</div>
-                </div>
-
-                <div className="border border-[var(--line)] bg-black/30 p-5">
-                  <div className="font-mono-tech text-[10px] uppercase tracking-[0.22em] text-[var(--muted)]">Investimento</div>
-                  <div className="mt-2 text-5xl font-bold uppercase tracking-[-0.05em] text-[var(--text)]">
-                    R$ 497<span className="text-xl font-normal text-[var(--muted)]">,00/mês</span>
-                  </div>
-                  <div className="mt-2 font-mono-tech text-xs text-[var(--muted)]">1º lote · 30 vagas · válido até 03/04/2026</div>
-                </div>
-
-                <div className="space-y-3">
-                  {[
-                    ["Acesso", "Recorrente mensal — cancele quando quiser"],
-                    ["Cancelamento", "Com 30 dias de antecedência"],
-                    ["Encontros", "2 sessões ao vivo por semana"],
-                    ["Currículo", "Sempre atualizado conforme o mercado"],
-                  ].map(([k, v]) => (
-                    <div key={k} className="flex items-start justify-between gap-4 border-b border-[var(--line)] pb-3">
-                      <span className="font-mono-tech text-[10px] uppercase tracking-[0.2em] text-[var(--muted)] shrink-0">{k}</span>
-                      <span className="font-mono-tech text-[11px] text-right text-[var(--text)]">{v}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => handleBuy("mensal")}
-                  disabled={!!buyingPlan}
-                  className="mt-auto border border-[var(--line-strong)] bg-black/40 px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {buyingPlan === "mensal" ? "Aguarde..." : "Assinar plano mensal"}
-                </button>
-              </div>
+              {/* Cards de planos */}
+            <div className="mt-10 grid grid-cols-1 lg:grid-cols-1">
 
               {/* Plano Anual */}
-              <div className="relative border border-[var(--accent)] bg-[var(--panel)] p-8 flex flex-col gap-6">
+              <div className="relative border border-[var(--accent)] bg-[var(--panel)] p-8 flex flex-col gap-6 max-w-2xl mx-auto w-full">
                 {/* Badge destaque */}
                 <div className="absolute -top-3 left-8">
                   <div className="bg-[var(--accent)] px-3 py-1 font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black font-bold">
