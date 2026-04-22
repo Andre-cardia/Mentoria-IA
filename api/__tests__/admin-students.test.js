@@ -79,7 +79,7 @@ describe('api/admin/students handler', () => {
       data: [
         { email: 'novo@test.com', reference_id: 'mensal-1', amount: 49700, created_at: '2026-04-16' },
         { email: 'NOVO@test.com', reference_id: 'mensal-2', amount: 49700, created_at: '2026-04-17' },
-        { email: 'existente@test.com', reference_id: 'anual-1', amount: 442368, created_at: '2026-04-18' },
+        { email: 'existente@test.com', reference_id: 'anual-1', amount: 356140, created_at: '2026-04-18' },
       ],
       error: null,
     };

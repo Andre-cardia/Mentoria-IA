@@ -540,7 +540,7 @@ export default function LandingPageMentoriaIA() {
                   <div className="mt-2 text-5xl font-bold uppercase tracking-[-0.05em] text-[var(--text)]">
                     R$ 368<span className="text-xl font-normal text-[var(--muted)]">,64/mês</span>
                   </div>
-                  <div className="mt-2 font-mono-tech text-xs text-[var(--accent)]">12x de R$ 368,64 — ou R$ 4.423,68 à vista</div>
+                  <div className="mt-2 font-mono-tech text-xs text-[var(--accent)]">12x de R$ 368,64 — ou R$ 3.561,40 à vista</div>
                   <div className="mt-1 font-mono-tech text-[10px] text-[var(--muted)]">Economia de ~26% em relação ao mensal</div>
                 </div>
 
@@ -968,7 +968,7 @@ export default function LandingPageMentoriaIA() {
                   <div className="absolute -top-3 right-4 bg-black px-2 py-0.5 font-mono-tech text-[9px] uppercase tracking-[0.2em] text-[var(--accent)] font-bold">Mais econômico</div>
                   <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/60">Plano Anual · 12 meses</div>
                   <div className="mt-1 text-3xl font-bold uppercase tracking-[-0.03em]">R$ 368,64<span className="text-base font-normal">/mês</span></div>
-                  <div className="mt-1 font-mono-tech text-xs font-bold text-black/80">ou R$ 4.423,68 à vista</div>
+                  <div className="mt-1 font-mono-tech text-xs font-bold text-black/80">ou R$ 3.561,40 à vista</div>
                   <div className="mt-2 font-mono-tech text-xs leading-5 text-black/70">
                     Cancela em até <strong>7 dias</strong> após a contratação.
                   </div>
