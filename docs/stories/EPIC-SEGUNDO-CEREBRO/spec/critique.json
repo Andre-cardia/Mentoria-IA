@@ -1,0 +1,208 @@
+{
+  "storyId": "EPIC-SEGUNDO-CEREBRO",
+  "critiquedAt": "2026-04-22T13:00:00Z",
+  "critiquedBy": "@qa",
+  "specVersion": 1,
+
+  "verdict": "APPROVED",
+  "verdictReason": "Spec é completo, bem estruturado e rastreável aos requisitos. Todas as 8 FRs são endereçadas com testes correspondentes. Documentação de riscos e Open Questions demonstra maturidade. Minor issues identificados, mas não bloqueantes.",
+
+  "scores": {
+    "accuracy": 5,
+    "completeness": 5,
+    "consistency": 5,
+    "feasibility": 4,
+    "alignment": 5,
+    "average": 4.8
+  },
+
+  "dimension_analysis": {
+    "accuracy": {
+      "score": 5,
+      "rationale": "Todas as 8 FRs de requirements.json são precisamente refletidas no spec. Nenhum phantom requirement detectado. Prioridades P0/P1 corretamente mapeadas. Seção 2.1 mapeia 1:1 com requirements.json.",
+      "checks_passed": [
+        "acc-1: Todas FRs (FR-1 a FR-8) endereçadas no spec",
+        "acc-2: Nenhuma feature não presente em requirements.json",
+        "acc-3: P0 requirements (FR-1, FR-2, FR-3, FR-7) são prominent, P1 são auxiliares",
+        "acc-4: Todos 8 NFRs têm seção correspondente em 2.2 e testing (6.1, 6.2, 6.3)"
+      ]
+    },
+    "completeness": {
+      "score": 5,
+      "rationale": "Spec tem todas seções obrigatórias (Overview, Requirements, Approach, Dependencies, Files, Testing, Risks, Implementation Checklist, Rollout). Cada FR tem pelo menos 1 test scenario (section 6.3). Dependencies listadas com versões (section 4). Files identificados (20+ arquivos em section 5). 9 risks documentados com mitigations.",
+      "checks_passed": [
+        "comp-1: Todas seções presentes (1-10 completas)",
+        "comp-2: FR-1 a FR-8 têm test scenarios em Gherkin (6.3)",
+        "comp-3: Dependencies listadas com versions (chromadb 1.5.8, rank_bm25 1.1.1, etc.)",
+        "comp-4: 20+ arquivos novos + 4 modified listados com purposes (section 5)",
+        "comp-5: 9 risks documentados com probability/impact/mitigation (section 7)"
+      ]
+    },
+    "consistency": {
+      "score": 5,
+      "rationale": "Todas referências FR-*/NFR-*/CON-* validadas contra requirements.json. Dependencies mencionadas em approach (3.2) match dependencies section (4). Spec depth é apropriado para COMPLEX epic (~20 pontos). Nenhuma contradição encontrada entre seções.",
+      "checks_passed": [
+        "con-1: Todas referências FR-1 a FR-8, NFR-1 a NFR-8, CON-1 a CON-7 existem em requirements.json",
+        "con-2: Dependencies em 3.2 (ChromaDB, rank_bm25, sentence-transformers) match section 4.1",
+        "con-3: Spec depth (700 linhas, 4 stories, 34 pontos) alinha com COMPLEX classification",
+        "con-4: Nenhuma contradição entre Technical Approach (3) e Testing (6)"
+      ]
+    },
+    "feasibility": {
+      "score": 4,
+      "rationale": "Dependencies são verificadas (Research 1/3, 2/3, 3/3). Arquitetura é sólida baseada em patterns estabelecidos. Scope é grande mas dividido em 4 stories (8+13+8+5=34 pontos). Alguns risks medium/high probability (NotebookLM rate limits, latência com 20 usuários) requerem validação em POC. Open Questions (8) indicam áreas de incerteza técnica ainda não resolvidas.",
+      "checks_passed": [
+        "feas-1: All dependencies exist (jacob-bd MCP verificado, ChromaDB 1.5.8 exists, OpenRouter API available)",
+        "feas-2: Technical approach sound (RAG híbrido é pattern estabelecido, Supabase Auth já implementado)",
+        "feas-4: All requirements technically possible (nenhum impossível detectado)"
+      ],
+      "checks_flagged": [
+        "feas-3: CONCERN - Scope is large (34 pontos) but divided into 4 stories. Story 2 (13 pontos) is heavy - consider splitting RAG Engine (5pts) from Chatbot UI (8pts)"
+      ]
+    },
+    "alignment": {
+      "score": 5,
+      "rationale": "Tech stack alinha perfeitamente com projeto existente (Supabase Auth, Express, React). Patterns seguem codebase (server/routes/, server/lib/, src/plataforma/pages/). File naming conventions corretos (kebab-case para arquivos, PascalCase para components). Architecture fit é excelente (extends existing auth system, adds new module without breaking changes).",
+      "checks_passed": [
+        "align-1: Technologies match project (Supabase Auth, Express, React, Vite)",
+        "align-2: Patterns match existing codebase (server/routes/*, src/plataforma/pages/*, RLS policies)",
+        "align-3: File/component names follow conventions (rag-engine.js, ChatbotPage.jsx)",
+        "align-4: Fits within existing architecture (extends auth, adds /chatbot route, no breaking changes)"
+      ]
+    }
+  },
+
+  "issues": [
+    {
+      "id": "CRIT-1",
+      "severity": "MEDIUM",
+      "category": "completeness",
+      "check": "comp-2",
+      "description": "FR-6 (Histórico de conversas) não tem test scenario em Gherkin na section 6.3. Apenas mencionado em AC-2 implicitamente.",
+      "location": "spec.md#section-6.3",
+      "suggestion": "Adicionar test scenario explícito: 'Feature: Histórico de Conversas' com Given-When-Then para aluno acessar histórico, selecionar sessão anterior, continuar conversa.",
+      "autoFixable": true
+    },
+    {
+      "id": "CRIT-2",
+      "severity": "LOW",
+      "category": "feasibility",
+      "check": "feas-3",
+      "description": "Story 2 (RAG Engine + Chatbot Q&A) tem 13 pontos, acima do ideal (8-10 pontos). Risk de ser muito grande para 1 sprint.",
+      "location": "spec.md#section-9",
+      "suggestion": "Considerar split: Story 2a 'RAG Engine' (5pts: ChromaDB setup, indexing, hybrid retriever) e Story 2b 'Chatbot API + UI' (8pts: API routes, streaming, UI components).",
+      "autoFixable": false
+    },
+    {
+      "id": "CRIT-3",
+      "severity": "LOW",
+      "category": "completeness",
+      "check": "comp-4",
+      "description": "Section 5.1 não especifica formato exato de skill uploads (.json schema, .yaml schema). Open Question OQ-1 resolve isso, mas ideal ter placeholder schema em spec.",
+      "location": "spec.md#section-5.1",
+      "suggestion": "Adicionar exemplo de skill schema em section 5.1 ou referência a template placeholder (mesmo que incompleto) para guiar implementação.",
+      "autoFixable": true
+    }
+  ],
+
+  "summary": {
+    "highIssues": 0,
+    "mediumIssues": 1,
+    "lowIssues": 2,
+    "autoFixable": 2,
+    "strengths": [
+      "Excelente rastreabilidade: Todas statements rastreiam para FR/NFR/CON/Research (Article IV - No Invention compliance)",
+      "Testing strategy comprehensiva: Unit tests, integration tests, acceptance tests em Gherkin para todas FRs",
+      "Risk assessment detalhado: 9 risks com probability/impact/mitigation, rastreáveis a assumptions/constraints",
+      "Implementation breakdown claro: 4 stories com pontos estimados (8+13+8+5=34), checklists detalhados",
+      "Rollout plan pragmático: 3 phases (Internal Beta → Limited Production → Full Rollout)",
+      "Open Questions documentadas: 8 questões técnicas identificadas, atribuídas a agentes, marcadas como non-blocking",
+      "Dependencies verification: Todas dependencies verificadas em research docs (notebooklm-mcp-research.md, auth-system-research.md, rag-hybrid-research.md)"
+    ],
+    "weaknesses": [
+      "Story 2 scope: 13 pontos é pesado, risco de não completar em 1 sprint",
+      "FR-6 test coverage: Histórico de conversas não tem test scenario explícito em Gherkin",
+      "Skill schema: Formato exato de upload não especificado (delegado a OQ-1 mas poderia ter placeholder)"
+    ]
+  },
+
+  "nextAction": "APPROVED - Spec está pronto para implementation. Sugestão: Resolver OQ-1 (skill schema) antes de Story 3 start. Considerar split de Story 2 em planning session.",
+
+  "recommendations": [
+    {
+      "priority": "MEDIUM",
+      "recommendation": "Resolver Open Question OQ-1 (skill schema format) antes de Story 3 planning",
+      "rationale": "Admin UI para skills (Story 3) depende de schema validation definido. Evita retrabalho."
+    },
+    {
+      "priority": "LOW",
+      "recommendation": "Considerar split de Story 2 em planning: '2a: RAG Engine' (5pts) + '2b: Chatbot API+UI' (8pts)",
+      "rationale": "13 pontos é acima do ideal. Split permite deploy incremental e reduz risk de story não completar."
+    },
+    {
+      "priority": "LOW",
+      "recommendation": "Load testing (ASM-3 validation) deve ser executado em Story 2 acceptance phase",
+      "rationale": "Assumption de 20 usuários simultâneos precisa ser validada antes de Story 4 (Observabilidade) para garantir métricas realistas."
+    }
+  ],
+
+  "autoFixes": [
+    {
+      "issueId": "CRIT-1",
+      "location": "spec.md#section-6.3",
+      "original": "#### AC-5: Observabilidade",
+      "suggested": "#### AC-5: Histórico de Conversas\n\n```gherkin\nFeature: Histórico de Conversas\n\n  Scenario: Aluno acessa histórico e continua conversa\n    Given aluno autenticado na página /chatbot\n    And aluno tem 3 sessões anteriores salvas\n    When aluno clica em sessão \"Perguntas sobre RAG\" no sidebar\n    Then sessão é carregada com histórico completo\n    And aluno pode continuar fazendo perguntas na mesma sessão\n    And novas perguntas são adicionadas ao histórico\n\n  Scenario: Aluno inicia nova conversa\n    Given aluno autenticado na página /chatbot\n    When aluno clica \"Nova Conversa\"\n    Then nova sessão é criada\n    And histórico está vazio\n    And aluno pode fazer primeira pergunta\n```\n\n#### AC-6: Observabilidade"
+    },
+    {
+      "issueId": "CRIT-3",
+      "location": "spec.md#section-5.1",
+      "original": "| `server/routes/admin/skills.js` | CRUD endpoints para skills | auth.js |",
+      "suggested": "| `server/routes/admin/skills.js` | CRUD endpoints para skills | auth.js |\n| `server/lib/skill-schema.json` | JSON Schema para validação de skill uploads (ver OQ-1 para formato final) | — |"
+    }
+  ],
+
+  "constitutional_compliance": {
+    "article_iv_no_invention": {
+      "status": "PASS",
+      "evidence": "Spec metadata (line 687-696) documenta inputs: requirements.json + 3 research docs. Todas technical choices rastreiam para research findings. Nenhum phantom feature detectado."
+    }
+  },
+
+  "metrics": {
+    "spec_length_lines": 700,
+    "requirements_count": {
+      "functional": 8,
+      "non_functional": 8,
+      "constraints": 7
+    },
+    "test_coverage": {
+      "unit_tests": 5,
+      "integration_tests": 5,
+      "acceptance_tests": 5,
+      "total_scenarios": 7
+    },
+    "dependencies_count": {
+      "external": 9,
+      "internal": 9
+    },
+    "files_impacted": {
+      "new_files": 18,
+      "modified_files": 4
+    },
+    "risks_documented": 9,
+    "open_questions": 8,
+    "stories_estimated": 4,
+    "total_points": 34
+  },
+
+  "gate_decision": {
+    "decision": "APPROVED",
+    "conditions": [
+      "Resolve OQ-1 (skill schema) antes de Story 3 start",
+      "Considerar split de Story 2 em planning session"
+    ],
+    "blocking_issues": [],
+    "quality_bar_met": true,
+    "ready_for_implementation": true
+  }
+}

@@ -399,6 +399,7 @@ _Derivado de: FR-2, FR-7, FR-8, NFR-5, NFR-6, INT-1 (requirements.json)_
 | `server/routes/chatbot.js` | API endpoints: `/query`, `/sessions`, `/sessions/:id` | auth.js, rag-engine.js, skill-router.js |
 | `server/routes/admin/notebooks.js` | API endpoints: `/connect`, `/list`, `/import`, `/status` | auth.js, notebook-importer.js |
 | `server/routes/admin/skills.js` | CRUD endpoints para skills | auth.js |
+| `server/lib/skill-schema.json` | JSON Schema para validação de skill uploads (ver OQ-1 para formato final) | — |
 | `server/routes/admin/observability.js` | Dashboard metrics endpoints | auth.js |
 | `server/lib/rag-engine.js` | Hybrid retriever (ChromaDB + BM25) | chromadb, rank_bm25, sentence-transformers |
 | `server/lib/skill-router.js` | Skill detection logic | — |
@@ -545,7 +546,28 @@ Feature: Criação de Skill Customizada
     And resposta segue formato: Objetivo, Pré-requisitos, Passos, Validação
 ```
 
-#### AC-5: Observabilidade
+#### AC-5: Histórico de Conversas
+
+```gherkin
+Feature: Histórico de Conversas
+
+  Scenario: Aluno acessa histórico e continua conversa
+    Given aluno autenticado na página /chatbot
+    And aluno tem 3 sessões anteriores salvas
+    When aluno clica em sessão "Perguntas sobre RAG" no sidebar
+    Then sessão é carregada com histórico completo
+    And aluno pode continuar fazendo perguntas na mesma sessão
+    And novas perguntas são adicionadas ao histórico
+
+  Scenario: Aluno inicia nova conversa
+    Given aluno autenticado na página /chatbot
+    When aluno clica "Nova Conversa"
+    Then nova sessão é criada
+    And histórico está vazio
+    And aluno pode fazer primeira pergunta
+```
+
+#### AC-6: Observabilidade
 
 ```gherkin
 Feature: Dashboard de Observabilidade
