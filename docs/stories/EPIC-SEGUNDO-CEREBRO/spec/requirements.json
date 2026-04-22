@@ -1,0 +1,501 @@
+{
+  "storyId": "EPIC-SEGUNDO-CEREBRO",
+  "gatheredAt": "2026-04-21T22:30:00Z",
+  "source": "user",
+  "gatheredBy": "@pm",
+  "elicitationVersion": "2.0",
+
+  "functional": [
+    {
+      "id": "FR-1",
+      "description": "Ingestão de notebooks do NotebookLM para Obsidian via MCP jacob-bd/notebooklm-mcp-cli",
+      "priority": "P0",
+      "rationale": "Base de conhecimento precisa ser populada antes do chatbot funcionar",
+      "acceptance": [
+        "AC-1: Admin conecta conta NotebookLM, seleciona notebooks, inicia importação, notebooks convertidos para Markdown no Obsidian vault, confirmação de sucesso exibida, RAG re-indexado automaticamente"
+      ]
+    },
+    {
+      "id": "FR-2",
+      "description": "Chatbot Q&A autenticado com streaming de resposta e citação de fontes",
+      "priority": "P0",
+      "rationale": "Funcionalidade principal do épico - alunos consultam base de conhecimento",
+      "acceptance": [
+        "AC-2: Aluno autenticado digita pergunta, resposta aparece progressivamente (streaming), resposta completa em <60s, fontes/notebooks exibidos, conversa salva no histórico, pergunta fora de escopo retorna mensagem apropriada"
+      ]
+    },
+    {
+      "id": "FR-3",
+      "description": "Admin seleciona LLM via dropdown populado dinamicamente da API OpenRouter",
+      "priority": "P0",
+      "rationale": "Admin precisa controlar qual modelo LLM é usado pelo chatbot",
+      "acceptance": [
+        "AC-3: Admin acessa painel de configuração, abre selector de LLM, vê lista de modelos do OpenRouter, seleciona modelo, modelo é salvo como default, próximas perguntas usam modelo selecionado"
+      ]
+    },
+    {
+      "id": "FR-4",
+      "description": "Admin cria/importa skills customizadas (upload .json/.yaml ou formulário)",
+      "priority": "P1",
+      "rationale": "Skills permitem gerar conteúdo especializado (cookbooks, resumos, tabelas comparativas)",
+      "acceptance": [
+        "AC-4: Admin cria skill via formulário OU upload de arquivo, skill salva no sistema, admin pode ativar/desativar, agente detecta automaticamente quando usar skill ativa, skill desativada não é usada"
+      ]
+    },
+    {
+      "id": "FR-5",
+      "description": "Dashboard de observabilidade com métricas de uso, custo e performance",
+      "priority": "P1",
+      "rationale": "Admin precisa monitorar saúde do sistema e custos operacionais",
+      "acceptance": [
+        "AC-5: Admin acessa dashboard, vê latência média, consumo/custo de tokens (input/cache/output/thinking), erros/timeouts, sessões ativas, usuários ativos, top perguntas, notebooks mais consultados, dados atualizados em near-real-time"
+      ]
+    },
+    {
+      "id": "FR-6",
+      "description": "Histórico de conversas persistente e acessível por aluno",
+      "priority": "P1",
+      "rationale": "Alunos precisam revisar conversas anteriores",
+      "acceptance": [
+        "Aluno vê sidebar com sessões anteriores, pode selecionar sessão para continuar conversa, pode iniciar nova sessão"
+      ]
+    },
+    {
+      "id": "FR-7",
+      "description": "Agente capaz de gerar múltiplos tipos de conteúdo (resumos, relatórios, tabelas comparativas, análises, cookbooks)",
+      "priority": "P0",
+      "rationale": "Usuários precisam de diferentes formatos de output além de Q&A simples",
+      "acceptance": [
+        "Aluno solicita resumo e recebe resumo estruturado, solicita cookbook e recebe guia passo-a-passo, solicita tabela comparativa e recebe tabela formatada"
+      ]
+    },
+    {
+      "id": "FR-8",
+      "description": "Sistema de skills com detecção automática e triggers/keywords",
+      "priority": "P1",
+      "rationale": "Agente precisa rotear perguntas para skills apropriadas sem intervenção manual",
+      "acceptance": [
+        "Pergunta contendo 'resumo' ativa skill de resumo, 'cookbook' ativa skill de cookbook, 'tabela' ativa skill de tabela comparativa, sem match usa prompt genérico"
+      ]
+    }
+  ],
+
+  "nonFunctional": [
+    {
+      "id": "NFR-1",
+      "category": "performance",
+      "description": "Resposta do chatbot deve completar em menos de 60 segundos",
+      "metric": "95th percentile de latência end-to-end < 60s"
+    },
+    {
+      "id": "NFR-2",
+      "category": "performance",
+      "description": "Sistema deve suportar 20 usuários simultâneos sem degradação",
+      "metric": "Latência p95 < 60s com 20 requests concorrentes"
+    },
+    {
+      "id": "NFR-3",
+      "category": "security",
+      "description": "Todas conversas devem ser auditadas e registradas em log",
+      "metric": "100% de mensagens registradas em chatbot_sessions com timestamps"
+    },
+    {
+      "id": "NFR-4",
+      "category": "security",
+      "description": "RLS policies garantem que aluno vê apenas próprias conversas",
+      "metric": "Tentativa de acesso a sessão de outro aluno retorna 403 Forbidden"
+    },
+    {
+      "id": "NFR-5",
+      "category": "usability",
+      "description": "Respostas do chatbot devem usar streaming (progressive rendering)",
+      "metric": "TTFB (Time To First Byte) < 2s, tokens aparecem progressivamente"
+    },
+    {
+      "id": "NFR-6",
+      "category": "usability",
+      "description": "Chatbot deve sempre citar fontes (notebooks consultados)",
+      "metric": "100% das respostas incluem seção 'Fontes' com links para notebooks"
+    },
+    {
+      "id": "NFR-7",
+      "category": "reliability",
+      "description": "Sistema deve ter graceful degradation se ChromaDB falhar",
+      "metric": "Fallback para BM25-only se vector store indisponível, alertar admin"
+    },
+    {
+      "id": "NFR-8",
+      "category": "usability",
+      "description": "Admin deve ver métricas de observabilidade atualizadas em near-real-time",
+      "metric": "Dashboard atualiza a cada 30s com dados dos últimos 5 minutos"
+    }
+  ],
+
+  "constraints": [
+    {
+      "id": "CON-1",
+      "type": "technical",
+      "description": "NotebookLM usa APIs não-oficiais com rate limit de ~50 queries/day no free tier",
+      "impact": "Importação pode falhar se rate limit atingido, requer retry logic e account rotation"
+    },
+    {
+      "id": "CON-2",
+      "type": "technical",
+      "description": "Autenticação obrigatória via Supabase Auth com roles (admin/user)",
+      "impact": "RLS policies devem ser implementadas para todas tabelas de chatbot"
+    },
+    {
+      "id": "CON-3",
+      "type": "technical",
+      "description": "LLM provider é OpenRouter, lista de modelos via API /models",
+      "impact": "Sistema depende de OpenRouter estar disponível, endpoint /models deve ser cached"
+    },
+    {
+      "id": "CON-4",
+      "type": "technical",
+      "description": "RAG híbrido usa ChromaDB (vector) + rank_bm25 (keyword) com peso 60/40",
+      "impact": "Ambos indexes devem estar sincronizados, reindexação deve atualizar ambos"
+    },
+    {
+      "id": "CON-5",
+      "type": "business",
+      "description": "Chatbot NÃO pode responder sobre assuntos fora da mentoria (scope enforcement crítico)",
+      "impact": "System prompt deve incluir instrução forte de scope, respostas fora de escopo devem ser rejeitadas explicitamente"
+    },
+    {
+      "id": "CON-6",
+      "type": "business",
+      "description": "Sem rate limits para alunos (unlimited queries)",
+      "impact": "Sistema deve escalar horizontalmente, monitorar abuso via observabilidade"
+    },
+    {
+      "id": "CON-7",
+      "type": "technical",
+      "description": "Timeout máximo de 1 minuto para resposta do chatbot",
+      "impact": "LLM request deve ter timeout configurado, UI deve mostrar erro se exceder"
+    }
+  ],
+
+  "assumptions": [
+    {
+      "id": "ASM-1",
+      "description": "MCP jacob-bd/notebooklm-mcp-cli continuará funcional e mantido",
+      "risk_if_wrong": "Ingestão quebra se Google mudar APIs internas do NotebookLM",
+      "validation_needed": true,
+      "validation_method": "POC com 1-2 notebooks antes de full implementation"
+    },
+    {
+      "id": "ASM-2",
+      "description": "OpenRouter API /models retorna lista completa de modelos disponíveis",
+      "risk_if_wrong": "Admin não terá opções de LLM para selecionar",
+      "validation_needed": true,
+      "validation_method": "curl https://openrouter.ai/api/v1/models -H 'Authorization: Bearer $TOKEN'"
+    },
+    {
+      "id": "ASM-3",
+      "description": "20 usuários simultâneos não sobrecarregam ChromaDB/OpenRouter",
+      "risk_if_wrong": "Latência > 60s, timeouts frequentes",
+      "validation_needed": true,
+      "validation_method": "Load testing com 20 queries simultâneas antes de produção"
+    },
+    {
+      "id": "ASM-4",
+      "description": "Conteúdo dos notebooks do NotebookLM é suficiente para responder perguntas de alunos",
+      "risk_if_wrong": "Chatbot não consegue responder bem por falta de contexto na base",
+      "validation_needed": true,
+      "validation_method": "Testar com 20-30 perguntas reais de alunos após primeira importação"
+    },
+    {
+      "id": "ASM-5",
+      "description": "Agente consegue detectar automaticamente quando skill é necessária via triggers/keywords",
+      "risk_if_wrong": "Skills não ativadas quando deveriam, experiência ruim para alunos",
+      "validation_needed": true,
+      "validation_method": "Teste com 10 perguntas variadas, verificar ≥80% de acurácia no skill routing"
+    }
+  ],
+
+  "domainModel": [
+    {
+      "id": "DM-1",
+      "entity": "User",
+      "attributes": ["id", "email", "role (admin/user)", "created_at"],
+      "relationships": [
+        {
+          "type": "has_many",
+          "target": "ChatSession"
+        }
+      ]
+    },
+    {
+      "id": "DM-2",
+      "entity": "ChatSession",
+      "attributes": ["id", "user_id", "created_at", "updated_at"],
+      "relationships": [
+        {
+          "type": "belongs_to",
+          "target": "User"
+        },
+        {
+          "type": "has_many",
+          "target": "ChatMessage"
+        }
+      ]
+    },
+    {
+      "id": "DM-3",
+      "entity": "ChatMessage",
+      "attributes": ["id", "session_id", "role (user/assistant)", "content", "tokens_used (jsonb: input/cache/output/thinking)", "cost", "sources (jsonb: array of notebook refs)", "created_at"],
+      "relationships": [
+        {
+          "type": "belongs_to",
+          "target": "ChatSession"
+        }
+      ]
+    },
+    {
+      "id": "DM-4",
+      "entity": "Notebook",
+      "attributes": ["id", "title", "notebooklm_url", "obsidian_path", "imported_at", "status (pending/imported/failed)", "hash (for incremental indexing)"],
+      "relationships": [
+        {
+          "type": "has_many",
+          "target": "NotebookChunk (via RAG index)"
+        }
+      ]
+    },
+    {
+      "id": "DM-5",
+      "entity": "Skill",
+      "attributes": ["id", "name", "description", "prompt", "is_active", "triggers (jsonb: keywords array)", "created_by (admin user_id)", "created_at"],
+      "relationships": []
+    },
+    {
+      "id": "DM-6",
+      "entity": "LLMConfig",
+      "attributes": ["id", "model_name", "provider (openrouter)", "is_default", "created_at"],
+      "relationships": []
+    }
+  ],
+
+  "interactions": [
+    {
+      "id": "INT-1",
+      "trigger": "Aluno acessa área do chatbot",
+      "flow": [
+        "Aluno vê histórico de sessões anteriores (sidebar)",
+        "Clica 'Nova conversa' ou seleciona sessão existente",
+        "Digita pergunta → clica Enviar",
+        "Loading state: 'Buscando na base de conhecimento...'",
+        "Resposta aparece progressivamente (streaming)",
+        "Após resposta completa: mostra fontes (notebooks consultados)",
+        "Aluno pode continuar conversa ou iniciar nova"
+      ],
+      "states": {
+        "loading": "Spinner + 'Processando...'",
+        "streaming": "Texto aparecendo palavra por palavra",
+        "error": "'Erro ao processar pergunta. Tente novamente.' + retry button",
+        "empty": "'Nenhuma conversa ainda. Faça sua primeira pergunta!'",
+        "timeout": "'Pergunta demorou muito (>60s). Tente uma pergunta mais específica.'"
+      }
+    },
+    {
+      "id": "INT-2",
+      "trigger": "Admin importa notebooks",
+      "flow": [
+        "Admin acessa /admin/notebooks",
+        "Clica 'Conectar NotebookLM'",
+        "Autentica via browser (cookie extraction)",
+        "Lista de notebooks aparece",
+        "Admin seleciona checkboxes dos notebooks desejados",
+        "Clica 'Importar Selecionados'",
+        "Progress bar mostra importação (X/Y notebooks)",
+        "Após conclusão: 'Importação concluída! Re-indexando...'",
+        "Re-indexação automática (progress bar)",
+        "Dashboard atualiza com novos notebooks"
+      ],
+      "states": {
+        "loading": "Progress bar com percentual",
+        "error": "Erro específico (rate limit, auth fail, network) + retry button",
+        "empty": "'Nenhum notebook importado ainda. Conecte sua conta NotebookLM.'"
+      }
+    },
+    {
+      "id": "INT-3",
+      "trigger": "Admin cria skill",
+      "flow": [
+        "Admin acessa /admin/skills",
+        "Clica 'Nova Skill' OU 'Importar Skill'",
+        "Se Nova: preenche formulário (nome, descrição, prompt, triggers)",
+        "Se Importar: faz upload de .json/.yaml",
+        "Pré-visualização da skill",
+        "Admin clica 'Salvar'",
+        "Skill aparece na lista, toggle on/off",
+        "Admin ativa skill → imediatamente disponível para agente"
+      ],
+      "states": {
+        "loading": "Salvando skill...",
+        "error": "Erro de validação de schema: 'Campo X obrigatório'",
+        "empty": "'Nenhuma skill criada. Crie sua primeira skill customizada.'"
+      }
+    }
+  ],
+
+  "edgeCases": [
+    {
+      "id": "EC-1",
+      "scenario": "NotebookLM rate limit atingido durante importação",
+      "handling": "Pausar importação, mostrar 'Rate limit atingido. Tentando novamente em 1h...', retry automático com exponential backoff",
+      "severity": "medium"
+    },
+    {
+      "id": "EC-2",
+      "scenario": "LLM timeout (>60s)",
+      "handling": "Abortar request, mostrar mensagem ao aluno 'Pergunta demorou muito. Tente uma pergunta mais específica.', registrar erro no observability dashboard",
+      "severity": "high"
+    },
+    {
+      "id": "EC-3",
+      "scenario": "Pergunta fora de escopo da mentoria",
+      "handling": "Agente retorna 'Não encontrei essa informação na base de conhecimento da mentoria. Posso ajudar com temas relacionados ao conteúdo dos nossos materiais.'",
+      "severity": "low"
+    },
+    {
+      "id": "EC-4",
+      "scenario": "ChromaDB down ou corrompido",
+      "handling": "Fallback para BM25 apenas (keyword search), alertar admin via dashboard, log critical error",
+      "severity": "critical"
+    },
+    {
+      "id": "EC-5",
+      "scenario": "Aluno tenta acessar histórico de outro aluno",
+      "handling": "RLS bloqueia query, retorna 403 Forbidden, log security event",
+      "severity": "critical"
+    },
+    {
+      "id": "EC-6",
+      "scenario": "Admin faz upload de skill com formato inválido",
+      "handling": "Validação de schema JSON, erro detalhado: 'Campo X obrigatório', 'Formato esperado: .json ou .yaml'",
+      "severity": "low"
+    },
+    {
+      "id": "EC-7",
+      "scenario": "OpenRouter API down",
+      "handling": "Retry 3x com exponential backoff (1s, 2s, 4s), se falhar → erro ao aluno 'Serviço temporariamente indisponível' + alerta crítico no dashboard admin",
+      "severity": "critical"
+    },
+    {
+      "id": "EC-8",
+      "scenario": "Agente não detecta skill apropriada",
+      "handling": "Usa prompt genérico, registra evento para análise posterior (analytics: 'skill_miss'), permite refinamento de triggers",
+      "severity": "medium"
+    },
+    {
+      "id": "EC-9",
+      "scenario": "RAG retrieval retorna 0 documentos (pergunta muito específica ou corpus vazio)",
+      "handling": "Agente retorna 'Não encontrei informações relevantes sobre isso na base atual. Você pode reformular a pergunta ou verificar se esse conteúdo já foi importado.'",
+      "severity": "medium"
+    },
+    {
+      "id": "EC-10",
+      "scenario": "Usuário envia múltiplas perguntas rapidamente (mesmo sem rate limit)",
+      "handling": "Enfileirar requests, processar sequencialmente por sessão (evita concorrência), mostrar 'X perguntas na fila'",
+      "severity": "low"
+    }
+  ],
+
+  "terminology": [
+    {
+      "term": "Notebook",
+      "definition": "Documento do NotebookLM importado como base de conhecimento",
+      "synonyms": [],
+      "avoid": ["Documento", "Arquivo", "Material"]
+    },
+    {
+      "term": "Skill",
+      "definition": "Template de prompt customizado para gerar tipo específico de conteúdo (cookbook, resumo, tabela comparativa, etc)",
+      "synonyms": [],
+      "avoid": ["Prompt", "Template", "Ação", "Capability"]
+    },
+    {
+      "term": "Agente",
+      "definition": "Sistema de IA que responde perguntas dos alunos (sinônimo de Chatbot, preferir 'Agente' em contexto técnico)",
+      "synonyms": ["Chatbot"],
+      "avoid": ["Bot", "Assistente", "AI"]
+    },
+    {
+      "term": "RAG Engine",
+      "definition": "Sistema de busca híbrida (ChromaDB + BM25) que recupera contexto relevante dos notebooks",
+      "synonyms": [],
+      "avoid": ["Search", "Retrieval", "Index"]
+    },
+    {
+      "term": "Ingestão",
+      "definition": "Processo de importar notebooks do NotebookLM para Obsidian",
+      "synonyms": [],
+      "avoid": ["Importação", "Sincronização", "Upload"]
+    },
+    {
+      "term": "Streaming",
+      "definition": "Resposta do LLM aparecendo progressivamente (palavra por palavra) em tempo real",
+      "synonyms": [],
+      "avoid": ["Progressive", "Real-time", "Incremental"]
+    },
+    {
+      "term": "Observabilidade",
+      "definition": "Dashboard de métricas (latência, tokens, custos, erros) para monitoramento do sistema",
+      "synonyms": [],
+      "avoid": ["Monitoramento", "Analytics", "Logs"]
+    },
+    {
+      "term": "Aluno",
+      "definition": "Usuário da mentoria com role='user', consumidor principal do chatbot",
+      "synonyms": [],
+      "avoid": ["Estudante", "User", "Cliente"]
+    },
+    {
+      "term": "Admin",
+      "definition": "Usuário administrador com role='admin', gerencia notebooks, skills e configurações",
+      "synonyms": [],
+      "avoid": ["Administrador", "Gestor", "Manager"]
+    },
+    {
+      "term": "Trigger",
+      "definition": "Palavra-chave ou padrão que ativa uma skill específica (ex: 'resumo', 'cookbook', 'tabela')",
+      "synonyms": [],
+      "avoid": ["Keyword", "Pattern", "Ativador"]
+    }
+  ],
+
+  "openQuestions": [
+    {
+      "id": "OQ-1",
+      "question": "Qual formato exato esperado para upload de skills? (.json estruturado, .yaml, .md com frontmatter?)",
+      "blocking": false,
+      "assignedTo": "@architect"
+    },
+    {
+      "id": "OQ-2",
+      "question": "Como admin define triggers para skills? (lista de keywords, regex patterns, ou LLM-based detection?)",
+      "blocking": false,
+      "assignedTo": "@architect"
+    },
+    {
+      "id": "OQ-3",
+      "question": "Dashboard de observabilidade é página dedicada ou modal/sidebar no admin panel?",
+      "blocking": false,
+      "assignedTo": "@ux-design-expert"
+    },
+    {
+      "id": "OQ-4",
+      "question": "Skills podem ter parâmetros configuráveis pelo aluno? (ex: tamanho do resumo, formato da tabela)",
+      "blocking": false,
+      "assignedTo": "@po"
+    },
+    {
+      "id": "OQ-5",
+      "question": "Como lidar com custo de tokens thinking (OpenRouter o3-mini)? Separar no dashboard ou agrupar com output?",
+      "blocking": false,
+      "assignedTo": "@pm"
+    }
+  ]
+}
