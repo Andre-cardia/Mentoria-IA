@@ -7,7 +7,7 @@ const PLANS = {
   },
   anual: {
     name: "Mentoria NeuralHub — Plano Anual",
-    amount: 356140, // R$ 3.561,40 em centavos
+    amount: 442368, // R$ 4.423,68 em centavos (12x de R$ 368,64)
   },
 };
 
