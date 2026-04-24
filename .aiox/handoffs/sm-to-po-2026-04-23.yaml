@@ -1,0 +1,21 @@
+handoff:
+  from_agent: "sm"
+  to_agent: "po"
+  timestamp: "2026-04-23T00:00:00Z"
+  consumed: false
+  story_context:
+    story_id: "2.4"
+    story_path: "docs/stories/2.4.story.md"
+    story_status: "Draft"
+    current_task: "Story criada — aguardando validação @po"
+    branch: "master"
+  decisions:
+    - "Conteúdo salvo como HTML via editor.getHTML() (não JSON como no blog)"
+    - "LessonRichEditor extraído como componente reutilizável (não duplicado inline)"
+    - "Detecção de conteúdo legado via content.startsWith('<') para fallback"
+    - "Reutiliza endpoint /api/blog/image-upload sem criar novo endpoint"
+  files_modified:
+    - "docs/stories/2.4.story.md"
+  blockers: []
+  next_action: "*validate-story-draft 2.4"
+  last_command: "*draft"
