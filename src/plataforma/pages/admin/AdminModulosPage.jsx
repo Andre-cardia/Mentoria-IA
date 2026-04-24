@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import LessonRichEditor from '../../components/LessonRichEditor';
 import {
   DndContext,
   closestCenter,
@@ -182,6 +183,11 @@ export default function AdminModulosPage() {
 
   // Modal de confirmação
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
+
+  async function getToken() {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token ?? '';
+  }
 
   // Sensores dnd-kit — distância mínima de 5px evita cliques acidentais
   const sensors = useSensors(
@@ -566,7 +572,12 @@ export default function AdminModulosPage() {
                                             <input style={inputSx} placeholder="URL do vídeo (opcional)" value={lessonEditForm.video_url} onChange={(e) => setLessonEditForm((p) => ({ ...p, video_url: e.target.value }))} />
                                           )}
                                           {['text', 'activity'].includes(lessonEditForm.lesson_type) && (
-                                            <textarea style={{ ...inputSx, minHeight: '100px', resize: 'vertical', lineHeight: '1.6' }} placeholder={lessonEditForm.lesson_type === 'activity' ? 'Instruções da atividade...' : 'Conteúdo da aula...'} value={lessonEditForm.content} onChange={(e) => setLessonEditForm((p) => ({ ...p, content: e.target.value }))} />
+                                            <LessonRichEditor
+                                              value={lessonEditForm.content}
+                                              onChange={(html) => setLessonEditForm((p) => ({ ...p, content: html }))}
+                                              placeholder={lessonEditForm.lesson_type === 'activity' ? 'Instruções da atividade...' : 'Conteúdo da aula...'}
+                                              getToken={getToken}
+                                            />
                                           )}
                                           {lessonEditForm.lesson_type === 'quiz' && (
                                             <p style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)', margin: 0 }}>Quiz Builder disponível na Story 3.2.</p>
@@ -597,7 +608,12 @@ export default function AdminModulosPage() {
                                 <input style={inputSx} placeholder="URL do vídeo (opcional)" value={lessonForm.video_url} onChange={(e) => setLessonForm((p) => ({ ...p, video_url: e.target.value }))} />
                               )}
                               {['text', 'activity'].includes(lessonForm.lesson_type) && (
-                                <textarea style={{ ...inputSx, minHeight: '100px', resize: 'vertical', lineHeight: '1.6' }} placeholder={lessonForm.lesson_type === 'activity' ? 'Instruções da atividade...' : 'Conteúdo da aula...'} value={lessonForm.content} onChange={(e) => setLessonForm((p) => ({ ...p, content: e.target.value }))} required />
+                                <LessonRichEditor
+                                  value={lessonForm.content}
+                                  onChange={(html) => setLessonForm((p) => ({ ...p, content: html }))}
+                                  placeholder={lessonForm.lesson_type === 'activity' ? 'Instruções da atividade...' : 'Conteúdo da aula...'}
+                                  getToken={getToken}
+                                />
                               )}
                               {lessonForm.lesson_type === 'quiz' && (
                                 <p style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)', margin: 0 }}>Quiz Builder disponível na Story 3.2.</p>
