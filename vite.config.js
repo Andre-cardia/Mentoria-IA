@@ -15,6 +15,8 @@ const devRewrites = {
         req.url = '/brand.html'
       } else if (req.url === '/obrigado') {
         req.url = '/obrigado.html'
+      } else if (req.url === '/neuralhub' || req.url.startsWith('/neuralhub/')) {
+        req.url = '/neuralhub.html'
       }
       next()
     })
@@ -41,13 +43,14 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main:     resolve(__dirname, 'index.html'),
-        lead:     resolve(__dirname, 'lead.html'),
-        brand:    resolve(__dirname, 'brand.html'),
-        obrigado: resolve(__dirname, 'obrigado.html'),
+        main:       resolve(__dirname, 'index.html'),
+        lead:       resolve(__dirname, 'lead.html'),
+        brand:      resolve(__dirname, 'brand.html'),
+        obrigado:   resolve(__dirname, 'obrigado.html'),
         privacidade: resolve(__dirname, 'privacidade.html'),
-        termos: resolve(__dirname, 'termos.html'),
+        termos:     resolve(__dirname, 'termos.html'),
         plataforma: resolve(__dirname, 'plataforma.html'),
+        neuralhub:  resolve(__dirname, 'neuralhub.html'),
       },
     },
   },

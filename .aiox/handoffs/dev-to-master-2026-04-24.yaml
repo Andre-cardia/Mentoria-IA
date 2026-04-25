@@ -1,0 +1,28 @@
+handoff:
+  from_agent: "dev"
+  to_agent: "aiox-master"
+  timestamp: "2026-04-24T00:00:00Z"
+  consumed: false
+  story_context:
+    story_id: "10.1"
+    story_path: "docs/stories/10.1.story.md"
+    story_status: "Done"
+    current_task: "Homepage Neural Hub implementada e documentada"
+    branch: "master"
+  decisions:
+    - "Novo entry point Vite dentro do projeto existente (não repositório separado)"
+    - "Componente único NeuralHubHome.jsx — sem subcomponentes externos para manter simplicidade"
+    - "Background hero: src/assets/neuralhub-background.png importado via módulo ES (não URL externa)"
+    - "Animações replicadas da mentoria landing: nhRise, nhGlow, nhPulseLine, nhScan, nhFloat"
+    - "Neurônio SVG inline (sem canvas/WebGL) — flutuante com nhFloat"
+    - "Epic 10 criado retroativamente para registrar a iniciativa homepage"
+  files_modified:
+    - "neuralhub.html"
+    - "src/neuralhub-main.jsx"
+    - "src/NeuralHubHome.jsx"
+    - "vite.config.js"
+    - "docs/stories/10.1.story.md"
+    - "docs/stories/epics/epic-10-neuralhub-home.md"
+  blockers: []
+  next_action: "Commit e revisão visual no browser antes de push"
+  last_command: "*develop"
