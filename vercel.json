@@ -2,6 +2,11 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "neuralhub.ia.br" }],
+      "destination": "/neuralhub.html"
+    },
     { "source": "/neuralhub", "destination": "/neuralhub.html" },
     { "source": "/neuralhub/(.*)", "destination": "/neuralhub.html" },
     { "source": "/obrigado", "destination": "/obrigado.html" },
@@ -10,11 +15,6 @@
     { "source": "/plataforma", "destination": "/plataforma.html" },
     { "source": "/plataforma/(.*)", "destination": "/plataforma.html" },
     { "source": "/blog", "destination": "/index.html" },
-    { "source": "/blog/(.*)", "destination": "/index.html" },
-    {
-      "source": "/((?!assets/).*)",
-      "has": [{ "type": "host", "value": "neuralhub.ia.br" }],
-      "destination": "/neuralhub.html"
-    }
+    { "source": "/blog/(.*)", "destination": "/index.html" }
   ]
 }
