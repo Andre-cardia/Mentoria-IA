@@ -3,6 +3,11 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "neuralhub.ia.br" }],
+      "destination": "/neuralhub.html"
+    },
+    {
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "neuralhub.ia.br" }],
       "destination": "/neuralhub.html"
