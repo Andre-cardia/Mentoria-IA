@@ -700,6 +700,7 @@ const PROGRAMS = [
       'Construção prática de pelo menos um Agente de IA (nível 5)',
     ],
     cta: 'Solicitar Proposta',
+    ctaHref: 'https://mentoria.neuralhub.ia.br/solicitar-proposta',
     highlight: false,
   },
   {
@@ -716,6 +717,7 @@ const PROGRAMS = [
       'Construção prática de pelo menos um Agente autônomo',
     ],
     cta: 'Solicitar Proposta',
+    ctaHref: 'https://mentoria.neuralhub.ia.br/solicitar-proposta',
     highlight: false,
   },
   {
