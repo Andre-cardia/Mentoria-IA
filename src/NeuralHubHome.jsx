@@ -129,6 +129,56 @@ const GLOBAL_STYLES = `
       animation: none !important;
     }
   }
+
+  @media (max-width: 900px) {
+    .nh-nav-inner, .nh-hero-grid { box-sizing: border-box !important; }
+    .nh-nav-inner { height: auto !important; min-height: 64px !important; padding: 10px 18px !important; gap: 16px !important; }
+    .nh-nav-links { gap: 12px !important; }
+    .nh-nav-links > a:not(.nh-nav-cta) { display: none !important; }
+    .nh-nav-cta { box-sizing: border-box !important; padding: 9px 12px !important; font-size: .72rem !important; overflow-wrap: anywhere !important; }
+    .nh-hero-grid { display: flex !important; flex-direction: column !important; padding: 84px 20px 0 !important; gap: 12px !important; align-items: stretch !important; }
+    .nh-hero-copy { max-width: calc(100vw - 40px) !important; padding: 28px 0 10px !important; }
+    .nh-hero-copy h1, .nh-hero-copy p { max-width: calc(100vw - 40px) !important; }
+    .nh-hero-copy .nh-rise-2, .nh-hero-copy .nh-rise-3 { opacity: 1 !important; transform: none !important; }
+    .nh-hero-kicker { align-items: flex-start !important; margin-bottom: 24px !important; }
+    .nh-hero-kicker span { line-height: 1.5 !important; letter-spacing: .12em !important; }
+    .nh-hero-pre { max-width: calc(100vw - 40px) !important; white-space: normal !important; overflow-wrap: break-word !important; font-size: clamp(1.05rem, 6vw, 1.55rem) !important; line-height: 1.02 !important; }
+    .nh-hero-ai { max-width: calc(100vw - 40px) !important; white-space: normal !important; overflow-wrap: break-word !important; font-size: clamp(2.8rem, 14vw, 3.7rem) !important; line-height: .92 !important; }
+    .nh-hero-sub { font-size: .98rem !important; max-width: calc(100vw - 40px) !important; overflow-wrap: anywhere !important; }
+    .nh-hero-visual { min-height: 300px !important; margin-top: 4px !important; }
+    .nh-hero-blob { width: min(92vw, 430px) !important; }
+    .nh-hero-marquee { padding-bottom: 30px !important; }
+    .nh-strip { padding: 22px 20px !important; }
+    .nh-alliances-card { flex-direction: column !important; gap: 26px !important; padding: 28px 24px !important; }
+    .nh-alliances-divider, .nh-partner-divider { width: 56px !important; height: 1px !important; }
+    .nh-program-grid, .nh-two-col, .nh-founders-grid { grid-template-columns: 1fr !important; }
+    .nh-program-card, .nh-founder-card { padding: 24px !important; }
+    .nh-compare-head, .nh-compare-row { grid-template-columns: 1fr !important; }
+    .nh-compare-left { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,.08) !important; }
+    .nh-compare-cell { padding: 18px 20px !important; }
+    .nh-step-row { gap: 18px !important; padding: 24px 0 !important; }
+    .nh-stats-grid { grid-template-columns: repeat(2, 1fr) !important; row-gap: 28px !important; }
+    .nh-stat-cell { border-right: none !important; }
+    .nh-stat-cell:nth-child(odd) { border-right: 1px solid rgba(255,255,255,.08) !important; }
+    .nh-founder-cards { grid-template-columns: 1fr !important; }
+    .nh-partner-title { font-size: clamp(1.2rem, 8vw, 1.8rem) !important; letter-spacing: .12em !important; margin-bottom: 40px !important; }
+    .nh-partners { gap: 28px !important; }
+    .nh-footer-inner { flex-direction: column !important; align-items: flex-start !important; gap: 24px !important; }
+  }
+
+  @media (max-width: 560px) {
+    .nh-brand-word { display: none !important; }
+    .nh-nav-logo { height: 40px !important; }
+    .nh-nav-cta { max-width: 46vw !important; text-align: center !important; line-height: 1.25 !important; white-space: normal !important; }
+    .nh-section-title { font-size: clamp(1.75rem, 11vw, 2.45rem) !important; line-height: 1.02 !important; }
+    .nh-stats-grid { grid-template-columns: 1fr !important; row-gap: 0 !important; }
+    .nh-stat-cell, .nh-stat-cell:nth-child(odd) { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,.08) !important; padding: 22px 0 !important; }
+    .nh-stat-cell:last-child { border-bottom: none !important; }
+    .nh-founder-head { flex-direction: column !important; }
+    .nh-final-cta { min-height: 420px !important; }
+    .nh-final-title { font-size: clamp(2rem, 13vw, 3rem) !important; }
+    .nh-footer-links { flex-direction: column !important; gap: 14px !important; }
+  }
 `
 
 /* ─── tokens ─────────────────────────────────────────────── */
@@ -296,7 +346,7 @@ function Nav() {
       borderBottom: `1px solid ${C.line}`,
     }}>
       {/* full-width inner — sem maxWidth aqui */}
-      <div style={{
+      <div className="nh-nav-inner" style={{
         width: '100%',
         padding: '0 48px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -304,14 +354,14 @@ function Nav() {
       }}>
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <img src={nhLogoImg} alt="Neural Hub" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
-          <span style={{ ...grotesk, fontWeight: 700, fontSize: '1rem', letterSpacing: '-.01em', color: C.text }}>
+          <img className="nh-nav-logo" src={nhLogoImg} alt="Neural Hub" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
+          <span className="nh-brand-word" style={{ ...grotesk, fontWeight: 700, fontSize: '1rem', letterSpacing: '-.01em', color: C.text }}>
             NEURAL HUB
           </span>
         </div>
 
         {/* Links + CTA */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '36px' }}>
+        <div className="nh-nav-links" style={{ display: 'flex', alignItems: 'center', gap: '36px' }}>
           {[
             { label: 'Treinamentos', href: '#treinamentos' },
             { label: 'Conceito',     href: '#conceito' },
@@ -326,7 +376,7 @@ function Nav() {
               onMouseLeave={e => e.target.style.color = C.muted}
             >{l.label}</a>
           ))}
-          <a href="https://mentoria.neuralhub.ia.br/plataforma/login" target="_blank" rel="noopener noreferrer" style={{
+          <a className="nh-nav-cta" href="https://mentoria.neuralhub.ia.br/plataforma/login" target="_blank" rel="noopener noreferrer" style={{
             ...grotesk, fontWeight: 600, fontSize: '.875rem',
             background: C.accent, color: '#000',
             padding: '10px 20px', borderRadius: '4px', textDecoration: 'none',
@@ -412,7 +462,7 @@ function Hero() {
       <div className="nh-bg-grid" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1 }} />
 
       {/* Conteúdo — full-width, grid 2 colunas */}
-      <div style={{
+      <div className="nh-hero-grid" style={{
         position: 'relative', zIndex: 2,
         width: '100%',
         padding: '0 48px',
@@ -424,11 +474,11 @@ function Hero() {
         paddingTop: '64px',
       }}>
         {/* LEFT — texto */}
-        <div style={{
+        <div className="nh-hero-copy" style={{
           paddingTop: '80px', paddingBottom: '80px',
         }}>
           {/* Eyebrow — typewriter */}
-          <div style={{
+          <div className="nh-hero-kicker" style={{
             display: 'flex', alignItems: 'center', gap: '12px',
             marginBottom: '36px',
           }}>
@@ -452,14 +502,14 @@ function Hero() {
             textTransform: 'uppercase',
             marginBottom: '28px',
           }}>
-            <span style={{
+            <span className="nh-hero-pre" style={{
               color: C.text, display: 'block',
               fontSize: 'clamp(1.35rem, 2.25vw, 2.7rem)',
               letterSpacing: '-.04em',
               marginBottom: '2px',
               whiteSpace: 'nowrap',
             }}>SUA EMPRESA PRONTA PARA</span>
-            <span style={{
+            <span className="nh-hero-ai" style={{
               color: C.accent, display: 'block',
               fontSize: 'clamp(3.8rem, 6.4vw, 7.6rem)',
               letterSpacing: '-.04em',
@@ -468,7 +518,7 @@ function Hero() {
           </h1>
 
           {/* Sub */}
-          <p className="nh-rise-3" style={{
+          <p className="nh-rise-3 nh-hero-sub" style={{
             ...grotesk, fontSize: 'clamp(1rem, 1.4vw, 1.2rem)',
             color: C.muted, lineHeight: 1.7,
             maxWidth: '520px',
@@ -479,7 +529,7 @@ function Hero() {
         </div>
 
         {/* RIGHT — blob interativo */}
-        <div style={{
+        <div className="nh-hero-visual" style={{
           display: 'grid',
           placeItems: 'center',
           perspective: '1200px',
@@ -498,6 +548,7 @@ function Hero() {
             opacity: .65,
           }} />
           <div
+            className="nh-hero-blob"
             ref={blobRef}
             style={{
               width: 'min(55vw, 816px)',
@@ -522,7 +573,7 @@ function Hero() {
       </div>
 
       {/* Carrossel de clientes — base da hero */}
-      <div style={{
+      <div className="nh-hero-marquee" style={{
         position: 'relative', zIndex: 2,
         width: '100%',
         paddingBottom: '48px',
@@ -575,7 +626,7 @@ function Hero() {
 /* ─── 3. STRIP ────────────────────────────────────────────── */
 function Strip() {
   return (
-    <section style={{
+    <section className="nh-strip" style={{
       background: C.panel,
       borderTop: `1px solid ${C.line}`,
       borderBottom: `1px solid ${C.line}`,
@@ -667,7 +718,7 @@ function Testimonials() {
           Alianças Globais de Tecnologia
         </p>
 
-        <div style={{
+        <div className="nh-alliances-card" style={{
           border: `1px solid ${C.line}`,
           borderRadius: '12px',
           background: 'linear-gradient(135deg, rgba(255,255,255,.03) 0%, rgba(255,255,255,.01) 100%)',
@@ -678,7 +729,7 @@ function Testimonials() {
           gap: 'clamp(48px, 8vw, 120px)',
         }}>
           <img src={logoMicrosoft} alt="Microsoft" style={{ height: '36px', width: 'auto', filter: 'grayscale(1) brightness(0.7)' }} />
-          <div style={{ width: '1px', height: '32px', background: C.line }} />
+          <div className="nh-alliances-divider" style={{ width: '1px', height: '32px', background: C.line }} />
           <img src={logoNvidia} alt="NVIDIA" style={{ height: '36px', width: 'auto', filter: 'grayscale(1) brightness(0.7)' }} />
         </div>
       </div>
@@ -746,7 +797,7 @@ function TudoFeito() {
       <div style={{ ...CONTAINER }}>
         <div style={{ marginBottom: '56px' }}>
           <Eyebrow>Programas</Eyebrow>
-          <h2 style={{
+          <h2 className="nh-section-title" style={{
             ...grotesk, fontWeight: 700,
             fontSize: 'clamp(2rem, 3.5vw, 3rem)',
             lineHeight: 1.1, letterSpacing: '-.02em', color: C.text,
@@ -755,9 +806,9 @@ function TudoFeito() {
           </h2>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', alignItems: 'stretch' }}>
+        <div className="nh-program-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', alignItems: 'stretch' }}>
           {PROGRAMS.map((p, i) => (
-            <div key={i} style={{
+            <div className="nh-program-card" key={i} style={{
               display: 'flex', flexDirection: 'column',
               padding: '32px',
               border: `1px solid ${p.highlight ? C.accent : C.line}`,
@@ -898,7 +949,7 @@ function Problem() {
         {/* Header */}
         <div style={{ marginBottom: '48px' }}>
           <Eyebrow>Conceito</Eyebrow>
-          <h2 style={{
+          <h2 className="nh-section-title" style={{
             ...grotesk, fontWeight: 700,
             fontSize: 'clamp(2rem, 3.5vw, 3rem)',
             lineHeight: 1.05, letterSpacing: '-.025em',
@@ -924,10 +975,10 @@ function Problem() {
           overflow: 'hidden',
         }}>
           {/* Header row */}
-          <div style={{
+          <div className="nh-compare-head" style={{
             display: 'grid', gridTemplateColumns: '1fr 1fr',
           }}>
-            <div style={{
+            <div className="nh-compare-left nh-compare-cell" style={{
               padding: '14px 24px',
               borderBottom: `1px solid ${C.line}`,
               borderRight: `1px solid ${C.line}`,
@@ -941,7 +992,7 @@ function Problem() {
                 O QUE O AI-ONLY <span style={{ color: C.accent }}>É</span>
               </span>
             </div>
-            <div style={{
+            <div className="nh-compare-cell" style={{
               padding: '14px 24px',
               borderBottom: `1px solid ${C.line}`,
             }}>
@@ -958,11 +1009,11 @@ function Problem() {
 
           {/* Data rows */}
           {IA_ONLY_ROWS.map((row, i) => (
-            <div key={i} style={{
+            <div className="nh-compare-row" key={i} style={{
               display: 'grid', gridTemplateColumns: '1fr 1fr',
               borderBottom: i < IA_ONLY_ROWS.length - 1 ? `1px solid ${C.line}` : 'none',
             }}>
-              <div style={{
+              <div className="nh-compare-left nh-compare-cell" style={{
                 padding: '20px 28px',
                 borderRight: `1px solid ${C.line}`,
                 background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,.015)',
@@ -971,7 +1022,7 @@ function Problem() {
                   {row.is}
                 </p>
               </div>
-              <div style={{
+              <div className="nh-compare-cell" style={{
                 padding: '20px 28px',
                 background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,.015)',
               }}>
@@ -1143,14 +1194,14 @@ function Differentials() {
   return (
     <section style={{ padding: `${SECTION_PAD} 0`, background: C.bg }}>
       <div style={{ ...CONTAINER }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(48px, 6vw, 96px)', alignItems: 'center' }}>
+        <div className="nh-two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(48px, 6vw, 96px)', alignItems: 'center' }}>
 
           {/* LEFT — texto */}
           <div>
             <span style={{ ...mono, fontSize: '.68rem', letterSpacing: '.18em', color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: '20px' }}>
               O Problema
             </span>
-            <h2 style={{
+            <h2 className="nh-section-title" style={{
               ...grotesk, fontWeight: 700,
               fontSize: 'clamp(1.8rem, 3vw, 2.8rem)',
               lineHeight: 1.1, letterSpacing: '-.02em', color: C.text,
@@ -1210,7 +1261,7 @@ function Methodology() {
       <div style={{ ...CONTAINER }}>
         <div style={{ marginBottom: '64px' }}>
           <Eyebrow>Como funciona</Eyebrow>
-          <h2 style={{
+          <h2 className="nh-section-title" style={{
             ...grotesk, fontWeight: 700,
             fontSize: 'clamp(2rem, 3.5vw, 3rem)',
             lineHeight: 1.1, letterSpacing: '-.02em', color: C.text,
@@ -1224,6 +1275,7 @@ function Methodology() {
           {steps.map((step, i) => (
             <div key={i}>
               <div
+                className="nh-step-row"
                 role="button"
                 tabIndex={0}
                 aria-expanded={active === i}
@@ -1351,13 +1403,13 @@ function Stats() {
       borderBottom: `1px solid ${C.line}`,
       padding: `clamp(48px, 6vw, 72px) 0`,
     }}>
-      <div style={{
+      <div className="nh-stats-grid" style={{
         ...CONTAINER,
         display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
         position: 'relative',
       }}>
         {STATS_DATA.map((stat, i) => (
-          <div key={i} style={{
+          <div className="nh-stat-cell" key={i} style={{
             borderRight: i < STATS_DATA.length - 1 ? `1px solid ${C.line}` : 'none',
           }}>
             <StatItem stat={stat} delay={i * 120} visible={visible} />
@@ -1422,7 +1474,7 @@ function FounderCard({ founder }) {
       padding: '36px',
     }}>
       {/* Header: foto + identidade */}
-      <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', marginBottom: '28px' }}>
+      <div className="nh-founder-head" style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', marginBottom: '28px' }}>
         <div style={{
           width: '100px', height: '120px',
           flexShrink: 0,
@@ -1473,7 +1525,7 @@ function FounderCard({ founder }) {
       </p>
 
       {/* Grid 2×2 de cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+      <div className="nh-founder-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
         {founder.cards.map((card, i) => (
           <div key={i} style={{
             padding: '18px 20px',
@@ -1500,12 +1552,12 @@ function Founders() {
       <div style={{ ...CONTAINER }}>
         <div style={{ marginBottom: '64px' }}>
           <Eyebrow>Quem está por trás</Eyebrow>
-          <h2 style={{ ...grotesk, fontWeight: 700, fontSize: 'clamp(2rem, 3.5vw, 3rem)', lineHeight: 1.1, letterSpacing: '-.02em', color: C.text }}>
+          <h2 className="nh-section-title" style={{ ...grotesk, fontWeight: 700, fontSize: 'clamp(2rem, 3.5vw, 3rem)', lineHeight: 1.1, letterSpacing: '-.02em', color: C.text }}>
             OS FOUNDERS
           </h2>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '32px' }}>
+        <div className="nh-founders-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '32px' }}>
           {FOUNDERS_DATA.map((f, i) => <FounderCard key={i} founder={f} />)}
         </div>
       </div>
@@ -1532,7 +1584,7 @@ function Honesty() {
       borderBottom: `1px solid ${C.line}`,
     }}>
       <div style={{ ...CONTAINER }}>
-        <p style={{
+        <p className="nh-partner-title" style={{
           ...mono, fontSize: '2.25rem', letterSpacing: '.18em',
           textTransform: 'uppercase', color: C.muted,
           textAlign: 'center', marginBottom: '64px',
@@ -1540,7 +1592,7 @@ function Honesty() {
           Parceiros Estratégicos
         </p>
 
-        <div style={{
+        <div className="nh-partners" style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -1556,7 +1608,7 @@ function Honesty() {
             ABSTRATO
           </span>
 
-          <div style={{ width: '1px', height: '40px', background: C.line, flexShrink: 0 }} />
+          <div className="nh-partner-divider" style={{ width: '1px', height: '40px', background: C.line, flexShrink: 0 }} />
 
           {/* Innovation Center — texto */}
           <span
@@ -1567,7 +1619,7 @@ function Honesty() {
             INNOVATION CENTER
           </span>
 
-          <div style={{ width: '1px', height: '40px', background: C.line, flexShrink: 0 }} />
+          <div className="nh-partner-divider" style={{ width: '1px', height: '40px', background: C.line, flexShrink: 0 }} />
 
           {/* Freedom AI — logo */}
           <img
@@ -1592,7 +1644,7 @@ function Honesty() {
 /* ─── 13. CTA FINAL ───────────────────────────────────────── */
 function FinalCTA() {
   return (
-    <section id="cta" style={{
+    <section id="cta" className="nh-final-cta" style={{
       position: 'relative',
       minHeight: '560px',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -1645,7 +1697,7 @@ function FinalCTA() {
           Neural Hub
         </span>
 
-        <h2 style={{
+        <h2 className="nh-final-title" style={{
           ...grotesk, fontWeight: 700,
           fontSize: 'clamp(1.8rem, 4vw, 3.6rem)',
           lineHeight: 1, letterSpacing: '-.04em',
@@ -1694,7 +1746,7 @@ function FinalCTA() {
 function Footer() {
   return (
     <footer style={{ background: C.bg2, borderTop: `1px solid ${C.line}`, padding: '48px 0' }}>
-      <div style={{
+      <div className="nh-footer-inner" style={{
         ...CONTAINER,
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
@@ -1710,7 +1762,7 @@ function Footer() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '32px' }}>
+        <div className="nh-footer-links" style={{ display: 'flex', gap: '32px' }}>
           {[
             { label: 'Privacidade', href: '/privacidade' },
             { label: 'Termos',      href: '/termos' },

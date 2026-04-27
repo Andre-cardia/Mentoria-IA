@@ -242,6 +242,54 @@ export default function ProposalPage() {
             scroll-behavior: auto !important;
           }
         }
+        @media (max-width: 640px) {
+          *, *::before, *::after {
+            box-sizing: border-box;
+          }
+          html,
+          body,
+          #root {
+            overflow-x: hidden;
+          }
+          header > div {
+            align-items: flex-start !important;
+            flex-direction: column !important;
+            gap: 14px !important;
+          }
+          .proposal-header-title {
+            font-size: 1.05rem !important;
+          }
+          .proposal-header-cta,
+          .proposal-button {
+            box-sizing: border-box !important;
+            letter-spacing: .14em !important;
+            max-width: calc(100vw - 32px) !important;
+            width: 100% !important;
+          }
+          .proposal-hero {
+            min-height: auto !important;
+          }
+          .proposal-hero h1 {
+            max-width: calc(100vw - 32px) !important;
+            font-size: clamp(1.7rem, 8.8vw, 2.05rem) !important;
+            overflow-wrap: anywhere !important;
+          }
+          .proposal-hero p,
+          .proposal-hero span,
+          .proposal-hero h2 {
+            max-width: calc(100vw - 32px) !important;
+            overflow-wrap: anywhere !important;
+          }
+          .proposal-hero-grid {
+            min-height: auto !important;
+          }
+          .proposal-signals {
+            grid-template-columns: 1fr !important;
+          }
+          .proposal-hero-panel {
+            min-height: auto !important;
+          }
+        }
       `}</style>
 
       <div className="fixed inset-0 pointer-events-none opacity-[0.07] bg-grid-tech" />
@@ -253,12 +301,12 @@ export default function ProposalPage() {
             <div className="h-3 w-3 bg-[var(--accent)] animate-glow" />
             <div>
               <div className="font-mono-tech text-[11px] uppercase tracking-[0.34em] text-[var(--muted)]">Neural Hub</div>
-              <div className="text-xl font-semibold tracking-[-0.04em] text-[var(--text)] md:text-2xl">PROPOSTA IA</div>
+              <div className="proposal-header-title text-xl font-semibold tracking-[-0.04em] text-[var(--text)] md:text-2xl">PROPOSTA IA</div>
             </div>
           </a>
           <a
             href="#cadastro"
-            className="rounded-[4px] border border-[var(--line-strong)] bg-[var(--accent)] px-5 py-3 text-center text-[11px] font-bold uppercase tracking-[0.24em] text-black transition hover:brightness-110 active:scale-95 animate-glow"
+            className="proposal-header-cta rounded-[4px] border border-[var(--line-strong)] bg-[var(--accent)] px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-black transition hover:brightness-110 active:scale-95 animate-glow sm:px-5 sm:text-[11px] sm:tracking-[0.24em]"
           >
             Solicitar proposta
           </a>
@@ -266,7 +314,7 @@ export default function ProposalPage() {
       </header>
 
       <main>
-        <section className="relative min-h-[calc(100vh-73px)] overflow-hidden border-b border-[var(--line)]">
+        <section className="proposal-hero relative min-h-[calc(100vh-73px)] overflow-hidden border-b border-[var(--line)]">
           <div className="absolute inset-0">
             <img
               src={HERO_BACKGROUND}
@@ -277,14 +325,14 @@ export default function ProposalPage() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_22%,rgba(255,106,0,.18),transparent_26%),radial-gradient(circle_at_18%_82%,rgba(255,255,255,.04),transparent_20%)]" />
           </div>
 
-          <div className="relative mx-auto grid min-h-[calc(100vh-73px)] max-w-[1600px] grid-cols-1 lg:grid-cols-12">
+          <div className="proposal-hero-grid relative mx-auto grid min-h-[calc(100vh-73px)] max-w-[1600px] grid-cols-1 lg:grid-cols-12">
             <div className="flex flex-col justify-between border-b border-[var(--line)] px-4 py-10 lg:col-span-7 lg:border-b-0 lg:border-r lg:px-8 lg:py-14">
               <div className="animate-rise">
                 <div className="mb-7 flex items-center gap-4 font-mono-tech text-[11px] uppercase tracking-[0.32em] text-[var(--accent)]">
                   <span>// Proposta personalizada para equipes e negócios</span>
                 </div>
                 <div className="mb-7 h-px w-32 bg-[var(--accent)] animate-pulseLine" />
-                <h1 className="max-w-5xl text-[2.75rem] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-[var(--text)] md:text-[3.6rem] lg:text-[4rem]">
+                <h1 className="max-w-5xl text-[2.2rem] font-semibold uppercase leading-[0.94] tracking-[-0.04em] text-[var(--text)] sm:text-[2.75rem] md:text-[3.6rem] lg:text-[4rem]">
                   Transforme IA em vantagem operacional.
                 </h1>
                 <p className="mt-7 max-w-3xl border-l-2 border-[var(--accent)] pl-5 font-mono-tech text-sm leading-7 text-zinc-300 md:text-base">
@@ -293,20 +341,20 @@ export default function ProposalPage() {
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                   <a
                     href="#cadastro"
-                    className="rounded-[4px] bg-[var(--accent)] px-8 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-black transition hover:brightness-110 active:scale-95 animate-glow"
+                    className="proposal-button rounded-[4px] bg-[var(--accent)] px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-black transition hover:brightness-110 active:scale-95 animate-glow sm:px-8 sm:tracking-[0.26em]"
                   >
                     Solicitar proposta
                   </a>
                   <a
                     href="#metodo"
-                    className="rounded-[4px] border border-[var(--line-strong)] bg-black/30 px-8 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] active:scale-95"
+                    className="proposal-button rounded-[4px] border border-[var(--line-strong)] bg-black/30 px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--text)] transition hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] active:scale-95 sm:px-8 sm:tracking-[0.26em]"
                   >
                     Ver método
                   </a>
                 </div>
               </div>
 
-              <div className="mt-12 grid max-w-4xl grid-cols-2 gap-3 md:grid-cols-4 animate-rise-delay">
+              <div className="proposal-signals mt-12 grid max-w-4xl grid-cols-2 gap-3 md:grid-cols-4 animate-rise-delay">
                 {SIGNALS.map(([value, label]) => (
                   <div key={label} className="rounded-[6px] border border-[var(--line)] bg-black/25 p-4">
                     <div className="text-[1.65rem] font-semibold uppercase leading-none tracking-[-0.04em] text-[var(--accent)] md:text-3xl">{value}</div>
@@ -317,7 +365,7 @@ export default function ProposalPage() {
             </div>
 
             <div className="relative scan-overlay lg:col-span-5">
-              <div className="relative flex h-full min-h-[560px] flex-col justify-between p-4 md:p-8">
+              <div className="proposal-hero-panel relative flex h-full min-h-[560px] flex-col justify-between p-4 md:p-8">
                 <div className="flex items-start justify-between">
                   <div className="border border-[var(--line-strong)] bg-black/60 px-3 py-2 font-mono-tech text-[10px] uppercase tracking-[0.22em] text-[var(--text)]">
                     Diagnóstico // IA aplicada
@@ -509,7 +557,7 @@ export default function ProposalPage() {
                     <div className="mt-6 font-mono-tech text-[10px] uppercase tracking-[0.28em] text-[var(--green)]">
                       Solicitação recebida
                     </div>
-                    <h3 className="mt-4 max-w-lg text-4xl uppercase leading-[0.92] tracking-[-0.05em] text-[var(--text)] md:text-5xl">
+                    <h3 className="mt-4 max-w-lg text-3xl uppercase leading-[0.94] tracking-[-0.05em] text-[var(--text)] md:text-5xl">
                       Agora vamos transformar contexto em proposta.
                     </h3>
                     <p className="mt-5 max-w-md font-mono-tech text-sm leading-7 text-[var(--muted)]">
