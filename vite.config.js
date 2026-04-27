@@ -31,7 +31,7 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     setupFiles: './src/test/setup.js',
-    include: ['src/**/*.test.{js,jsx,ts,tsx}', 'server/**/*.test.{js,ts}'],
+    include: ['src/**/*.test.{js,jsx,ts,tsx}', 'server/**/*.test.{js,ts}', 'api/__tests__/admin-students.test.js'],
     coverage: { provider: 'v8', reporter: ['text', 'html'] },
   },
   server: {

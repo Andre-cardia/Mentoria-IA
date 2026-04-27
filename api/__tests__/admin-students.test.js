@@ -16,6 +16,8 @@ const mockSupabase = {
     admin: {
       listUsers: vi.fn(),
       createUser: vi.fn(),
+      getUserById: vi.fn(),
+      updateUserById: vi.fn(),
       deleteUser: vi.fn(),
     },
   },
@@ -27,6 +29,8 @@ vi.mock('@supabase/supabase-js', () => ({
 
 const { default: studentsHandler } = await import('../admin/students.js');
 const { default: studentByIdHandler } = await import('../admin/students/[id].js');
+const { default: platformUsersHandler } = await import('../admin/platform-users.js');
+const { default: platformUserByIdHandler } = await import('../admin/platform-users/[id].js');
 
 function createRes() {
   return {
@@ -219,5 +223,147 @@ describe('api/admin/students/[id] handler', () => {
     expect(res.statusCode).toBe(200);
     expect(res.body).toEqual({ ok: true });
     expect(mockSupabase.auth.admin.deleteUser).toHaveBeenCalledWith('student-user');
+  });
+});
+
+describe('api/admin/platform-users handler', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'admin-user', user_metadata: { role: 'admin' } } },
+      error: null,
+    });
+  });
+
+  it('lista somente usuários admin e comercial', async () => {
+    mockSupabase.auth.admin.listUsers.mockResolvedValue({
+      data: {
+        users: [
+          { id: 'admin-1', email: 'admin@test.com', user_metadata: { role: 'admin', full_name: 'Admin' }, created_at: '2026-04-27' },
+          { id: 'sales-1', email: 'comercial@test.com', user_metadata: { role: 'comercial', full_name: 'Comercial' }, created_at: '2026-04-27' },
+          { id: 'student-1', email: 'aluno@test.com', user_metadata: { role: 'aluno', full_name: 'Aluno' }, created_at: '2026-04-27' },
+        ],
+      },
+      error: null,
+    });
+
+    const req = { method: 'GET', headers: { authorization: 'Bearer valid-token' } };
+    const res = createRes();
+
+    await platformUsersHandler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.users).toHaveLength(2);
+    expect(res.body.users.map((user) => user.role).sort()).toEqual(['admin', 'comercial']);
+    expect(res.body.currentUserId).toBe('admin-user');
+  });
+
+  it('cria usuário comercial com metadata de role', async () => {
+    mockSupabase.auth.admin.createUser.mockResolvedValue({
+      data: { user: { id: 'sales-1', email: 'sales@test.com', user_metadata: { role: 'comercial', full_name: 'Sales' } } },
+      error: null,
+    });
+
+    const req = {
+      method: 'POST',
+      headers: { authorization: 'Bearer valid-token' },
+      body: {
+        email: 'sales@test.com',
+        password: '123456',
+        full_name: 'Sales',
+        role: 'comercial',
+      },
+    };
+    const res = createRes();
+
+    await platformUsersHandler(req, res);
+
+    expect(res.statusCode).toBe(201);
+    expect(mockSupabase.auth.admin.createUser).toHaveBeenCalledWith({
+      email: 'sales@test.com',
+      password: '123456',
+      email_confirm: true,
+      user_metadata: { full_name: 'Sales', role: 'comercial' },
+    });
+  });
+
+  it('rejeita role inválido na criação', async () => {
+    const req = {
+      method: 'POST',
+      headers: { authorization: 'Bearer valid-token' },
+      body: {
+        email: 'x@test.com',
+        password: '123456',
+        full_name: 'X',
+        role: 'aluno',
+      },
+    };
+    const res = createRes();
+
+    await platformUsersHandler(req, res);
+
+    expect(res.statusCode).toBe(400);
+  });
+});
+
+describe('api/admin/platform-users/[id] handler', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'admin-user', user_metadata: { role: 'admin' } } },
+      error: null,
+    });
+  });
+
+  it('impede admin de remover o próprio acesso admin', async () => {
+    const req = {
+      method: 'PATCH',
+      headers: { authorization: 'Bearer valid-token' },
+      query: { id: 'admin-user' },
+      body: { role: 'comercial' },
+    };
+    const res = createRes();
+
+    await platformUserByIdHandler(req, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(mockSupabase.auth.admin.updateUserById).not.toHaveBeenCalled();
+  });
+
+  it('atualiza metadata preservando campos existentes', async () => {
+    mockSupabase.auth.admin.getUserById.mockResolvedValue({
+      data: { user: { id: 'sales-1', user_metadata: { role: 'comercial', theme: 'dark' } } },
+      error: null,
+    });
+    mockSupabase.auth.admin.updateUserById.mockResolvedValue({ error: null });
+
+    const req = {
+      method: 'PATCH',
+      headers: { authorization: 'Bearer valid-token' },
+      query: { id: 'sales-1' },
+      body: { full_name: 'Comercial Novo', role: 'admin' },
+    };
+    const res = createRes();
+
+    await platformUserByIdHandler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(mockSupabase.auth.admin.updateUserById).toHaveBeenCalledWith('sales-1', {
+      user_metadata: { role: 'admin', theme: 'dark', full_name: 'Comercial Novo' },
+    });
+  });
+
+  it('impede excluir o próprio usuário', async () => {
+    const req = {
+      method: 'DELETE',
+      headers: { authorization: 'Bearer valid-token' },
+      query: { id: 'admin-user' },
+    };
+    const res = createRes();
+
+    await platformUserByIdHandler(req, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(mockSupabase.auth.admin.deleteUser).not.toHaveBeenCalled();
   });
 });
