@@ -30,6 +30,7 @@ const AdminBlogPage          = lazy(() => import('./plataforma/pages/admin/Admin
 const AdminBlogEditorPage    = lazy(() => import('./plataforma/pages/admin/AdminBlogEditorPage'));
 const PlataformaBlogPage     = lazy(() => import('./plataforma/pages/PlataformaBlogPage'));
 const PlataformaBlogPostPage = lazy(() => import('./plataforma/pages/PlataformaBlogPostPage'));
+const CrmReportsPage         = lazy(() => import('./plataforma/pages/admin/CrmReportsPage'));
 
 function LegacyLessonRedirect() {
   const { moduleId, lessonId } = useParams();
@@ -82,6 +83,7 @@ createRoot(document.getElementById('root')).render(
 
             {/* CRM Neural Hub */}
             <Route path="/crm/leads"        element={<CrmRoute><AdminLeadsPage /></CrmRoute>} />
+            <Route path="/crm/relatorios"   element={<CrmRoute><CrmReportsPage /></CrmRoute>} />
 
             {/* Blog da plataforma (alunos autenticados) */}
             <Route path="/blog"       element={<ProtectedRoute><ProfileGuard><PlataformaBlogPage /></ProfileGuard></ProtectedRoute>} />

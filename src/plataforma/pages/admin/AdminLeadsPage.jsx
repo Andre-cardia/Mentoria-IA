@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../../../lib/supabase';
 import CrmLayout from '../../components/CrmLayout';
+import { useAuth } from '../../context/AuthContext';
 import { toast } from 'sonner';
 
 const STATUSES = [
@@ -13,6 +14,13 @@ const STATUSES = [
 ];
 
 const STATUS_BY_ID = Object.fromEntries(STATUSES.map((status) => [status.id, status]));
+const SYSTEM_OWNER_KEY = 'system';
+const SYSTEM_OWNER = {
+  user_id: SYSTEM_OWNER_KEY,
+  email: 'sistema@neuralhub.ia.br',
+  full_name: 'Sistema Neural Hub',
+  role: 'system',
+};
 
 const EMPTY_LEAD_FORM = {
   name: '',
@@ -65,10 +73,23 @@ function matchLead(lead, query) {
   return haystack.includes(query.trim().toLowerCase());
 }
 
+function getOwnerKey(lead) {
+  if ((lead.owner_type || 'system') === 'system') return SYSTEM_OWNER_KEY;
+  return lead.owner_user_id || lead.owner_email || SYSTEM_OWNER_KEY;
+}
+
+function getOwnerLabel(lead) {
+  if ((lead.owner_type || 'system') === 'system') return SYSTEM_OWNER.full_name;
+  return lead.owner_name || lead.owner_email || 'Responsável não informado';
+}
+
 export default function AdminLeadsPage() {
+  const { isAdmin } = useAuth();
   const [leads, setLeads] = useState([]);
+  const [crmUsers, setCrmUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
+  const [ownerFilter, setOwnerFilter] = useState('all');
   const [draggingId, setDraggingId] = useState(null);
   const [selectedLead, setSelectedLead] = useState(null);
   const [notes, setNotes] = useState('');
@@ -78,7 +99,20 @@ export default function AdminLeadsPage() {
   const [createErrors, setCreateErrors] = useState({});
   const [savingLead, setSavingLead] = useState(false);
 
-  useEffect(() => { loadLeads(); }, []);
+  useEffect(() => {
+    loadLeads();
+    loadCrmUsers();
+  }, []);
+
+  async function loadCrmUsers() {
+    const { data, error } = await supabase.rpc('list_crm_users');
+    if (error) {
+      console.error('[AdminLeads] users error:', error);
+      setCrmUsers([]);
+      return;
+    }
+    setCrmUsers(data ?? []);
+  }
 
   async function loadLeads() {
     setLoading(true);
@@ -114,6 +148,42 @@ export default function AdminLeadsPage() {
       setSelectedLead((lead) => ({ ...lead, status }));
     }
     toast.success(`Lead movido para ${STATUS_BY_ID[status]?.label ?? status}.`);
+  }
+
+  async function updateOwner(leadId, nextOwnerKey) {
+    if (!isAdmin) return;
+    const current = leads.find((lead) => lead.id === leadId);
+    if (!current || getOwnerKey(current) === nextOwnerKey) return;
+
+    const nextOwner = ownerOptions.find((owner) => owner.key === nextOwnerKey);
+    if (!nextOwner) return;
+
+    const payload = nextOwner.key === SYSTEM_OWNER_KEY
+      ? {
+          owner_type: 'system',
+          owner_user_id: null,
+          owner_name: SYSTEM_OWNER.full_name,
+          owner_email: SYSTEM_OWNER.email,
+        }
+      : {
+          owner_type: 'user',
+          owner_user_id: nextOwner.user_id,
+          owner_name: nextOwner.full_name,
+          owner_email: nextOwner.email,
+        };
+
+    setLeads((items) => items.map((lead) => lead.id === leadId ? { ...lead, ...payload } : lead));
+    if (selectedLead?.id === leadId) setSelectedLead((lead) => ({ ...lead, ...payload }));
+
+    const { error } = await supabase.from('proposal_requests').update(payload).eq('id', leadId);
+    if (error) {
+      setLeads((items) => items.map((lead) => lead.id === leadId ? current : lead));
+      if (selectedLead?.id === leadId) setSelectedLead(current);
+      toast.error('Não foi possível trocar o responsável.');
+      return;
+    }
+
+    toast.success(`Responsável alterado para ${payload.owner_name}.`);
   }
 
   function openLead(lead) {
@@ -186,7 +256,33 @@ export default function AdminLeadsPage() {
     toast.success('Lead criado manualmente.');
   }
 
-  const filteredLeads = useMemo(() => leads.filter((lead) => matchLead(lead, query)), [leads, query]);
+  const ownerOptions = useMemo(() => {
+    const users = new Map([[SYSTEM_OWNER_KEY, { ...SYSTEM_OWNER, key: SYSTEM_OWNER_KEY }]]);
+
+    crmUsers.forEach((user) => {
+      if (user.user_id) users.set(user.user_id, { ...user, key: user.user_id });
+    });
+
+    leads.forEach((lead) => {
+      const key = getOwnerKey(lead);
+      if (!users.has(key)) {
+        users.set(key, {
+          key,
+          user_id: lead.owner_user_id || key,
+          email: lead.owner_email,
+          full_name: getOwnerLabel(lead),
+          role: lead.owner_type || 'system',
+        });
+      }
+    });
+
+    return Array.from(users.values());
+  }, [crmUsers, leads]);
+
+  const filteredLeads = useMemo(() => leads.filter((lead) => {
+    const matchesOwner = ownerFilter === 'all' || getOwnerKey(lead) === ownerFilter;
+    return matchesOwner && matchLead(lead, query);
+  }), [leads, ownerFilter, query]);
   const columns = useMemo(() => STATUSES.map((status) => ({
     ...status,
     leads: filteredLeads.filter((lead) => (lead.status || 'new') === status.id),
@@ -274,6 +370,17 @@ export default function AdminLeadsPage() {
             placeholder="Buscar por nome, empresa, e-mail, objetivo..."
             style={{ ...inputSx, minWidth: '320px', flex: '1 1 420px' }}
           />
+          <select
+            value={ownerFilter}
+            onChange={(event) => setOwnerFilter(event.target.value)}
+            aria-label="Filtrar por responsável"
+            style={{ ...inputSx, minWidth: '240px', cursor: 'pointer' }}
+          >
+            <option value="all">Todos os responsáveis</option>
+            {ownerOptions.map((owner) => (
+              <option key={owner.key} value={owner.key}>{owner.full_name}</option>
+            ))}
+          </select>
           <span style={{ color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.72rem', letterSpacing: '.12em', textTransform: 'uppercase' }}>
             {filteredLeads.length} lead{filteredLeads.length === 1 ? '' : 's'} no filtro
           </span>
@@ -344,9 +451,12 @@ export default function AdminLeadsPage() {
           notes={notes}
           setNotes={setNotes}
           savingNotes={savingNotes}
+          ownerOptions={ownerOptions}
+          isAdmin={isAdmin}
           onClose={() => setSelectedLead(null)}
           onSaveNotes={saveNotes}
           onStatusChange={(status) => updateStatus(selectedLead.id, status)}
+          onOwnerChange={(ownerKey) => updateOwner(selectedLead.id, ownerKey)}
         />
       )}
 
@@ -526,6 +636,7 @@ function LeadCard({ lead, onOpen, onDragStart, onDragEnd, onStatusChange }) {
         </div>
 
         <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '4px', color: 'var(--muted)', fontSize: '.78rem' }}>
+          <span>Resp.: {getOwnerLabel(lead)}</span>
           <span>{lead.role || 'Cargo não informado'}</span>
           <span>{lead.company_size || 'Porte não informado'}</span>
           <span>{lead.email}</span>
@@ -544,10 +655,11 @@ function LeadCard({ lead, onOpen, onDragStart, onDragEnd, onStatusChange }) {
   );
 }
 
-function LeadDrawer({ lead, notes, setNotes, savingNotes, onClose, onSaveNotes, onStatusChange }) {
+function LeadDrawer({ lead, notes, setNotes, savingNotes, ownerOptions, isAdmin, onClose, onSaveNotes, onStatusChange, onOwnerChange }) {
   const status = STATUS_BY_ID[lead.status || 'new'] ?? STATUS_BY_ID.new;
   const panelRef = useRef(null);
   const statusId = `lead-${lead.id}-status`;
+  const ownerId = `lead-${lead.id}-owner`;
   const notesId = `lead-${lead.id}-notes`;
 
   useEffect(() => {
@@ -590,6 +702,11 @@ function LeadDrawer({ lead, notes, setNotes, savingNotes, onClose, onSaveNotes, 
           <Info label="Momento" value={lead.urgency} />
         </div>
 
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '18px' }}>
+          <Info label="Cadastrado por" value={lead.created_by_name || SYSTEM_OWNER.full_name} />
+          <Info label="Origem" value={lead.source === 'crm-manual' ? 'Cadastro manual' : 'Site Neural Hub'} />
+        </div>
+
         <Info label="Objetivo principal" value={lead.objective} full />
         <Info label="Contexto" value={lead.context} full />
 
@@ -600,6 +717,26 @@ function LeadDrawer({ lead, notes, setNotes, savingNotes, onClose, onSaveNotes, 
           <select id={statusId} value={lead.status || 'new'} onChange={(event) => onStatusChange(event.target.value)} style={{ ...inputSx, width: '100%', cursor: 'pointer' }}>
             {STATUSES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
           </select>
+        </div>
+
+        <div style={{ marginTop: '18px' }}>
+          <label htmlFor={ownerId} style={{ display: 'block', fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
+            Responsável
+          </label>
+          <select
+            id={ownerId}
+            value={getOwnerKey(lead)}
+            onChange={(event) => onOwnerChange(event.target.value)}
+            disabled={!isAdmin}
+            style={{ ...inputSx, width: '100%', cursor: isAdmin ? 'pointer' : 'not-allowed', opacity: isAdmin ? 1 : .72 }}
+          >
+            {ownerOptions.map((owner) => <option key={owner.key} value={owner.key}>{owner.full_name}</option>)}
+          </select>
+          {!isAdmin && (
+            <div style={{ marginTop: '8px', color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.68rem', lineHeight: 1.5 }}>
+              Apenas administradores podem trocar o responsável.
+            </div>
+          )}
         </div>
 
         <div style={{ marginTop: '18px' }}>

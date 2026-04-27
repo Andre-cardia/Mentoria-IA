@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 
 const CRM_NAV = [
   { to: '/crm/leads', label: 'Leads' },
+  { to: '/crm/relatorios', label: 'Relatórios' },
 ];
 
 const ADMIN_NAV = [
