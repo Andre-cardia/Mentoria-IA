@@ -20,6 +20,7 @@
     { "source": "/obrigado", "destination": "/obrigado.html" },
     { "source": "/lead", "destination": "/lead.html" },
     { "source": "/brand", "destination": "/brand.html" },
+    { "source": "/solicitar-proposta", "destination": "/index.html" },
     { "source": "/plataforma", "destination": "/plataforma.html" },
     { "source": "/plataforma/(.*)", "destination": "/plataforma.html" },
     { "source": "/blog", "destination": "/index.html" },

@@ -15,6 +15,8 @@ const devRewrites = {
         req.url = '/brand.html'
       } else if (req.url === '/obrigado') {
         req.url = '/obrigado.html'
+      } else if (req.url === '/solicitar-proposta') {
+        req.url = '/index.html'
       } else if (req.url === '/neuralhub' || req.url.startsWith('/neuralhub/')) {
         req.url = '/neuralhub.html'
       }
