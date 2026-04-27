@@ -40,7 +40,8 @@ Transformar o interesse gerado pela landing page em pipeline comercial administr
 | 3 | CRM restrito em `/plataforma/crm/leads` | @dev | Done |
 | 4 | Separacao entre Admin Mentoria e CRM Neural Hub | @dev | Done |
 | 5 | Kanban com atualizacao de status e notas internas | @dev | Done |
-| 6 | QA visual autenticado e validacao em Supabase remoto | @qa | Pending |
+| 6 | Cadastro manual de leads e acesso comercial restrito ao CRM | @dev | Done |
+| 7 | QA visual autenticado e validacao em Supabase remoto | @qa | Pending |
 
 ## Metricas de Sucesso
 
@@ -48,6 +49,8 @@ Transformar o interesse gerado pela landing page em pipeline comercial administr
 - 100% dos formularios validos geram registro em `proposal_requests`
 - Administradores conseguem visualizar, filtrar e movimentar leads no Kanban
 - Cada lead possui status comercial atualizado e notas internas
+- Leads podem ser cadastrados manualmente pela equipe comercial
+- Role `comercial` acessa apenas o CRM
 
 ## Escopo
 
@@ -82,7 +85,7 @@ Transformar o interesse gerado pela landing page em pipeline comercial administr
 | Risco | Probabilidade | Mitigacao |
 |-------|---------------|-----------|
 | Formulario publico receber spam | Media | RLS restrita e futura protecao anti-spam/captcha |
-| Admin sem permissao correta nao ver leads | Media | Reutilizar `AdminRoute` e policies por role admin |
+| Usuario sem permissao correta nao ver leads | Media | Usar `CrmRoute` e policies por roles `admin`/`comercial` |
 | Kanban divergir do banco apos falha de update | Baixa | Recarregar dados apos update e exibir erro |
 | Dados sensiveis ficarem expostos | Baixa | Select/update apenas para usuarios admin |
 

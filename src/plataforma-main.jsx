@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-
 import { AuthProvider } from './plataforma/context/AuthContext';
 import ProtectedRoute from './plataforma/components/ProtectedRoute';
 import AdminRoute from './plataforma/components/AdminRoute';
+import CrmRoute from './plataforma/components/CrmRoute';
 import ProfileGuard from './plataforma/components/ProfileGuard';
 import LoginPage from './plataforma/pages/LoginPage';
 import RegisterPage from './plataforma/pages/RegisterPage';
@@ -69,7 +70,7 @@ createRoot(document.getElementById('root')).render(
 
             {/* Área de Admin */}
             <Route path="/admin/alunos"     element={<AdminRoute><AdminAlunosPage /></AdminRoute>} />
-            <Route path="/admin/leads"      element={<AdminRoute><Navigate to="/crm/leads" replace /></AdminRoute>} />
+            <Route path="/admin/leads"      element={<CrmRoute><Navigate to="/crm/leads" replace /></CrmRoute>} />
             <Route path="/admin/modulos"    element={<AdminRoute><AdminModulosPage /></AdminRoute>} />
             <Route path="/admin/aulas"      element={<AdminRoute><AdminAulasPage /></AdminRoute>} />
             <Route path="/admin/materiais"  element={<AdminRoute><AdminMateriaisPage /></AdminRoute>} />
@@ -80,7 +81,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/admin/blog/:id/editar"       element={<AdminRoute><AdminBlogEditorPage /></AdminRoute>} />
 
             {/* CRM Neural Hub */}
-            <Route path="/crm/leads"        element={<AdminRoute><AdminLeadsPage /></AdminRoute>} />
+            <Route path="/crm/leads"        element={<CrmRoute><AdminLeadsPage /></CrmRoute>} />
 
             {/* Blog da plataforma (alunos autenticados) */}
             <Route path="/blog"       element={<ProtectedRoute><ProfileGuard><PlataformaBlogPage /></ProfileGuard></ProtectedRoute>} />

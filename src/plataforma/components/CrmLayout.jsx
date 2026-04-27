@@ -26,7 +26,7 @@ const linkStyle = (isActive, collapsed = false) => ({
 });
 
 export default function CrmLayout({ children }) {
-  const { user, signOut } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -123,12 +123,16 @@ export default function CrmLayout({ children }) {
             </NavLink>
           ))}
 
-          <div style={{ borderTop: '1px solid var(--line)', margin: '16px 0 8px' }} />
-          {ADMIN_NAV.map(({ to, label }) => (
-            <NavLink key={to} to={to} title={label} style={() => linkStyle(false, collapsed)}>
-              {collapsed ? 'AD' : `← ${label}`}
-            </NavLink>
-          ))}
+          {isAdmin && (
+            <>
+              <div style={{ borderTop: '1px solid var(--line)', margin: '16px 0 8px' }} />
+              {ADMIN_NAV.map(({ to, label }) => (
+                <NavLink key={to} to={to} title={label} style={() => linkStyle(false, collapsed)}>
+                  {collapsed ? 'AD' : `← ${label}`}
+                </NavLink>
+              ))}
+            </>
+          )}
         </nav>
 
         <div style={{ borderTop: '1px solid var(--line)', paddingTop: '16px' }}>

@@ -37,7 +37,7 @@ function BlockedPage({ status }) {
  * Aluno suspenso/cancelado → tela de bloqueio
  */
 export default function ProfileGuard({ children }) {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isCommercial } = useAuth();
   const [checked, setChecked] = useState(false);
   const [profile, setProfile] = useState(null);
   const [loadError, setLoadError] = useState('');
@@ -53,6 +53,12 @@ export default function ProfileGuard({ children }) {
     }
     if (isAdmin) {
       setProfile({ status: 'active' });
+      setLoadError('');
+      setChecked(true);
+      return;
+    }
+    if (isCommercial) {
+      setProfile(null);
       setLoadError('');
       setChecked(true);
       return;
@@ -81,9 +87,10 @@ export default function ProfileGuard({ children }) {
     return () => {
       cancelled = true;
     };
-  }, [user, isAdmin]);
+  }, [user, isAdmin, isCommercial]);
 
   if (!checked) return null;
+  if (isCommercial) return <Navigate to="/crm/leads" replace />;
   if (loadError) {
     return (
       <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>

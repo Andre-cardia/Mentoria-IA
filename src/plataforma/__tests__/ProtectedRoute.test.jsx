@@ -6,6 +6,8 @@ const authState = {
   user: null,
   loading: false,
   isAdmin: false,
+  isCommercial: false,
+  hasCrmAccess: false,
   signIn: vi.fn(),
   signOut: vi.fn(),
 };
@@ -16,12 +18,15 @@ vi.mock('../context/AuthContext', () => ({
 
 import ProtectedRoute from '../components/ProtectedRoute';
 import AdminRoute from '../components/AdminRoute';
+import CrmRoute from '../components/CrmRoute';
 
 function buildAuthContext(overrides = {}) {
   return {
     user: null,
     loading: false,
     isAdmin: false,
+    isCommercial: false,
+    hasCrmAccess: false,
     signIn: vi.fn(),
     signOut: vi.fn(),
     ...overrides,
@@ -70,6 +75,52 @@ describe('ProtectedRoute', () => {
       { loading: true }
     );
     expect(screen.getByText('Carregando...')).toBeInTheDocument();
+  });
+});
+
+describe('CrmRoute', () => {
+  it('redireciona para /login quando não autenticado', () => {
+    renderWithAuth(
+      <Routes>
+        <Route path="/" element={<CrmRoute><div>CRM</div></CrmRoute>} />
+        <Route path="/login" element={<div>Login</div>} />
+      </Routes>,
+      { user: null, hasCrmAccess: false }
+    );
+    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(screen.queryByText('CRM')).not.toBeInTheDocument();
+  });
+
+  it('redireciona para /inicio quando autenticado sem acesso CRM', () => {
+    renderWithAuth(
+      <Routes>
+        <Route path="/" element={<CrmRoute><div>CRM</div></CrmRoute>} />
+        <Route path="/inicio" element={<div>Início</div>} />
+      </Routes>,
+      { user: { email: 'aluno@test.com' }, hasCrmAccess: false }
+    );
+    expect(screen.getByText('Início')).toBeInTheDocument();
+    expect(screen.queryByText('CRM')).not.toBeInTheDocument();
+  });
+
+  it('renderiza children quando usuário tem role comercial', () => {
+    renderWithAuth(
+      <Routes>
+        <Route path="/" element={<CrmRoute><div>CRM</div></CrmRoute>} />
+      </Routes>,
+      { user: { email: 'comercial@test.com' }, isCommercial: true, hasCrmAccess: true }
+    );
+    expect(screen.getByText('CRM')).toBeInTheDocument();
+  });
+
+  it('renderiza children quando usuário tem role admin', () => {
+    renderWithAuth(
+      <Routes>
+        <Route path="/" element={<CrmRoute><div>CRM</div></CrmRoute>} />
+      </Routes>,
+      { user: { email: 'admin@test.com' }, isAdmin: true, hasCrmAccess: true }
+    );
+    expect(screen.getByText('CRM')).toBeInTheDocument();
   });
 });
 

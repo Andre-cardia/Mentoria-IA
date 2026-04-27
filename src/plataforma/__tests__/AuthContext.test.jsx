@@ -18,12 +18,15 @@ vi.mock('../../lib/supabase', () => ({
 import { supabase } from '../../lib/supabase';
 
 function TestConsumer() {
-  const { user, loading, isAdmin, signIn, signOut } = useAuth();
+  const { user, loading, role, isAdmin, isCommercial, hasCrmAccess, signIn, signOut } = useAuth();
   return (
     <div>
       <span data-testid="loading">{String(loading)}</span>
       <span data-testid="user">{user?.email ?? 'none'}</span>
+      <span data-testid="role">{role ?? 'none'}</span>
       <span data-testid="isAdmin">{String(isAdmin)}</span>
+      <span data-testid="isCommercial">{String(isCommercial)}</span>
+      <span data-testid="hasCrmAccess">{String(hasCrmAccess)}</span>
       <button onClick={() => signIn('test@test.com', '123456')}>Login</button>
       <button onClick={() => signOut()}>Logout</button>
     </div>
@@ -60,6 +63,7 @@ describe('AuthContext', () => {
     renderWithAuth();
     await waitFor(() => expect(screen.getByTestId('user').textContent).toBe('aluno@test.com'));
     expect(screen.getByTestId('isAdmin').textContent).toBe('false');
+    expect(screen.getByTestId('hasCrmAccess').textContent).toBe('false');
   });
 
   it('isAdmin=true quando role=admin no user_metadata', async () => {
@@ -68,6 +72,19 @@ describe('AuthContext', () => {
     });
     renderWithAuth();
     await waitFor(() => expect(screen.getByTestId('isAdmin').textContent).toBe('true'));
+    expect(screen.getByTestId('role').textContent).toBe('admin');
+    expect(screen.getByTestId('hasCrmAccess').textContent).toBe('true');
+  });
+
+  it('isCommercial=true e hasCrmAccess=true quando role=comercial', async () => {
+    supabase.auth.getSession.mockResolvedValue({
+      data: { session: { user: { email: 'comercial@test.com', user_metadata: { role: 'comercial' } } } },
+    });
+    renderWithAuth();
+    await waitFor(() => expect(screen.getByTestId('isCommercial').textContent).toBe('true'));
+    expect(screen.getByTestId('isAdmin').textContent).toBe('false');
+    expect(screen.getByTestId('role').textContent).toBe('comercial');
+    expect(screen.getByTestId('hasCrmAccess').textContent).toBe('true');
   });
 
   it('signIn chama supabase.auth.signInWithPassword com credenciais corretas', async () => {

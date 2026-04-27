@@ -61,10 +61,13 @@ export function AuthProvider({ children }) {
 
   const signOut = () => supabase.auth.signOut();
 
-  const isAdmin = user?.user_metadata?.role === 'admin';
+  const role = user?.user_metadata?.role ?? null;
+  const isAdmin = role === 'admin';
+  const isCommercial = role === 'comercial';
+  const hasCrmAccess = isAdmin || isCommercial;
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAdmin, profile, profileError, refreshProfile, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, loading, role, isAdmin, isCommercial, hasCrmAccess, profile, profileError, refreshProfile, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

@@ -14,6 +14,19 @@ const STATUSES = [
 
 const STATUS_BY_ID = Object.fromEntries(STATUSES.map((status) => [status.id, status]));
 
+const EMPTY_LEAD_FORM = {
+  name: '',
+  email: '',
+  whatsapp: '',
+  company: '',
+  role: '',
+  company_size: '',
+  objective: '',
+  urgency: '',
+  context: '',
+  status: 'new',
+};
+
 const inputSx = {
   background: 'var(--panel-2)',
   border: '1px solid var(--line-strong)',
@@ -60,6 +73,10 @@ export default function AdminLeadsPage() {
   const [selectedLead, setSelectedLead] = useState(null);
   const [notes, setNotes] = useState('');
   const [savingNotes, setSavingNotes] = useState(false);
+  const [showCreateLead, setShowCreateLead] = useState(false);
+  const [createForm, setCreateForm] = useState(EMPTY_LEAD_FORM);
+  const [createErrors, setCreateErrors] = useState({});
+  const [savingLead, setSavingLead] = useState(false);
 
   useEffect(() => { loadLeads(); }, []);
 
@@ -123,6 +140,52 @@ export default function AdminLeadsPage() {
     toast.success('Notas salvas.');
   }
 
+  function updateCreateForm(field, value) {
+    setCreateForm((current) => ({ ...current, [field]: value }));
+    setCreateErrors((current) => ({ ...current, [field]: undefined }));
+  }
+
+  function validateCreateForm() {
+    const errors = {};
+    Object.entries(createForm).forEach(([field, value]) => {
+      if (!String(value ?? '').trim()) errors[field] = 'Campo obrigatório';
+    });
+    if (createForm.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(createForm.email.trim())) {
+      errors.email = 'E-mail inválido';
+    }
+    return errors;
+  }
+
+  async function createLead() {
+    const errors = validateCreateForm();
+    setCreateErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
+    setSavingLead(true);
+    const payload = Object.fromEntries(
+      Object.entries(createForm).map(([field, value]) => [field, String(value).trim()])
+    );
+
+    const { data, error } = await supabase
+      .from('proposal_requests')
+      .insert([{ ...payload, source: 'crm-manual' }])
+      .select('*')
+      .single();
+
+    setSavingLead(false);
+    if (error) {
+      console.error('[AdminLeads] create error:', error);
+      toast.error('Não foi possível criar o lead.');
+      return;
+    }
+
+    setLeads((items) => [data, ...items]);
+    setCreateForm(EMPTY_LEAD_FORM);
+    setCreateErrors({});
+    setShowCreateLead(false);
+    toast.success('Lead criado manualmente.');
+  }
+
   const filteredLeads = useMemo(() => leads.filter((lead) => matchLead(lead, query)), [leads, query]);
   const columns = useMemo(() => STATUSES.map((status) => ({
     ...status,
@@ -168,6 +231,23 @@ export default function AdminLeadsPage() {
             }}
           >
             {loading ? 'Atualizando...' : 'Atualizar'}
+          </button>
+          <button
+            onClick={() => setShowCreateLead(true)}
+            style={{
+              ...inputSx,
+              cursor: 'pointer',
+              background: 'var(--accent)',
+              borderColor: 'var(--accent)',
+              color: '#000',
+              fontFamily: 'Space Mono, monospace',
+              fontSize: '.72rem',
+              fontWeight: 700,
+              letterSpacing: '.12em',
+              textTransform: 'uppercase',
+            }}
+          >
+            Novo lead
           </button>
         </div>
 
@@ -269,7 +349,146 @@ export default function AdminLeadsPage() {
           onStatusChange={(status) => updateStatus(selectedLead.id, status)}
         />
       )}
+
+      {showCreateLead && (
+        <CreateLeadModal
+          form={createForm}
+          errors={createErrors}
+          saving={savingLead}
+          onChange={updateCreateForm}
+          onClose={() => {
+            setShowCreateLead(false);
+            setCreateErrors({});
+          }}
+          onSubmit={createLead}
+        />
+      )}
     </CrmLayout>
+  );
+}
+
+function CreateLeadModal({ form, errors, saving, onChange, onClose, onSubmit }) {
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    panelRef.current?.focus();
+
+    function onKeyDown(event) {
+      if (event.key === 'Escape') onClose();
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
+
+  function submit(event) {
+    event.preventDefault();
+    onSubmit();
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(0,0,0,.72)', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '32px 16px', overflowY: 'auto' }} onClick={onClose}>
+      <section
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-lead-title"
+        tabIndex={-1}
+        onClick={(event) => event.stopPropagation()}
+        style={{ width: 'min(820px, 100%)', background: 'var(--bg-2)', border: '1px solid var(--line-strong)', borderRadius: '8px', padding: '28px' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '24px' }}>
+          <div>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+              CRM / Cadastro manual
+            </div>
+            <h2 id="create-lead-title" style={{ margin: 0, fontSize: '1.8rem', lineHeight: 1.05, letterSpacing: '-.04em' }}>Novo lead</h2>
+          </div>
+          <button type="button" aria-label="Fechar cadastro de lead" onClick={onClose} style={{ ...inputSx, cursor: 'pointer', padding: '8px 12px' }}>Fechar</button>
+        </div>
+
+        <form onSubmit={submit} style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '14px' }}>
+          <LeadInput label="Nome" field="name" value={form.name} error={errors.name} onChange={onChange} />
+          <LeadInput label="E-mail" field="email" type="email" value={form.email} error={errors.email} onChange={onChange} />
+          <LeadInput label="WhatsApp" field="whatsapp" value={form.whatsapp} error={errors.whatsapp} onChange={onChange} />
+          <LeadInput label="Empresa" field="company" value={form.company} error={errors.company} onChange={onChange} />
+          <LeadInput label="Cargo" field="role" value={form.role} error={errors.role} onChange={onChange} />
+          <LeadSelect
+            label="Porte"
+            field="company_size"
+            value={form.company_size}
+            error={errors.company_size}
+            onChange={onChange}
+            options={['1-10 pessoas', '11-50 pessoas', '51-200 pessoas', '201-500 pessoas', '500+ pessoas']}
+          />
+          <LeadSelect
+            label="Momento"
+            field="urgency"
+            value={form.urgency}
+            error={errors.urgency}
+            onChange={onChange}
+            options={['Preciso de proposta com urgência', 'Quero planejar este trimestre', 'Estou pesquisando possibilidades']}
+          />
+          <LeadSelect
+            label="Estágio"
+            field="status"
+            value={form.status}
+            error={errors.status}
+            onChange={onChange}
+            options={STATUSES.map((status) => status.label)}
+            values={STATUSES.map((status) => status.id)}
+          />
+          <LeadTextarea label="Objetivo principal" field="objective" value={form.objective} error={errors.objective} onChange={onChange} />
+          <LeadTextarea label="Contexto" field="context" value={form.context} error={errors.context} onChange={onChange} />
+
+          <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '8px' }}>
+            <button type="button" onClick={onClose} style={{ ...inputSx, cursor: 'pointer' }}>Cancelar</button>
+            <button
+              type="submit"
+              disabled={saving}
+              style={{ background: 'var(--accent)', color: '#000', border: 'none', borderRadius: '4px', padding: '10px 16px', fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer' }}
+            >
+              {saving ? 'Salvando...' : 'Criar lead'}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
+}
+
+function LeadInput({ label, field, type = 'text', value, error, onChange }) {
+  return (
+    <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+      <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase' }}>{label}</span>
+      <input type={type} value={value} onChange={(event) => onChange(field, event.target.value)} style={{ ...inputSx, width: '100%' }} />
+      {error && <span style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.68rem' }}>{error}</span>}
+    </label>
+  );
+}
+
+function LeadSelect({ label, field, value, error, onChange, options, values }) {
+  return (
+    <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+      <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase' }}>{label}</span>
+      <select value={value} onChange={(event) => onChange(field, event.target.value)} style={{ ...inputSx, width: '100%', cursor: 'pointer' }}>
+        <option value="">Selecione</option>
+        {options.map((option, index) => (
+          <option key={values?.[index] ?? option} value={values?.[index] ?? option}>{option}</option>
+        ))}
+      </select>
+      {error && <span style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.68rem' }}>{error}</span>}
+    </label>
+  );
+}
+
+function LeadTextarea({ label, field, value, error, onChange }) {
+  return (
+    <label style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+      <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase' }}>{label}</span>
+      <textarea value={value} onChange={(event) => onChange(field, event.target.value)} rows={4} style={{ ...inputSx, width: '100%', resize: 'vertical', lineHeight: 1.55 }} />
+      {error && <span style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.68rem' }}>{error}</span>}
+    </label>
   );
 }
 

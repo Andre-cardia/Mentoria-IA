@@ -21,13 +21,14 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-    const { error: authError } = await signIn(email, password);
+    const { data, error: authError } = await signIn(email, password);
     setLoading(false);
     if (authError) {
       setError('Email ou senha inválidos.');
       return;
     }
-    navigate('/inicio', { replace: true });
+    const role = data?.user?.user_metadata?.role;
+    navigate(role === 'comercial' ? '/crm/leads' : '/inicio', { replace: true });
   }
 
   return (
