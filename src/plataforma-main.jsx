@@ -69,7 +69,7 @@ createRoot(document.getElementById('root')).render(
 
             {/* Área de Admin */}
             <Route path="/admin/alunos"     element={<AdminRoute><AdminAlunosPage /></AdminRoute>} />
-            <Route path="/admin/leads"      element={<AdminRoute><AdminLeadsPage /></AdminRoute>} />
+            <Route path="/admin/leads"      element={<AdminRoute><Navigate to="/crm/leads" replace /></AdminRoute>} />
             <Route path="/admin/modulos"    element={<AdminRoute><AdminModulosPage /></AdminRoute>} />
             <Route path="/admin/aulas"      element={<AdminRoute><AdminAulasPage /></AdminRoute>} />
             <Route path="/admin/materiais"  element={<AdminRoute><AdminMateriaisPage /></AdminRoute>} />
@@ -78,6 +78,9 @@ createRoot(document.getElementById('root')).render(
             <Route path="/admin/blog"                  element={<AdminRoute><AdminBlogPage /></AdminRoute>} />
             <Route path="/admin/blog/novo"             element={<AdminRoute><AdminBlogEditorPage /></AdminRoute>} />
             <Route path="/admin/blog/:id/editar"       element={<AdminRoute><AdminBlogEditorPage /></AdminRoute>} />
+
+            {/* CRM Neural Hub */}
+            <Route path="/crm/leads"        element={<AdminRoute><AdminLeadsPage /></AdminRoute>} />
 
             {/* Blog da plataforma (alunos autenticados) */}
             <Route path="/blog"       element={<ProtectedRoute><ProfileGuard><PlataformaBlogPage /></ProfileGuard></ProtectedRoute>} />

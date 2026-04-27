@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../../../lib/supabase';
-import AdminLayout from '../../components/AdminLayout';
+import CrmLayout from '../../components/CrmLayout';
 import { toast } from 'sonner';
 
 const STATUSES = [
@@ -134,7 +134,7 @@ export default function AdminLeadsPage() {
   const proposals = leads.filter((lead) => lead.status === 'proposal').length;
 
   return (
-    <AdminLayout>
+    <CrmLayout>
       <style>{`
         .admin-leads-focus :focus-visible {
           outline: 2px solid var(--accent);
@@ -146,7 +146,7 @@ export default function AdminLeadsPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px', marginBottom: '28px', flexWrap: 'wrap' }}>
           <div>
             <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
-              Admin / CRM
+              CRM / Neural Hub
             </div>
             <h1 style={{ margin: 0, fontSize: '2rem', lineHeight: 1, letterSpacing: '-.04em' }}>Leads de Proposta</h1>
             <p style={{ margin: '10px 0 0', maxWidth: '720px', color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.82rem', lineHeight: 1.7 }}>
@@ -269,7 +269,7 @@ export default function AdminLeadsPage() {
           onStatusChange={(status) => updateStatus(selectedLead.id, status)}
         />
       )}
-    </AdminLayout>
+    </CrmLayout>
   );
 }
 

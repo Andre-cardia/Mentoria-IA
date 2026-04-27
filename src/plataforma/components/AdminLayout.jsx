@@ -5,12 +5,15 @@ import { useAuth } from '../context/AuthContext';
 
 const ADMIN_NAV = [
   { to: '/admin/alunos',     label: 'Alunos' },
-  { to: '/admin/leads',      label: 'CRM Leads' },
   { to: '/admin/modulos',    label: 'Cursos & Aulas' },
   { to: '/admin/materiais',  label: 'Materiais' },
   { to: '/admin/avisos',     label: 'Avisos' },
   { to: '/admin/progresso',  label: 'Progresso' },
   { to: '/admin/blog',       label: 'Blog' },
+];
+
+const CRM_NAV = [
+  { to: '/crm/leads', label: 'CRM Neural Hub' },
 ];
 
 const ALUNO_NAV = [
@@ -101,6 +104,11 @@ export default function AdminLayout({ children }) {
           </div>
           {ADMIN_NAV.map(({ to, label }) => (
             <NavLink key={to} to={to} title={label} style={({ isActive }) => linkStyle(isActive, collapsed)}>{collapsed ? label.slice(0, 2).toUpperCase() : label}</NavLink>
+          ))}
+
+          <div style={{ borderTop: '1px solid var(--line)', margin: '16px 0 8px' }} />
+          {CRM_NAV.map(({ to, label }) => (
+            <NavLink key={to} to={to} title={label} style={() => linkStyle(false, collapsed)}>{collapsed ? 'CRM' : `→ ${label}`}</NavLink>
           ))}
 
           <div style={{ borderTop: '1px solid var(--line)', margin: '16px 0 8px' }} />

@@ -37,9 +37,10 @@ Transformar o interesse gerado pela landing page em pipeline comercial administr
 |------|---------|-------------|--------|
 | 1 | Pagina publica `/solicitar-proposta` com conteudo persuasivo e formulario | @dev | Done |
 | 2 | Persistencia de solicitacoes em `proposal_requests` | @dev | Done |
-| 3 | CRM restrito em `/plataforma/admin/leads` | @dev | Done |
-| 4 | Kanban com atualizacao de status e notas internas | @dev | Done |
-| 5 | QA visual autenticado e validacao em Supabase remoto | @qa | Pending |
+| 3 | CRM restrito em `/plataforma/crm/leads` | @dev | Done |
+| 4 | Separacao entre Admin Mentoria e CRM Neural Hub | @dev | Done |
+| 5 | Kanban com atualizacao de status e notas internas | @dev | Done |
+| 6 | QA visual autenticado e validacao em Supabase remoto | @qa | Pending |
 
 ## Metricas de Sucesso
 

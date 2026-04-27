@@ -104,7 +104,6 @@ export default function Layout({ children }) {
               </div>
               {[
                 { to: '/admin/alunos',    label: 'Alunos' },
-                { to: '/admin/leads',     label: 'CRM Leads' },
                 { to: '/admin/modulos',   label: 'Módulos & Aulas' },
                 { to: '/admin/materiais', label: 'Materiais' },
                 { to: '/admin/avisos',    label: 'Avisos' },
@@ -114,6 +113,10 @@ export default function Layout({ children }) {
                   {label}
                 </NavLink>
               ))}
+              <div style={{ borderTop: '1px solid var(--line)', margin: '12px 0 8px' }} />
+              <NavLink to="/crm/leads" style={({ isActive }) => linkStyle(isActive)}>
+                CRM Neural Hub
+              </NavLink>
             </>
           )}
         </nav>
