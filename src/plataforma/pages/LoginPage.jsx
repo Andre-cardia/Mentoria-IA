@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { isSupabaseConfigured } from '../../lib/supabase';
 
 export default function LoginPage() {
   const { signIn } = useAuth();
@@ -13,6 +14,12 @@ export default function LoginPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
+
+    if (!isSupabaseConfigured) {
+      setError('Supabase não configurado no ambiente local. Crie um .env com VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY para validar login.');
+      return;
+    }
+
     setLoading(true);
     const { error: authError } = await signIn(email, password);
     setLoading(false);

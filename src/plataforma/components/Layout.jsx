@@ -104,6 +104,7 @@ export default function Layout({ children }) {
               </div>
               {[
                 { to: '/admin/alunos',    label: 'Alunos' },
+                { to: '/admin/leads',     label: 'CRM Leads' },
                 { to: '/admin/modulos',   label: 'Módulos & Aulas' },
                 { to: '/admin/materiais', label: 'Materiais' },
                 { to: '/admin/avisos',    label: 'Avisos' },

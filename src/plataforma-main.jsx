@@ -17,6 +17,7 @@ const ForumPage        = lazy(() => import('./plataforma/pages/ForumPage'));
 const MateriaisPage    = lazy(() => import('./plataforma/pages/MateriaisPage'));
 const AvisosPage       = lazy(() => import('./plataforma/pages/AvisosPage'));
 const AdminAlunosPage    = lazy(() => import('./plataforma/pages/admin/AdminAlunosPage'));
+const AdminLeadsPage     = lazy(() => import('./plataforma/pages/admin/AdminLeadsPage'));
 const AdminModulosPage   = lazy(() => import('./plataforma/pages/admin/AdminModulosPage'));
 const AdminAulasPage   = lazy(() => import('./plataforma/pages/admin/AdminAulasPage'));
 const AdminMateriaisPage = lazy(() => import('./plataforma/pages/admin/AdminMateriaisPage'));
@@ -68,6 +69,7 @@ createRoot(document.getElementById('root')).render(
 
             {/* Área de Admin */}
             <Route path="/admin/alunos"     element={<AdminRoute><AdminAlunosPage /></AdminRoute>} />
+            <Route path="/admin/leads"      element={<AdminRoute><AdminLeadsPage /></AdminRoute>} />
             <Route path="/admin/modulos"    element={<AdminRoute><AdminModulosPage /></AdminRoute>} />
             <Route path="/admin/aulas"      element={<AdminRoute><AdminAulasPage /></AdminRoute>} />
             <Route path="/admin/materiais"  element={<AdminRoute><AdminMateriaisPage /></AdminRoute>} />

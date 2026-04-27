@@ -6,6 +6,7 @@ import LandingPageMentoriaIA from '../landing_page_mentoria_ia_react.jsx'
 
 const BlogPage     = lazy(() => import('./pages/BlogPage.jsx'))
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage.jsx'))
+const ProposalPage = lazy(() => import('./pages/ProposalPage.jsx'))
 
 const Fallback = () => (
   <div style={{ minHeight: '100vh', background: '#060606', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -21,6 +22,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Routes>
             <Route path="/blog"       element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
+            <Route path="/solicitar-proposta" element={<ProposalPage />} />
             <Route path="*"           element={<LandingPageMentoriaIA />} />
           </Routes>
         </Suspense>

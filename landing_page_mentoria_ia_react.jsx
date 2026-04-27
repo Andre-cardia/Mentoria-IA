@@ -269,6 +269,9 @@ export default function LandingPageMentoriaIA() {
             <a href="/blog" className="text-[11px] uppercase tracking-[0.24em] text-[var(--muted)] hover:text-[var(--text)] transition">
               Blog
             </a>
+            <a href="/solicitar-proposta" className="hidden text-[11px] uppercase tracking-[0.24em] text-[var(--muted)] transition hover:text-[var(--text)] sm:inline">
+              Solicitar proposta
+            </a>
             <a
               href="https://mentoria.neuralhub.ia.br/plataforma/"
               className="border border-[var(--line-strong)] bg-[var(--accent)] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.24em] text-black transition hover:brightness-110 active:scale-95 animate-glow"
@@ -983,10 +986,10 @@ export default function LandingPageMentoriaIA() {
                 </button>
 
                 <a
-                  href="https://wa.me/5548988549556?text=Quero%20mais%20informa%C3%A7%C3%B5es%20sobre%20a%20mentoria%20cont%C3%ADnua%20de%20IA"
+                  href="/solicitar-proposta"
                   className="mt-3 block border border-black/30 px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-black transition hover:border-black hover:bg-black/5 active:scale-95"
                 >
-                  Falar com a equipe
+                  Solicitar proposta
                 </a>
 
                 <div className="mt-6 font-mono-tech text-xs leading-6 text-black/70">
@@ -1009,4 +1012,3 @@ export default function LandingPageMentoriaIA() {
     </div>
   );
 }
-

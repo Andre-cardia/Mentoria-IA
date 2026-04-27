@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 const ADMIN_NAV = [
   { to: '/admin/alunos',     label: 'Alunos' },
+  { to: '/admin/leads',      label: 'CRM Leads' },
   { to: '/admin/modulos',    label: 'Cursos & Aulas' },
   { to: '/admin/materiais',  label: 'Materiais' },
   { to: '/admin/avisos',     label: 'Avisos' },
