@@ -186,6 +186,27 @@ export default function AdminLeadsPage() {
     toast.success(`Responsável alterado para ${payload.owner_name}.`);
   }
 
+  async function deleteLead(lead) {
+    if (!isAdmin || !lead?.id) return;
+
+    const confirmed = window.confirm(`Excluir o lead de ${lead.name}? Esta ação não pode ser desfeita.`);
+    if (!confirmed) return;
+
+    const previousLeads = leads;
+    setLeads((items) => items.filter((item) => item.id !== lead.id));
+    if (selectedLead?.id === lead.id) setSelectedLead(null);
+
+    const { error } = await supabase.from('proposal_requests').delete().eq('id', lead.id);
+    if (error) {
+      setLeads(previousLeads);
+      if (selectedLead?.id === lead.id) setSelectedLead(lead);
+      toast.error('Não foi possível excluir o lead.');
+      return;
+    }
+
+    toast.success('Lead excluído.');
+  }
+
   function openLead(lead) {
     setSelectedLead(lead);
     setNotes(lead.notes ?? '');
@@ -431,7 +452,9 @@ export default function AdminLeadsPage() {
                       <LeadCard
                         key={lead.id}
                         lead={lead}
+                        isAdmin={isAdmin}
                         onOpen={() => openLead(lead)}
+                        onDelete={() => deleteLead(lead)}
                         onDragStart={() => setDraggingId(lead.id)}
                         onDragEnd={() => setDraggingId(null)}
                         onStatusChange={(status) => updateStatus(lead.id, status)}
@@ -454,6 +477,7 @@ export default function AdminLeadsPage() {
           ownerOptions={ownerOptions}
           isAdmin={isAdmin}
           onClose={() => setSelectedLead(null)}
+          onDelete={() => deleteLead(selectedLead)}
           onSaveNotes={saveNotes}
           onStatusChange={(status) => updateStatus(selectedLead.id, status)}
           onOwnerChange={(ownerKey) => updateOwner(selectedLead.id, ownerKey)}
@@ -602,7 +626,7 @@ function LeadTextarea({ label, field, value, error, onChange }) {
   );
 }
 
-function LeadCard({ lead, onOpen, onDragStart, onDragEnd, onStatusChange }) {
+function LeadCard({ lead, isAdmin, onOpen, onDelete, onDragStart, onDragEnd, onStatusChange }) {
   return (
     <article
       draggable
@@ -651,11 +675,38 @@ function LeadCard({ lead, onOpen, onDragStart, onDragEnd, onStatusChange }) {
       >
         {STATUSES.map((status) => <option key={status.id} value={status.id}>{status.label}</option>)}
       </select>
+
+      {isAdmin && (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete();
+          }}
+          style={{
+            width: '100%',
+            marginTop: '8px',
+            background: 'rgba(239,68,68,.08)',
+            border: '1px solid rgba(239,68,68,.35)',
+            borderRadius: '4px',
+            color: '#f87171',
+            cursor: 'pointer',
+            fontFamily: 'Space Mono, monospace',
+            fontSize: '.68rem',
+            fontWeight: 700,
+            letterSpacing: '.12em',
+            padding: '9px 10px',
+            textTransform: 'uppercase',
+          }}
+        >
+          Excluir lead
+        </button>
+      )}
     </article>
   );
 }
 
-function LeadDrawer({ lead, notes, setNotes, savingNotes, ownerOptions, isAdmin, onClose, onSaveNotes, onStatusChange, onOwnerChange }) {
+function LeadDrawer({ lead, notes, setNotes, savingNotes, ownerOptions, isAdmin, onClose, onDelete, onSaveNotes, onStatusChange, onOwnerChange }) {
   const status = STATUS_BY_ID[lead.status || 'new'] ?? STATUS_BY_ID.new;
   const panelRef = useRef(null);
   const statusId = `lead-${lead.id}-status`;
@@ -759,6 +810,34 @@ function LeadDrawer({ lead, notes, setNotes, savingNotes, ownerOptions, isAdmin,
             {savingNotes ? 'Salvando...' : 'Salvar notas'}
           </button>
         </div>
+
+        {isAdmin && (
+          <div style={{ marginTop: '24px', borderTop: '1px solid rgba(239,68,68,.28)', paddingTop: '18px' }}>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: '#f87171', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
+              Zona administrativa
+            </div>
+            <button
+              type="button"
+              onClick={onDelete}
+              style={{
+                width: '100%',
+                background: 'rgba(239,68,68,.08)',
+                border: '1px solid rgba(239,68,68,.45)',
+                borderRadius: '4px',
+                color: '#f87171',
+                cursor: 'pointer',
+                fontFamily: 'Space Mono, monospace',
+                fontSize: '.72rem',
+                fontWeight: 700,
+                letterSpacing: '.12em',
+                padding: '12px 14px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Excluir lead
+            </button>
+          </div>
+        )}
       </aside>
     </div>
   );
