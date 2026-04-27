@@ -142,7 +142,7 @@ export default function AdminLeadsPage() {
           border-radius: 4px;
         }
       `}</style>
-      <div className="admin-leads-focus" style={{ maxWidth: '1480px', margin: '0 auto' }}>
+      <div className="admin-leads-focus" style={{ width: '100%', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px', marginBottom: '28px', flexWrap: 'wrap' }}>
           <div>
             <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
@@ -204,54 +204,56 @@ export default function AdminLeadsPage() {
             Carregando leads...
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px', paddingBottom: '12px' }}>
-            {columns.map((column) => (
-              <section
-                key={column.id}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={() => {
-                  if (draggingId) updateStatus(draggingId, column.id);
-                  setDraggingId(null);
-                }}
-                style={{
-                  minHeight: '420px',
-                  background: 'var(--panel)',
-                  border: '1px solid var(--line)',
-                  borderTop: `2px solid ${column.color}`,
-                  borderRadius: '6px',
-                  padding: '12px',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px', marginBottom: '12px' }}>
-                  <div>
-                    <h2 style={{ margin: 0, fontSize: '1rem', letterSpacing: '-.02em' }}>{column.label}</h2>
-                    <div style={{ marginTop: '4px', color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.64rem', letterSpacing: '.08em', textTransform: 'uppercase' }}>
-                      {column.hint}
+          <div style={{ overflowX: 'auto', paddingBottom: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(210px, 1fr))', gap: '10px', minWidth: '1320px' }}>
+              {columns.map((column) => (
+                <section
+                  key={column.id}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={() => {
+                    if (draggingId) updateStatus(draggingId, column.id);
+                    setDraggingId(null);
+                  }}
+                  style={{
+                    minHeight: '420px',
+                    background: 'var(--panel)',
+                    border: '1px solid var(--line)',
+                    borderTop: `2px solid ${column.color}`,
+                    borderRadius: '6px',
+                    padding: '12px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '12px' }}>
+                    <div>
+                      <h2 style={{ margin: 0, fontSize: '.95rem', letterSpacing: '-.02em' }}>{column.label}</h2>
+                      <div style={{ marginTop: '4px', color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.58rem', letterSpacing: '.08em', textTransform: 'uppercase' }}>
+                        {column.hint}
+                      </div>
                     </div>
+                    <span style={{ background: 'var(--bg)', border: '1px solid var(--line)', borderRadius: '999px', padding: '2px 8px', color: column.color, fontSize: '.78rem', fontWeight: 700 }}>
+                      {column.leads.length}
+                    </span>
                   </div>
-                  <span style={{ background: 'var(--bg)', border: '1px solid var(--line)', borderRadius: '999px', padding: '2px 8px', color: column.color, fontSize: '.8rem', fontWeight: 700 }}>
-                    {column.leads.length}
-                  </span>
-                </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {column.leads.length === 0 ? (
-                    <div style={{ border: '1px dashed var(--line-strong)', borderRadius: '6px', padding: '18px 12px', color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.68rem', lineHeight: 1.6, textTransform: 'uppercase' }}>
-                      Solte leads aqui
-                    </div>
-                  ) : column.leads.map((lead) => (
-                    <LeadCard
-                      key={lead.id}
-                      lead={lead}
-                      onOpen={() => openLead(lead)}
-                      onDragStart={() => setDraggingId(lead.id)}
-                      onDragEnd={() => setDraggingId(null)}
-                      onStatusChange={(status) => updateStatus(lead.id, status)}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {column.leads.length === 0 ? (
+                      <div style={{ border: '1px dashed var(--line-strong)', borderRadius: '6px', padding: '18px 12px', color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.64rem', lineHeight: 1.6, textTransform: 'uppercase' }}>
+                        Solte leads aqui
+                      </div>
+                    ) : column.leads.map((lead) => (
+                      <LeadCard
+                        key={lead.id}
+                        lead={lead}
+                        onOpen={() => openLead(lead)}
+                        onDragStart={() => setDraggingId(lead.id)}
+                        onDragEnd={() => setDraggingId(null)}
+                        onStatusChange={(status) => updateStatus(lead.id, status)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
           </div>
         )}
       </div>
