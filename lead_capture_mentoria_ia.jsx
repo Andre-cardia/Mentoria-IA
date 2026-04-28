@@ -360,7 +360,7 @@ export default function LeadCaptureMentoriaIA() {
                     {[
                       ["INÍCIO", "14 de abril de 2026"],
                       ["FORMATO", "2 encontros / semana"],
-                      ["CARGA", "40h mínimas"],
+                      ["TRILHA", "Formação Completa"],
                       ["PREÇO · 1º LOTE", "R$ 497,00 / mês"],
                       ["VÁLIDO ATÉ", "03/04/2026 ou 30 vagas"],
                     ].map(([k, v]) => (
@@ -546,7 +546,7 @@ export default function LeadCaptureMentoriaIA() {
                   [`${alunos}+ alunos`, "formados"],
                   [`${empresas}+ organizações`, "treinadas"],
                   ["2 instrutores", "com repertório real"],
-                  ["40h mínimas", "de carga horária"],
+                  ["Formação Completa", "do zero à aplicação"],
                 ].map(([v, l]) => (
                   <div key={v} className="text-center">
                     <div className="text-lg font-semibold uppercase tracking-[-0.03em] text-[var(--text)]">{v}</div>
