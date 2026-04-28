@@ -372,8 +372,8 @@ export default function LandingPageMentoriaIA() {
                       <span className="text-[var(--text)]">2 ENCONTROS / SEMANA</span>
                     </div>
                     <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
-                      <span>TRILHA BASE</span>
-                      <span className="text-[var(--text)]">40H MÍNIMAS</span>
+                      <span>TRILHA</span>
+                      <span className="text-[var(--text)]">FORMAÇÃO COMPLETA</span>
                     </div>
                     <div className="flex items-center justify-between pb-1">
                       <span>OBJETIVO</span>
