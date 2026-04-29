@@ -269,6 +269,9 @@ export default function LandingPageMentoriaIA() {
             <a href="/blog" className="text-[11px] uppercase tracking-[0.24em] text-[var(--muted)] hover:text-[var(--text)] transition">
               Blog
             </a>
+            <a href="https://neuralhub.ia.br" target="_blank" rel="noopener noreferrer" className="hidden text-[11px] uppercase tracking-[0.24em] text-[var(--muted)] transition hover:text-[var(--text)] sm:inline">
+              Neural Hub
+            </a>
             <a href="/solicitar-proposta" className="hidden text-[11px] uppercase tracking-[0.24em] text-[var(--muted)] transition hover:text-[var(--text)] sm:inline">
               Solicitar proposta
             </a>
