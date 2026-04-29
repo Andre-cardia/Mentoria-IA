@@ -27,7 +27,7 @@ export default function BlogSidebar({ excludePostId }) {
 
       <PromoWidget
         variant="text"
-        badge="A partir de R$ 497/mês"
+        badge="A partir de R$ 368,64/mês"
         title="Mentoria Zero-to-Hero IA"
         description="2 encontros por semana. Pare de estudar como espectador."
         cta="Ver planos"
