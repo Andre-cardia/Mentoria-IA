@@ -949,14 +949,14 @@ export default function LandingPageMentoriaIA() {
               </div>
               <div className="p-6 md:p-10 lg:col-span-4">
                 <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/70">// Próxima turma</div>
-                <div className="mt-2 text-2xl font-bold uppercase leading-tight tracking-[-0.03em]">14 de abril de 2026</div>
+                <div className="mt-2 text-2xl font-bold uppercase leading-tight tracking-[-0.03em]">06 de junho de 2026</div>
 
                 {/* Plano Mensal */}
                 <div className="mt-5 border border-black/25 bg-black/10 p-4">
                   <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/60">Plano Mensal · 1º lote</div>
                   <div className="mt-1 text-3xl font-bold uppercase tracking-[-0.03em]">R$ 497,00<span className="text-base font-normal">/mês</span></div>
                   <div className="mt-2 font-mono-tech text-xs leading-5 text-black/70">
-                    Válido até <strong>03/04/2026</strong> ou ao encerrar as primeiras <strong>30 vagas</strong>.
+                    Válido até <strong>29/05/2026</strong> ou ao encerrar as primeiras <strong>30 vagas</strong>.
                     Cancelamento com 30 dias de antecedência.
                   </div>
                 </div>

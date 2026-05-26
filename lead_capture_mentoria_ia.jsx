@@ -25,7 +25,7 @@ const RAMO = [
 const BENEFITS = [
   [
     "Preço do 1º lote garantido",
-    "Ao se cadastrar, você congela R$ 497,00/mês antes do encerramento das 30 primeiras vagas ou do dia 03/04.",
+    "Ao se cadastrar, você congela R$ 497,00/mês antes do encerramento das 30 primeiras vagas ou do dia 29/05.",
   ],
   [
     "Grupo exclusivo no WhatsApp",
@@ -286,7 +286,7 @@ export default function LeadCaptureMentoriaIA() {
               <div className="animate-rise">
                 <div className="mb-6 flex items-center gap-4 font-mono-tech text-[11px] uppercase tracking-[0.32em] text-[var(--accent)]">
                   <div className="h-1.5 w-1.5 bg-[var(--accent)] animate-glow" />
-                  <span>// Turma · Abril 2026 · Vagas limitadas</span>
+                  <span>// Turma · Junho 2026 · Vagas limitadas</span>
                 </div>
                 <div className="mb-6 h-px w-24 bg-[var(--accent)] animate-pulseLine" />
                 <h1 className="max-w-4xl text-[3rem] font-semibold uppercase leading-[0.88] tracking-[-0.06em] text-[var(--text)] md:text-[5rem] lg:text-[6.4rem]">
@@ -295,7 +295,7 @@ export default function LeadCaptureMentoriaIA() {
                   ou vai ficar assistindo?
                 </h1>
                 <p className="mt-6 max-w-2xl border-l-2 border-[var(--accent)] pl-5 font-mono-tech text-sm leading-7 text-zinc-300 md:text-base">
-                  A Mentoria Zero-to-Hero IA começa em <strong className="text-[var(--text)]">14 de abril de 2026</strong>. O 1º lote tem apenas <strong className="text-[var(--text)]">30 vagas</strong> ao preço de <strong className="text-[var(--text)]">R$ 497,00/mês</strong>, válido até 03/04 ou quando esgotarem. Cadastre-se agora e garanta a sua.
+                  A Mentoria Zero-to-Hero IA começa em <strong className="text-[var(--text)]">06 de junho de 2026</strong>. O 1º lote tem apenas <strong className="text-[var(--text)]">30 vagas</strong> ao preço de <strong className="text-[var(--text)]">R$ 497,00/mês</strong>, válido até 29/05 ou quando esgotarem. Cadastre-se agora e garanta a sua.
                 </p>
                 <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                   <button
@@ -317,7 +317,7 @@ export default function LeadCaptureMentoriaIA() {
               <div className="mt-14 grid max-w-3xl grid-cols-2 gap-4 md:grid-cols-4 animate-rise-3">
                 {[
                   ["30", "vagas · 1º lote"],
-                  ["14/04", "início da turma"],
+                  ["06/06", "início da turma"],
                   [`${alunos}+`, "alunos formados"],
                   [`${empresas}+`, "organizações atendidas"],
                 ].map(([v, l]) => (
@@ -358,11 +358,11 @@ export default function LeadCaptureMentoriaIA() {
                   {/* Info rows */}
                   <div className="space-y-0 px-6 py-2 font-mono-tech text-sm">
                     {[
-                      ["INÍCIO", "14 de abril de 2026"],
+                      ["INÍCIO", "06 de junho de 2026"],
                       ["FORMATO", "2 encontros / semana"],
                       ["TRILHA", "Formação Completa"],
                       ["PREÇO · 1º LOTE", "R$ 497,00 / mês"],
-                      ["VÁLIDO ATÉ", "03/04/2026 ou 30 vagas"],
+                      ["VÁLIDO ATÉ", "29/05/2026 ou 30 vagas"],
                     ].map(([k, v]) => (
                       <div key={k} className="flex items-center justify-between border-b border-[var(--line)] py-3 last:border-b-0">
                         <span className="text-[var(--muted)] text-[11px]">{k}</span>
@@ -563,13 +563,13 @@ export default function LeadCaptureMentoriaIA() {
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,.14),transparent_32%,rgba(0,0,0,.08)_100%)]" />
           <div className="relative mx-auto max-w-[1600px] px-4 py-16 md:px-8 md:py-20">
             <div className="flex flex-col items-center gap-6 text-center">
-              <div className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-black/60">// Turma · 14 de abril de 2026</div>
+              <div className="font-mono-tech text-[10px] uppercase tracking-[0.28em] text-black/60">// Turma · 06 de junho de 2026</div>
               <h2 className="max-w-4xl text-4xl uppercase leading-[0.9] tracking-[-0.05em] md:text-6xl">
                 8 vagas ainda disponíveis<br />
                 <span className="text-black/60">no 1º lote.</span>
               </h2>
               <p className="max-w-xl font-mono-tech text-sm leading-7 text-black/70">
-                Após encerrar as 30 vagas ou o dia 03/04, o preço sobe e o grupo fecha para novos cadastros deste lote.
+                Após encerrar as 30 vagas ou o dia 29/05, o preço sobe e o grupo fecha para novos cadastros deste lote.
               </p>
               <button
                 onClick={scrollToForm}
