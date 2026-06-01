@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
     setLoading(false);
 
     if (authError) {
-      setError(`Erro: ${authError.message || authError.status || JSON.stringify(authError)}`);
+      setError('Não foi possível enviar o link. Tente novamente.');
       return;
     }
 
