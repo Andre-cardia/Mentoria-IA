@@ -1,15 +1,17 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { isSupabaseConfigured } from '../../lib/supabase';
 
 export default function LoginPage() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const successMessage = location.state?.successMessage ?? null;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -71,6 +73,12 @@ export default function LoginPage() {
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '28px', lineHeight: 1.2 }}>
             Entre na sua conta
           </h1>
+
+          {successMessage && (
+            <p style={{ color: '#4ade80', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '16px' }}>
+              {successMessage}
+            </p>
+          )}
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -138,7 +146,10 @@ export default function LoginPage() {
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
-          <p style={{ marginTop: '20px', fontSize: '.875rem', color: 'var(--muted)', textAlign: 'center' }}>
+          <p style={{ marginTop: '16px', fontSize: '.875rem', color: 'var(--muted)', textAlign: 'center' }}>
+            <Link to="/esqueci-senha" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Esqueci minha senha</Link>
+          </p>
+          <p style={{ marginTop: '8px', fontSize: '.875rem', color: 'var(--muted)', textAlign: 'center' }}>
             Ainda não tem conta?{' '}
             <Link to="/registro" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Criar conta</Link>
           </p>
