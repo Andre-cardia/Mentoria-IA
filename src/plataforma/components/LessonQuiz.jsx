@@ -10,10 +10,13 @@ export default function LessonQuiz({ lessonId }) {
   const [result, setResult] = useState(null);
   const [attempts, setAttempts] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) setCurrentUser(user);
+    }).catch(() => {
+      setError('Não foi possível validar sua sessão. Atualize a página e tente novamente.');
     });
   }, []);
 
@@ -24,7 +27,12 @@ export default function LessonQuiz({ lessonId }) {
       .select('id, question, order, quiz_options(id, label, order)')
       .eq('lesson_id', lessonId)
       .order('order')
-      .then(({ data }) => {
+      .then(({ data, error: loadError }) => {
+        if (loadError) {
+          setError('Não foi possível carregar o quiz. Tente novamente em instantes.');
+          setLoading(false);
+          return;
+        }
         if (!data || data.length === 0) {
           setNoQuiz(true);
         } else {
@@ -55,37 +63,55 @@ export default function LessonQuiz({ lessonId }) {
 
   async function submit() {
     if (Object.keys(answers).length < questions.length) return;
+    setError('');
     setSubmitting(true);
 
-    // Busca com is_correct apenas após submissão para calcular score
-    const { data: qWithCorrect } = await supabase
-      .from('quiz_questions')
-      .select('id, quiz_options(id, is_correct)')
-      .eq('lesson_id', lessonId);
+    try {
+      const user = currentUser || (await supabase.auth.getUser()).data?.user;
+      if (!user?.id) {
+        throw new Error('Usuário não autenticado.');
+      }
+      if (!currentUser) setCurrentUser(user);
 
-    let correct = 0;
-    const correctMap = {};
-    if (qWithCorrect) {
-      for (const q of qWithCorrect) {
-        const correctOpt = (q.quiz_options || []).find((o) => o.is_correct);
-        if (correctOpt) {
-          correctMap[q.id] = correctOpt.id;
-          if (answers[q.id] === correctOpt.id) correct++;
+      // Busca com is_correct apenas após submissão para calcular score
+      const { data: qWithCorrect, error: correctError } = await supabase
+        .from('quiz_questions')
+        .select('id, quiz_options(id, is_correct)')
+        .eq('lesson_id', lessonId);
+
+      if (correctError) throw correctError;
+
+      let correct = 0;
+      const correctMap = {};
+      if (qWithCorrect) {
+        for (const q of qWithCorrect) {
+          const correctOpt = (q.quiz_options || []).find((o) => o.is_correct);
+          if (correctOpt) {
+            correctMap[q.id] = correctOpt.id;
+            if (answers[q.id] === correctOpt.id) correct++;
+          }
         }
       }
+
+      const score = Math.round((correct / questions.length) * 100);
+
+      const { data: attempt, error: insertError } = await supabase
+        .from('quiz_attempts')
+        .insert({ lesson_id: lessonId, user_id: user.id, score, answers })
+        .select('id, score, completed_at')
+        .single();
+
+      if (insertError) throw insertError;
+      if (!attempt) throw new Error('Tentativa não retornada pelo servidor.');
+
+      setAttempts((p) => [attempt, ...p]);
+      setResult({ score, correct, total: questions.length, correctMap });
+    } catch (err) {
+      console.error('Erro ao salvar tentativa do quiz:', err);
+      setError('Não foi possível salvar suas respostas no servidor. Revise sua conexão e tente novamente.');
+    } finally {
+      setSubmitting(false);
     }
-
-    const score = Math.round((correct / questions.length) * 100);
-
-    const { data: attempt } = await supabase
-      .from('quiz_attempts')
-      .insert({ lesson_id: lessonId, user_id: currentUser.id, score, answers })
-      .select('id, score, completed_at')
-      .single();
-
-    if (attempt) setAttempts((p) => [attempt, ...p]);
-    setResult({ score, correct, total: questions.length, correctMap });
-    setSubmitting(false);
   }
 
   function retry() {
@@ -130,6 +156,22 @@ export default function LessonQuiz({ lessonId }) {
           }}>
             Tentar novamente
           </button>
+        </div>
+      )}
+
+      {error && (
+        <div style={{
+          background: 'rgba(248,113,113,.08)',
+          border: '1px solid rgba(248,113,113,.35)',
+          borderRadius: '6px',
+          color: '#f87171',
+          fontFamily: 'Space Mono, monospace',
+          fontSize: '.75rem',
+          lineHeight: 1.6,
+          marginBottom: '20px',
+          padding: '12px 14px',
+        }}>
+          {error}
         </div>
       )}
 
