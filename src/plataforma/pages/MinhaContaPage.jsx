@@ -226,7 +226,8 @@ export default function MinhaContaPage() {
   useEffect(() => () => clearInterval(cooldownRef.current), []);
 
   async function handleResetPassword() {
-    const { error } = await supabase.auth.resetPasswordForEmail(user.email);
+    const redirectTo = `${window.location.origin}/plataforma/redefinir-senha`;
+    const { error } = await supabase.auth.resetPasswordForEmail(user.email, { redirectTo });
     if (error) { toast.error(error.message ?? 'Erro ao enviar link.'); return; }
     toast.success(`Link de redefinição enviado para ${user.email}.`);
     startCooldown();
