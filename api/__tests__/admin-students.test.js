@@ -28,7 +28,7 @@ vi.mock('@supabase/supabase-js', () => ({
 }));
 
 const { default: studentsHandler } = await import('../admin/students.js');
-const { default: studentByIdHandler } = await import('../admin/students/[id].js');
+const { default: studentByIdHandler } = await import('../admin/students/[id]/index.js');
 const { default: platformUsersHandler } = await import('../admin/platform-users.js');
 const { default: platformUserByIdHandler } = await import('../admin/platform-users/[id].js');
 
