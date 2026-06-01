@@ -47,7 +47,9 @@ export function AuthProvider({ children }) {
     });
 
     // Listener de mudanças de auth
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    // PASSWORD_RECOVERY: não atualiza user aqui — ResetPasswordPage escuta por conta própria
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') return;
       const u = session?.user ?? null;
       setUser(u);
       loadProfile(u?.id);

@@ -151,10 +151,10 @@ describe('ForgotPasswordPage', () => {
 describe('ResetPasswordPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Simula hash na URL para não redirecionar
+    // Supabase PKCE: simula ?code= na URL para não redirecionar
     Object.defineProperty(window, 'location', {
       writable: true,
-      value: { ...window.location, hash: '#access_token=fake' },
+      value: { ...window.location, search: '?code=fake-code', hash: '' },
     });
   });
 

@@ -17,8 +17,12 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Se não há hash na URL (acesso direto sem token), redirecionar para /esqueci-senha
-    if (!window.location.hash) {
+    // Supabase v2 PKCE flow: token chega como ?code= (query string)
+    // Supabase implicit flow (legado): token chega como #access_token= (hash)
+    // Se nenhum dos dois está presente → acesso direto sem token, redirecionar
+    const hasCode = new URLSearchParams(window.location.search).has('code');
+    const hasHash = Boolean(window.location.hash);
+    if (!hasCode && !hasHash) {
       navigate('/esqueci-senha', { replace: true });
       return;
     }
