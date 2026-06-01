@@ -38,6 +38,75 @@ function Modal({ title, onClose, children }) {
   );
 }
 
+// ── Formulário de alteração de senha ─────────────────────────
+function ChangePasswordForm({ onSave, onCancel, loading }) {
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [localError, setLocalError] = useState('');
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (newPassword.length < 8) {
+      setLocalError('Senha deve ter pelo menos 8 caracteres');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setLocalError('As senhas não coincidem');
+      return;
+    }
+    setLocalError('');
+    onSave({ password: newPassword });
+  }
+
+  return (
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+        <label style={labelStyle}>Nova senha *</label>
+        <input
+          type="password"
+          value={newPassword}
+          onChange={e => setNewPassword(e.target.value)}
+          required
+          placeholder="mínimo 8 caracteres"
+          style={inputStyle}
+        />
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+        <label style={labelStyle}>Confirmar nova senha *</label>
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={e => setConfirmPassword(e.target.value)}
+          required
+          placeholder="repita a senha"
+          style={inputStyle}
+        />
+      </div>
+      {localError && (
+        <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', margin: 0 }}>
+          {localError}
+        </p>
+      )}
+      <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+        <button type="submit" disabled={loading} style={{
+          flex: 1, padding: '10px', background: loading ? 'rgba(255,106,0,.5)' : 'var(--accent)',
+          color: '#000', border: 'none', borderRadius: '4px',
+          fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
+        }}>
+          {loading ? 'Redefinindo...' : 'Redefinir'}
+        </button>
+        <button type="button" onClick={onCancel} style={{
+          padding: '10px 20px', background: 'transparent', border: '1px solid var(--line)',
+          borderRadius: '4px', color: 'var(--muted)', cursor: 'pointer',
+          fontFamily: 'Space Grotesk, sans-serif',
+        }}>
+          Cancelar
+        </button>
+      </div>
+    </form>
+  );
+}
+
 // ── Formulário de aluno (criar / editar) ──────────────────────
 function StudentForm({ initial = {}, onSave, onCancel, loading }) {
   const [fullName, setFullName] = useState(initial.full_name ?? '');
@@ -193,6 +262,20 @@ export default function AdminAlunosPage() {
     const data = await res.json();
     setSaving(false);
     if (!res.ok) { setActionError(data.error ?? 'Erro ao excluir'); return; }
+    setModal(null);
+    load();
+  }
+
+  async function handleChangePassword({ password }) {
+    setSaving(true); setActionError('');
+    const headers = await authHeaders();
+    const res = await fetch(`/api/admin/students/${modal.student.user_id}/password`, {
+      method: 'POST', headers,
+      body: JSON.stringify({ password }),
+    });
+    const data = await res.json();
+    setSaving(false);
+    if (!res.ok) { setActionError(data.error ?? 'Erro ao redefinir senha'); return; }
     setModal(null);
     load();
   }
@@ -364,6 +447,12 @@ export default function AdminAlunosPage() {
                     )}
 
                     <button
+                      onClick={() => { setActionError(''); setModal({ type: 'change-password', student: s }); }}
+                      title="Redefinir senha"
+                      style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--muted)', cursor: 'pointer', fontSize: '.8rem' }}>
+                      🔑
+                    </button>
+                    <button
                       onClick={() => { setActionError(''); setModal({ type: 'delete', student: s }); }}
                       title="Excluir permanentemente"
                       style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: '#f87171', cursor: 'pointer', fontSize: '.8rem' }}>
@@ -464,6 +553,14 @@ export default function AdminAlunosPage() {
         <Modal title="Editar aluno" onClose={() => setModal(null)}>
           {actionError && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
           <StudentForm initial={modal.student} onSave={handleEdit} onCancel={() => setModal(null)} loading={saving} />
+        </Modal>
+      )}
+
+      {/* Modal — Redefinir senha */}
+      {modal?.type === 'change-password' && (
+        <Modal title={`Redefinir senha — ${modal.student.full_name}`} onClose={() => setModal(null)}>
+          {actionError && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
+          <ChangePasswordForm onSave={handleChangePassword} onCancel={() => setModal(null)} loading={saving} />
         </Modal>
       )}
 
