@@ -2,7 +2,7 @@ handoff:
   from_agent: "sm"
   to_agent: "po"
   timestamp: "2026-04-23T00:00:00Z"
-  consumed: false
+  consumed: true
   story_context:
     story_id: "2.4"
     story_path: "docs/stories/2.4.story.md"

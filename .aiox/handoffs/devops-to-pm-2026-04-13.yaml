@@ -1,0 +1,21 @@
+from_agent: devops
+to_agent: pm
+last_command: push
+timestamp: "2026-04-13T00:00:00Z"
+consumed: true
+
+context:
+  project: mentoria-ia
+  branch: master
+  last_epic: "Epic 2 — Admin Módulos e Aulas (Done, pushed)"
+
+new_feature_request:
+  name: "Minha Conta"
+  description: "Página do usuário para gerenciar perfil pessoal"
+  requested_capabilities:
+    - Escolher/alterar foto de perfil
+    - Editar dados do cadastro inicial (nome, email, etc.)
+    - Alterar senha
+  requestor: "usuário (product owner)"
+
+next_action: "@pm coletar requisitos completos e criar epic + spec para a feature Minha Conta"

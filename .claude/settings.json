@@ -3,7 +3,8 @@
     "allow": [
       "Bash(supabase migration:*)",
       "Bash(npx supabase:*)",
-      "Bash(ls d:/GitHub/Mentoria-IA/docs/stories/*.story.md)"
+      "Bash(ls d:/GitHub/Mentoria-IA/docs/stories/*.story.md)",
+      "WebFetch(domain:mentoria.neuralhub.ia.br)"
     ]
   },
   "language": "portuguese"
