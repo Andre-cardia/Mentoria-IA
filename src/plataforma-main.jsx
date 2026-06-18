@@ -9,6 +9,8 @@ import ProfileGuard from './plataforma/components/ProfileGuard';
 import LoginPage from './plataforma/pages/LoginPage';
 import RegisterPage from './plataforma/pages/RegisterPage';
 import CompletarPerfilPage from './plataforma/pages/CompletarPerfilPage';
+import ForgotPasswordPage from './plataforma/pages/ForgotPasswordPage';
+import ResetPasswordPage from './plataforma/pages/ResetPasswordPage';
 
 // Lazy-load para code splitting
 const DashboardPage    = lazy(() => import('./plataforma/pages/DashboardPage'));
@@ -51,8 +53,10 @@ createRoot(document.getElementById('root')).render(
         <Suspense fallback={<Fallback />}>
           <Routes>
             {/* Pública */}
-            <Route path="/login"    element={<LoginPage />} />
-            <Route path="/registro" element={<RegisterPage />} />
+            <Route path="/login"           element={<LoginPage />} />
+            <Route path="/registro"        element={<RegisterPage />} />
+            <Route path="/esqueci-senha"   element={<ForgotPasswordPage />} />
+            <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
 
             {/* Perfil — autenticado mas sem guard (evita loop) */}
             <Route path="/completar-perfil" element={<ProtectedRoute><CompletarPerfilPage /></ProtectedRoute>} />
