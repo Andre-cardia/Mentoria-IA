@@ -75,7 +75,7 @@ const pillars = [
 const proof = [
   { text: "2 encontros por semana" },
   { text: "Carga horária mínima de 40 horas" },
-  { text: "2 modalidades de acesso", note: "Mensal ou Anual" },
+  { text: "Plano anual" },
   { text: "Currículo vivo em atualização contínua" },
 ];
 
@@ -547,7 +547,6 @@ export default function LandingPageMentoriaIA() {
                     R$ 368<span className="text-xl font-normal text-[var(--muted)]">,64/mês</span>
                   </div>
                   <div className="mt-2 font-mono-tech text-xs text-[var(--accent)]">12x de R$ 368,64 — ou R$ 3.561,40 à vista</div>
-                  <div className="mt-1 font-mono-tech text-[10px] text-[var(--muted)]">Economia de ~26% em relação ao mensal</div>
                 </div>
 
                 <div className="space-y-3">
@@ -950,24 +949,6 @@ export default function LandingPageMentoriaIA() {
               <div className="p-6 md:p-10 lg:col-span-4">
                 <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/70">// Próxima turma</div>
                 <div className="mt-2 text-2xl font-bold uppercase leading-tight tracking-[-0.03em]">06 de junho de 2026</div>
-
-                {/* Plano Mensal */}
-                <div className="mt-5 border border-black/25 bg-black/10 p-4">
-                  <div className="font-mono-tech text-[10px] uppercase tracking-[0.24em] text-black/60">Plano Mensal · 1º lote</div>
-                  <div className="mt-1 text-3xl font-bold uppercase tracking-[-0.03em]">R$ 497,00<span className="text-base font-normal">/mês</span></div>
-                  <div className="mt-2 font-mono-tech text-xs leading-5 text-black/70">
-                    Válido até <strong>29/05/2026</strong> ou ao encerrar as primeiras <strong>30 vagas</strong>.
-                    Cancelamento com 30 dias de antecedência.
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => handleBuy("mensal")}
-                  disabled={!!buyingPlan}
-                  className="mt-3 block w-full border border-black bg-black px-6 py-4 text-center text-[11px] font-bold uppercase tracking-[0.26em] text-[var(--text)] transition hover:bg-transparent hover:text-black active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {buyingPlan === "mensal" ? "Aguarde..." : "Assinar mensal"}
-                </button>
 
                 {/* Plano Anual */}
                 <div className="mt-5 border-2 border-black/50 bg-black/20 p-4 relative">
