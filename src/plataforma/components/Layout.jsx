@@ -55,7 +55,31 @@ export default function Layout({ children }) {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)', position: 'relative' }}>
+      {/* Botão expandir — fora da aside para não ser cortado pelo overflow */}
+      {collapsed && (
+        <button
+          onClick={() => setCollapsed(false)}
+          title="Expandir menu"
+          style={{
+            position: 'fixed',
+            top: '20px', left: '56px',
+            background: 'var(--bg-2)', border: '1px solid var(--line)',
+            borderLeft: 'none',
+            borderRadius: '0 4px 4px 0',
+            color: 'var(--muted)',
+            width: '18px', height: '28px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', fontSize: '14px', lineHeight: 1,
+            transition: 'border-color .15s, color .15s',
+            zIndex: 100,
+          }}
+          onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
+          onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--line)'; e.currentTarget.style.color = 'var(--muted)'; }}
+        >
+          ›
+        </button>
+      )}
       {/* Sidebar */}
       <aside style={{
         width: collapsed ? '56px' : '240px',
@@ -107,28 +131,6 @@ export default function Layout({ children }) {
               onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--line)'; e.currentTarget.style.color = 'var(--muted)'; }}
             >
               ‹‹
-            </button>
-          )}
-          {collapsed && (
-            <button
-              onClick={() => setCollapsed(false)}
-              title="Expandir menu"
-              style={{
-                position: 'absolute',
-                top: '20px', left: '56px',
-                background: 'var(--bg-2)', border: '1px solid var(--line)',
-                borderRadius: '0 4px 4px 0',
-                color: 'var(--muted)',
-                width: '18px', height: '28px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', fontSize: '12px', lineHeight: 1,
-                transition: 'border-color .15s, color .15s',
-                zIndex: 10,
-              }}
-              onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
-              onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--line)'; e.currentTarget.style.color = 'var(--muted)'; }}
-            >
-              ›
             </button>
           )}
         </div>
