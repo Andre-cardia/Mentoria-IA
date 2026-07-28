@@ -266,14 +266,30 @@ export default function LandingPageMentoriaIA() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <div className="group relative">
+              <a href="/aulas/governanca-ia" className="text-[11px] uppercase tracking-[0.24em] text-[var(--muted)] transition hover:text-[var(--text)]">
+                Governança
+              </a>
+              <div className="invisible absolute right-0 top-full mt-4 min-w-[230px] border border-[var(--line)] bg-black/95 p-2 opacity-0 shadow-2xl shadow-black/40 backdrop-blur-xl transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                <a href="/aulas/governanca-ia" className="block border-b border-[var(--line)] px-4 py-3 text-[11px] uppercase tracking-[0.2em] text-[var(--muted)] transition hover:bg-white/[0.04] hover:text-[var(--text)]">
+                  Conceitos teóricos
+                </a>
+                <a href="/aulas/governanca-ia/teste" className="block border-b border-[var(--line)] px-4 py-3 text-[11px] uppercase tracking-[0.2em] text-[var(--muted)] transition hover:bg-white/[0.04] hover:text-[var(--text)]">
+                  Teste
+                </a>
+                <a href="/aulas/governanca-ia/framework" className="block px-4 py-3 text-[11px] uppercase tracking-[0.2em] text-[var(--muted)] transition hover:bg-white/[0.04] hover:text-[var(--text)]">
+                  Framework
+                </a>
+              </div>
+            </div>
             <a href="/blog" className="text-[11px] uppercase tracking-[0.24em] text-[var(--muted)] hover:text-[var(--text)] transition">
               Blog
             </a>
+            <a href="/solicitar-proposta" className="hidden text-[11px] uppercase tracking-[0.24em] text-[var(--muted)] transition hover:text-[var(--text)] sm:inline">
+              Solicitar Proposta
+            </a>
             <a href="https://neuralhub.ia.br" target="_blank" rel="noopener noreferrer" className="hidden text-[11px] uppercase tracking-[0.24em] text-[var(--muted)] transition hover:text-[var(--text)] sm:inline">
               Neural Hub
-            </a>
-            <a href="/solicitar-proposta" className="hidden text-[11px] uppercase tracking-[0.24em] text-[var(--muted)] transition hover:text-[var(--text)] sm:inline">
-              Solicitar proposta
             </a>
             <a
               href="https://mentoria.neuralhub.ia.br/plataforma/"

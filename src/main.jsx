@@ -7,6 +7,9 @@ import LandingPageMentoriaIA from '../landing_page_mentoria_ia_react.jsx'
 const BlogPage     = lazy(() => import('./pages/BlogPage.jsx'))
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage.jsx'))
 const ProposalPage = lazy(() => import('./pages/ProposalPage.jsx'))
+const OrsegupsGovernancaPage = lazy(() => import('./pages/OrsegupsGovernancaSuite.jsx').then((m) => ({ default: m.OrsegupsGovernancaPage })))
+const OrsegupsGovernancaTestePage = lazy(() => import('./pages/OrsegupsGovernancaSuite.jsx').then((m) => ({ default: m.OrsegupsGovernancaTestePage })))
+const OrsegupsGovernancaFrameworkPage = lazy(() => import('./pages/OrsegupsGovernancaSuite.jsx').then((m) => ({ default: m.OrsegupsGovernancaFrameworkPage })))
 
 const Fallback = () => (
   <div style={{ minHeight: '100vh', background: '#060606', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -23,6 +26,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="/blog"       element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/solicitar-proposta" element={<ProposalPage />} />
+            <Route path="/governanca-ia" element={<OrsegupsGovernancaPage />} />
+            <Route path="/governanca-ia/teste" element={<OrsegupsGovernancaTestePage />} />
+            <Route path="/governanca-ia/framework" element={<OrsegupsGovernancaFrameworkPage />} />
+            <Route path="/aulas/governanca-ia" element={<OrsegupsGovernancaPage />} />
+            <Route path="/aulas/governanca-ia/teste" element={<OrsegupsGovernancaTestePage />} />
+            <Route path="/aulas/governanca-ia/framework" element={<OrsegupsGovernancaFrameworkPage />} />
             <Route path="*"           element={<LandingPageMentoriaIA />} />
           </Routes>
         </Suspense>
