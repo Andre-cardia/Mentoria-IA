@@ -23,6 +23,7 @@ Criar uma página inicial personalizada para o aluno, substituindo o redirect di
 | Story | Título | Pontos | Status |
 |-------|--------|--------|--------|
 | 4.1 | Página Inicial — Dashboard | 8 | Ready |
+| 4.2 | Expandir Últimos Lançamentos para 12 aulas | 2 | In Progress |
 
 ## Dependências
 

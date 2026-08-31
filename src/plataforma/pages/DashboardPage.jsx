@@ -195,7 +195,7 @@ export default function DashboardPage() {
         supabase.from('lessons')
           .select('id, title, lesson_type, video_url, module_id, modules(title)')
           .order('created_at', { ascending: false })
-          .limit(4),
+          .limit(12),
         supabase.rpc('get_weekly_ranking'),
         supabase.from('posts')
           .select('id, title, slug, cover_url, seo_description, published_at, author_name')
