@@ -14,6 +14,14 @@ const NAV_ITEMS = [
   { to: '/minha-conta',  label: 'Minha Conta' },
 ];
 
+const MOBILE_MEDIA_QUERY = '(max-width: 768px)';
+
+function isMobileViewport() {
+  return typeof window !== 'undefined'
+    && typeof window.matchMedia === 'function'
+    && window.matchMedia(MOBILE_MEDIA_QUERY).matches;
+}
+
 const linkStyle = (isActive) => ({
   display: 'block',
   padding: '10px 14px',
@@ -37,7 +45,7 @@ export default function Layout({ children }) {
   const navigate = useNavigate();
   const { getTotalProgress } = useLessonProgress();
   const [modules, setModules] = useState([]);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(isMobileViewport);
 
   useEffect(() => {
     if (!user) return;
@@ -46,6 +54,19 @@ export default function Layout({ children }) {
       .select('id, lessons(id)')
       .then(({ data }) => setModules(data ?? []));
   }, [user]);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return undefined;
+
+    const mediaQuery = window.matchMedia(MOBILE_MEDIA_QUERY);
+    const collapseOnMobile = ({ matches }) => {
+      if (matches) setCollapsed(true);
+    };
+
+    collapseOnMobile(mediaQuery);
+    mediaQuery.addEventListener?.('change', collapseOnMobile);
+    return () => mediaQuery.removeEventListener?.('change', collapseOnMobile);
+  }, []);
 
   const progress = getTotalProgress(modules);
 
@@ -56,6 +77,22 @@ export default function Layout({ children }) {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)', position: 'relative' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .mentoria-platform-sidebar {
+            position: fixed !important;
+            left: 0;
+            z-index: 50;
+          }
+
+          .mentoria-platform-main {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 24px 16px 40px 72px !important;
+            overflow-x: hidden;
+          }
+        }
+      `}</style>
       {/* Botão expandir — fora da aside para não ser cortado pelo overflow */}
       {collapsed && (
         <button
@@ -81,7 +118,7 @@ export default function Layout({ children }) {
         </button>
       )}
       {/* Sidebar */}
-      <aside style={{
+      <aside className="mentoria-platform-sidebar" style={{
         width: collapsed ? '56px' : '240px',
         flexShrink: 0,
         background: 'var(--bg-2)',
@@ -241,7 +278,7 @@ export default function Layout({ children }) {
       </aside>
 
       {/* Main content */}
-      <main style={{ flex: 1, minWidth: 0, padding: '40px', overflowY: 'auto' }}>
+      <main className="mentoria-platform-main" style={{ flex: 1, minWidth: 0, padding: '40px', overflowY: 'auto' }}>
         {children}
       </main>
     </div>
