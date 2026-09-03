@@ -1,0 +1,105 @@
+# generated: 09-01-2026 10:00
+# project: Mentoria IA
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: docs/stories
+# Migrado do frontmatter AIOX em 2026-09-01. Atualize com bmad-sprint-planning.
+
+generated: 09-01-2026 10:00
+last_updated: 09-03-2026
+project: Mentoria IA
+project_key: NOKEY
+tracking_system: file-system
+story_location: "docs/stories"
+
+development_status:
+  epic-1: done
+  1-1-criação-da-plataforma-da-mentoria: done
+  1-2-player-de-vídeo-e-progresso-do-aluno: done
+  1-3-deploy-de-produção-e-validação-end-to-end: done
+  1-4-cadastro-validação-de-pagamento-e-perfil-do-usuário: done
+  epic-1-retrospective: optional
+
+  epic-2: in-progress
+  2-1-admin-módulos-aulas-edição-inline-modal-confirmação-toast: ready-for-dev
+  2-2-admin-módulos-aulas-drag-and-drop-para-reordenação: backlog
+  2-3-admin-módulos-aulas-duplicar-aula: backlog
+  2-4-admin-aulas-editor-rich-text-tiptap-para-conteúdo: done
+  epic-2-retrospective: optional
+
+  epic-3: in-progress
+  3-1-tipos-de-aula-schema-admin-frontend: review
+  3-2-provas-objetivas-quiz: in-progress
+  3-3-q-a-por-aula: ready-for-dev
+  epic-3-retrospective: optional
+
+  epic-4: in-progress
+  4-1-página-inicial-dashboard-do-aluno: ready-for-dev
+  4-2-expandir-últimos-lançamentos-para-12-aulas: review
+  epic-4-retrospective: optional
+
+  epic-5: done
+  5-1-minha-conta-página-base-edição-de-dados-pessoais: done
+  5-2-minha-conta-foto-de-perfil-upload-s3-exibição-no-header: done
+  5-3-minha-conta-alterar-e-mail-e-senha: done
+  epic-5-retrospective: optional
+
+  epic-6: done
+  6-1-curso-db-subtitle-admin-labels: done
+  6-2-curso-cursopage-cursospage-rotas: done
+  epic-6-retrospective: optional
+
+  epic-7: backlog
+  7-1-materiais-db-module_id: ready-for-dev
+  7-2-materiais-admin-seletor-de-curso-no-upload: ready-for-dev
+  7-3-materiais-materiaispage-agrupada-por-curso: ready-for-dev
+  7-4-materiais-cursopage-seção-materiais-do-curso: ready-for-dev
+  epic-7-retrospective: optional
+
+  epic-8: backlog
+  8-1-blog-db-schema: ready-for-dev
+  8-2-blog-admin-listagem-e-gestão-de-posts: ready-for-dev
+  8-3-blog-admin-editor-de-post-tiptap-cover-seo: ready-for-dev
+  8-4-blog-public-blog-listagem-de-artigos: ready-for-dev
+  8-5-blog-public-blog-slug-artigo-seo-social-share: ready-for-dev
+  8-6-blog-platform-posts-privados-na-plataforma: ready-for-dev
+  8-7-blog-comments-sistema-de-comentários: ready-for-dev
+  epic-8-retrospective: optional
+
+  epic-9: backlog
+  9-1-blog-editorial-v2-recentpostswidget: ready-for-dev
+  9-2-blog-editorial-v2-promowidget-3-variantes: ready-for-dev
+  9-3-blog-editorial-v2-blogsidebar-blogpage-layout-2-colunas: backlog
+  9-4-blog-editorial-v2-blogpostpage-layout-com-sidebar-sticky: backlog
+  9-5-blog-editorial-v2-migration-featured-toggle-no-admin: backlog
+  9-6-blog-editorial-v2-featuredpost-hero: backlog
+  9-7-blog-editorial-v2-inlinepromo-banner-horizontal: backlog
+  epic-9-retrospective: optional
+
+  epic-10: done
+  10-1-homepage-neural-hub-estrutura-layout-aifounder-one: done
+  epic-10-retrospective: optional
+
+  epic-11: in-progress
+  11-1-pagina-solicitar-proposta: done
+  11-2-crm-kanban-de-leads: done
+  11-3-separacao-dos-workspaces-admin-mentoria-e-crm-neural-hub: done
+  11-4-crm-com-lead-manual-e-acesso-comercial: done
+  11-5-responsividade-mobile-das-paginas-neural-hub: done
+  11-6-responsaveis-e-relatorios-do-crm: review
+  11-7-exclusao-administrativa-de-leads-no-crm: done
+  11-8-gestao-de-usuarios-admin-e-comercial: done
+  11-9-corrigir-perda-de-foco-no-cadastro-manual-de-leads: backlog
+  epic-11-retrospective: optional
+
+  epic-12: in-progress
+  12-1-recuperação-de-senha: review
+  12-2-alteração-de-senha-de-aluno-pelo-admin: review
+  epic-12-retrospective: optional
+
+  epic-13: in-progress
+  13-1-definir-o-contrato-de-lint-e-typecheck-para-javascript-jsx: done
+  13-2-implementar-os-gates-e-eliminar-o-baseline-bloqueante: review
+  13-4-garantir-descoberta-e-ambiente-corretos-dos-testes: backlog
+  13-3-bloquear-deploy-quando-os-gates-falharem: backlog
+  epic-13-retrospective: optional
