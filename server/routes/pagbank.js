@@ -36,7 +36,7 @@ router.post("/checkout", async (req, res) => {
 router.post("/webhook", async (req, res) => {
   if (isPagBankWebhookVerificationEnabled()) {
     const verification = verifyPagBankWebhookSignature(
-      req.rawBody,
+      /** @type {import("express").Request & { rawBody?: string }} */ (req).rawBody,
       getPagBankSignature(req)
     );
 

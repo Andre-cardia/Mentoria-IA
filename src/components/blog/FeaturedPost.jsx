@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 
 export default function FeaturedPost({ onFeaturedId }) {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const onFeaturedIdRef = useRef(onFeaturedId);
+
+  useEffect(() => {
+    onFeaturedIdRef.current = onFeaturedId;
+  }, [onFeaturedId]);
 
   useEffect(() => {
     async function fetchFeatured() {
@@ -19,7 +24,7 @@ export default function FeaturedPost({ onFeaturedId }) {
 
         if (error || !data) { setLoading(false); return; }
         setPost(data);
-        onFeaturedId?.(data.id);
+        onFeaturedIdRef.current?.(data.id);
       } catch {
         // no featured post
       } finally {
@@ -73,6 +78,7 @@ export default function FeaturedPost({ onFeaturedId }) {
   );
 }
 
+/** @type {Record<string, import('react').CSSProperties>} */
 const styles = {
   container: {
     marginBottom: 32,

@@ -1,0 +1,17 @@
+{
+  "extends": "./jsconfig.quality.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    "types": ["node", "vitest/config"]
+  },
+  "include": [
+    "server/**/*.js",
+    "api/**/*.js",
+    "scripts/**/*.js",
+    "scripts/.quality-gate-canary-*/*.js",
+    "vite.config.js",
+    "eslint.config.js"
+  ]
+}

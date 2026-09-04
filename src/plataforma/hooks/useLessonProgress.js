@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 export function useLessonProgress() {
   const { user } = useAuth();
@@ -9,11 +9,10 @@ export function useLessonProgress() {
 
   // Carrega progresso do usuário atual
   useEffect(() => {
-    // Reseta imediatamente ao trocar de usuário — evita exibir dados do usuário anterior
-    setCompletedIds(new Set());
-    if (!user) return;
-
     async function load() {
+      // Reseta ao trocar de usuário — evita exibir dados do usuário anterior.
+      setCompletedIds(new Set());
+      if (!user) return;
       const { data } = await supabase
         .from('lesson_progress')
         .select('lesson_id')

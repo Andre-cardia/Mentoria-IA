@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 const CRM_NAV = [
   { to: '/crm/leads', label: 'Leads' },
@@ -12,6 +12,7 @@ const ADMIN_NAV = [
   { to: '/admin/alunos', label: 'Admin Mentoria' },
 ];
 
+/** @returns {import('react').CSSProperties} */
 const linkStyle = (isActive, collapsed = false) => ({
   display: 'block',
   padding: collapsed ? '10px 8px' : '10px 14px',

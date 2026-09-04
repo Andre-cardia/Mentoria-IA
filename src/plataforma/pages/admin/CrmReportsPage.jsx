@@ -22,6 +22,7 @@ const panelSx = {
   padding: '18px',
 };
 
+/** @type {import('react').CSSProperties} */
 const inputSx = {
   background: 'var(--panel-2)',
   border: '1px solid var(--line-strong)',
@@ -211,7 +212,7 @@ function Metric({ label, value }) {
   );
 }
 
-function ReportPanel({ title, rows, total, wide }) {
+function ReportPanel({ title, rows, total, wide = false }) {
   const max = Math.max(...rows.map((row) => row.value), 1);
 
   return (

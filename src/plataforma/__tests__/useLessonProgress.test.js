@@ -26,7 +26,7 @@ vi.mock('../../lib/supabase', () => ({
 }));
 
 const mockUseAuth = vi.fn(() => ({ user: mockUser }));
-vi.mock('../context/AuthContext', () => ({
+vi.mock('../context/useAuth', () => ({
   useAuth: mockUseAuth,
 }));
 

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../../../lib/supabase';
 import CrmLayout from '../../components/CrmLayout';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth';
 import { toast } from 'sonner';
 
 const STATUSES = [
@@ -35,6 +35,7 @@ const EMPTY_LEAD_FORM = {
   status: 'new',
 };
 
+/** @type {import('react').CSSProperties} */
 const inputSx = {
   background: 'var(--panel-2)',
   border: '1px solid var(--line-strong)',
@@ -601,7 +602,7 @@ function LeadInput({ label, field, type = 'text', value, error, onChange }) {
   );
 }
 
-function LeadSelect({ label, field, value, error, onChange, options, values }) {
+function LeadSelect({ label, field, value, error, onChange, options, values = undefined }) {
   return (
     <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase' }}>{label}</span>
@@ -843,7 +844,7 @@ function LeadDrawer({ lead, notes, setNotes, savingNotes, ownerOptions, isAdmin,
   );
 }
 
-function Info({ label, value, full }) {
+function Info({ label, value, full = false }) {
   return (
     <div style={{ gridColumn: full ? '1 / -1' : undefined, background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '6px', padding: '12px' }}>
       <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.64rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '6px' }}>{label}</div>

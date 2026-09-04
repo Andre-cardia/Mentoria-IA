@@ -3,7 +3,7 @@ import PromoWidget from './PromoWidget';
 import pulsemindImg from '../../assets/pulsemind01.jpeg';
 import pulsemindVideo from '../../assets/pulsemind-promo.mp4';
 
-export default function BlogSidebar({ excludePostId }) {
+export default function BlogSidebar({ excludePostId = undefined }) {
   return (
     <aside>
       <RecentPostsWidget excludePostId={excludePostId} />

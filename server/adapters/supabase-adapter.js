@@ -14,6 +14,7 @@ export class SupabaseAdapter {
    * @param {string} [params.checkoutId]
    * @param {string} params.status
    * @param {number} [params.amount]
+   * @param {string | null} [params.email]
    * @param {Object} params.rawEvent
    */
   async savePayment({ referenceId, checkoutId, status, amount, email, rawEvent }) {

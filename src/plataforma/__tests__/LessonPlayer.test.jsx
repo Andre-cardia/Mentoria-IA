@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import LessonPlayer, { toEmbedUrl } from '../components/LessonPlayer';
+import LessonPlayer from '../components/LessonPlayer';
+import { toEmbedUrl } from '../lib/lesson-embed';
 
 // ── toEmbedUrl unit tests ─────────────────────────────────────
 

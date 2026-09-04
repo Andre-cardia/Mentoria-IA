@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 const BLOCKED_MESSAGES = {
   suspended: {
@@ -45,23 +45,24 @@ export default function ProfileGuard({ children }) {
   useEffect(() => {
     let cancelled = false;
 
-    if (!user) {
-      setProfile(null);
-      setLoadError('');
+    const settle = (nextProfile, nextError = '') => {
+      if (cancelled) return;
+      setProfile(nextProfile);
+      setLoadError(nextError);
       setChecked(true);
-      return;
+    };
+
+    if (!user) {
+      settle(null);
+      return () => { cancelled = true; };
     }
     if (isAdmin) {
-      setProfile({ status: 'active' });
-      setLoadError('');
-      setChecked(true);
-      return;
+      settle({ status: 'active' });
+      return () => { cancelled = true; };
     }
     if (isCommercial) {
-      setProfile(null);
-      setLoadError('');
-      setChecked(true);
-      return;
+      settle(null);
+      return () => { cancelled = true; };
     }
 
     supabase
@@ -73,15 +74,11 @@ export default function ProfileGuard({ children }) {
         if (cancelled) return;
         if (error) {
           console.error('[ProfileGuard] erro ao carregar perfil:', error);
-          setProfile(null);
-          setLoadError(error.message ?? 'Erro ao verificar perfil.');
-          setChecked(true);
+          settle(null, error.message ?? 'Erro ao verificar perfil.');
           return;
         }
 
-        setProfile(data);
-        setLoadError('');
-        setChecked(true);
+        settle(data);
       });
 
     return () => {
@@ -91,6 +88,7 @@ export default function ProfileGuard({ children }) {
 
   if (!checked) return null;
   if (isCommercial) return <Navigate to="/crm/leads" replace />;
+  if (isAdmin) return children;
   if (loadError) {
     return (
       <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>

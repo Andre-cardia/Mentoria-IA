@@ -16,7 +16,9 @@ app.use(cors());
 app.use(express.json({
   verify: (req, _res, buf) => {
     if (buf?.length) {
-      req.rawBody = buf.toString("utf8");
+      /** @type {import("node:http").IncomingMessage & { rawBody?: string }} */
+      const requestWithRawBody = req;
+      requestWithRawBody.rawBody = buf.toString("utf8");
     }
   },
 }));
@@ -48,10 +50,12 @@ const server = app.listen(PORT, () => {
 });
 
 server.on("error", (err) => {
-  if (err.code === "EADDRINUSE") {
+  /** @type {NodeJS.ErrnoException} */
+  const serverError = err;
+  if (serverError.code === "EADDRINUSE") {
     console.error(`\n❌ Porta ${PORT} já está em uso. Mate o processo anterior e tente de novo.\n`);
   } else {
-    console.error("Erro no servidor:", err);
+    console.error("Erro no servidor:", serverError);
   }
   process.exit(1);
 });

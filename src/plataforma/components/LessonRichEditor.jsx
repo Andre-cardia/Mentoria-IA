@@ -22,6 +22,7 @@ const btnSx = (variant = 'primary') => ({
   color: variant === 'primary' ? '#000' : 'var(--text)',
 });
 
+/** @type {import('react').CSSProperties} */
 const inputSx = {
   width: '100%', background: 'var(--panel-2)', border: '1px solid var(--line-strong)',
   borderRadius: '4px', padding: '10px 14px', color: 'var(--text)',
@@ -29,7 +30,7 @@ const inputSx = {
   boxSizing: 'border-box',
 };
 
-function ToolbarButton({ active, onClick, children, title }) {
+function ToolbarButton({ active = false, onClick, children, title }) {
   return (
     <button type="button" onClick={onClick} title={title} style={toolbarBtnSx(active)}>
       {children}
@@ -152,7 +153,7 @@ export default function LessonRichEditor({ value = '', onChange, placeholder = '
     if (!editor || editor.isDestroyed) return;
     const current = editor.getHTML();
     if (value && value !== current) {
-      editor.commands.setContent(value, false);
+      editor.commands.setContent(value, { emitUpdate: false });
     } else if (!value && current !== '<p></p>') {
       editor.commands.clearContent();
     }

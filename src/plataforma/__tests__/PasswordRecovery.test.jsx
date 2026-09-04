@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/useAuth';
 
 // Mock Supabase
 vi.mock('../../lib/supabase', () => ({
@@ -18,6 +18,9 @@ vi.mock('../../lib/supabase', () => ({
 }));
 
 import { supabase } from '../../lib/supabase';
+
+/** @type {{ getSession: import('vitest').Mock, onAuthStateChange: import('vitest').Mock, resetPasswordForEmail: import('vitest').Mock, updateUser: import('vitest').Mock }} */
+const auth = /** @type {typeof auth} */ (/** @type {unknown} */ (supabase.auth));
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
 import PasswordStrengthIndicator from '../components/PasswordStrengthIndicator';
@@ -101,7 +104,7 @@ describe('ForgotPasswordPage', () => {
     await userEvent.type(input, 'test@test.com');
     await userEvent.click(button);
 
-    expect(button.disabled).toBe(true);
+    expect(/** @type {HTMLButtonElement} */ (button).disabled).toBe(true);
   });
 
   it('exibe mensagem ambígua após envio bem-sucedido (AC-3)', async () => {
@@ -173,7 +176,7 @@ describe('ResetPasswordPage', () => {
   }
 
   it('exibe estado de validação enquanto aguarda evento PASSWORD_RECOVERY', () => {
-    supabase.auth.onAuthStateChange.mockReturnValue({
+    auth.onAuthStateChange.mockReturnValue({
       data: { subscription: { unsubscribe: vi.fn() } },
     });
     renderReset();
@@ -182,7 +185,7 @@ describe('ResetPasswordPage', () => {
 
   it('exibe formulário após evento PASSWORD_RECOVERY', async () => {
     let authCallback;
-    supabase.auth.onAuthStateChange.mockImplementation((cb) => {
+    auth.onAuthStateChange.mockImplementation((cb) => {
       authCallback = cb;
       return { data: { subscription: { unsubscribe: vi.fn() } } };
     });
@@ -198,7 +201,7 @@ describe('ResetPasswordPage', () => {
 
   it('exibe erro inline quando senhas não coincidem (AC-6)', async () => {
     let authCallback;
-    supabase.auth.onAuthStateChange.mockImplementation((cb) => {
+    auth.onAuthStateChange.mockImplementation((cb) => {
       authCallback = cb;
       return { data: { subscription: { unsubscribe: vi.fn() } } };
     });
@@ -218,7 +221,7 @@ describe('ResetPasswordPage', () => {
   it('chama updatePassword e redireciona para /login após sucesso (AC-8)', async () => {
     const updatePassword = vi.fn().mockResolvedValue({ error: null });
     let authCallback;
-    supabase.auth.onAuthStateChange.mockImplementation((cb) => {
+    auth.onAuthStateChange.mockImplementation((cb) => {
       authCallback = cb;
       return { data: { subscription: { unsubscribe: vi.fn() } } };
     });
@@ -242,7 +245,7 @@ describe('ResetPasswordPage', () => {
   it('exibe erro quando updatePassword falha', async () => {
     const updatePassword = vi.fn().mockResolvedValue({ error: new Error('fail') });
     let authCallback;
-    supabase.auth.onAuthStateChange.mockImplementation((cb) => {
+    auth.onAuthStateChange.mockImplementation((cb) => {
       authCallback = cb;
       return { data: { subscription: { unsubscribe: vi.fn() } } };
     });
@@ -269,16 +272,17 @@ describe('ResetPasswordPage', () => {
 describe('AuthContext — resetPassword e updatePassword', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    supabase.auth.getSession.mockResolvedValue({ data: { session: null } });
-    supabase.auth.onAuthStateChange.mockReturnValue({
+    auth.getSession.mockResolvedValue({ data: { session: null } });
+    auth.onAuthStateChange.mockReturnValue({
       data: { subscription: { unsubscribe: vi.fn() } },
     });
   });
 
   it('resetPassword chama supabase.auth.resetPasswordForEmail com redirectTo', async () => {
-    supabase.auth.resetPasswordForEmail = vi.fn().mockResolvedValue({ error: null });
+    auth.resetPasswordForEmail.mockResolvedValue({ error: null });
 
-    const { AuthProvider, useAuth } = await import('../context/AuthContext');
+    const { AuthProvider } = await import('../context/AuthContext');
+    const { useAuth } = await import('../context/useAuth');
 
     function Consumer() {
       const { resetPassword } = useAuth();
@@ -293,16 +297,17 @@ describe('AuthContext — resetPassword e updatePassword', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'reset' }));
 
-    expect(supabase.auth.resetPasswordForEmail).toHaveBeenCalledWith(
+    expect(auth.resetPasswordForEmail).toHaveBeenCalledWith(
       'user@test.com',
       expect.objectContaining({ redirectTo: expect.stringContaining('/plataforma/redefinir-senha') })
     );
   });
 
   it('updatePassword chama supabase.auth.updateUser com nova senha', async () => {
-    supabase.auth.updateUser = vi.fn().mockResolvedValue({ error: null });
+    auth.updateUser.mockResolvedValue({ error: null });
 
-    const { AuthProvider, useAuth } = await import('../context/AuthContext');
+    const { AuthProvider } = await import('../context/AuthContext');
+    const { useAuth } = await import('../context/useAuth');
 
     function Consumer() {
       const { updatePassword } = useAuth();
@@ -317,6 +322,6 @@ describe('AuthContext — resetPassword e updatePassword', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'update' }));
 
-    expect(supabase.auth.updateUser).toHaveBeenCalledWith({ password: 'newPass123!' });
+    expect(auth.updateUser).toHaveBeenCalledWith({ password: 'newPass123!' });
   });
 });

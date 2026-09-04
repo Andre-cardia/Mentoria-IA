@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 
-export default function RecentPostsWidget({ excludePostId }) {
+export default function RecentPostsWidget({ excludePostId = null } = {}) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -84,6 +84,7 @@ export default function RecentPostsWidget({ excludePostId }) {
   );
 }
 
+/** @type {Record<string, import('react').CSSProperties>} */
 const styles = {
   container: {},
   heading: {

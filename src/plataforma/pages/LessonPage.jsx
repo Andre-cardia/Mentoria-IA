@@ -16,7 +16,7 @@ export default function LessonPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { isComplete, toggleComplete, marking } = useLessonProgress();
-  const [completed, setCompleted] = useState(false);
+  const completed = lessonId ? isComplete(lessonId) : false;
 
   useEffect(() => {
     async function load() {
@@ -35,13 +35,8 @@ export default function LessonPage() {
     load();
   }, [lessonId, moduleId]);
 
-  useEffect(() => {
-    if (lessonId) setCompleted(isComplete(lessonId));
-  }, [lessonId, isComplete]);
-
   async function handleToggle() {
     await toggleComplete(lessonId);
-    // não chamar setCompleted aqui — o useEffect abaixo já atualiza via isComplete
   }
 
   function formatDuration(seconds) {

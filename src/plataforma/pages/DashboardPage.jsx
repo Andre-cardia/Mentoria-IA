@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { useLessonProgress } from '../hooks/useLessonProgress';
 import Layout from '../components/Layout';
 import DashboardStats from '../components/DashboardStats';
@@ -63,7 +63,7 @@ function LessonCard({ lesson }) {
             <img
               src={thumb} alt={lesson.title}
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-              onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+              onError={(e) => { e.currentTarget.style.display = 'none'; /** @type {HTMLElement} */ (e.currentTarget.nextSibling).style.display = 'flex'; }}
             />
           ) : null}
           <div style={{
@@ -143,7 +143,7 @@ function BlogCard({ post }) {
             <img
               src={post.cover_url} alt={post.title}
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', position: 'absolute', top: 0, left: 0 }}
-              onError={(e) => { e.target.style.display = 'none'; }}
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
           )}
           <span style={{ fontSize: '2rem' }}>✍️</span>
@@ -182,7 +182,6 @@ export default function DashboardPage() {
   const [modules, setModules]             = useState([]);
   const [latestLessons, setLatestLessons] = useState([]);
   const [ranking, setRanking]             = useState([]);
-  const [nextLessons, setNextLessons]     = useState([]);   // próximas 3 aulas
   const [blogPosts, setBlogPosts]         = useState([]);
 
   useEffect(() => {
@@ -222,16 +221,16 @@ export default function DashboardPage() {
     load();
   }, [user]);
 
-  // Próximas 3 aulas não assistidas
-  useEffect(() => {
-    if (!modules.length) return;
+  // Próximas 3 aulas não assistidas são derivadas do estado já carregado.
+  const nextLessons = useMemo(() => {
+    if (!modules.length) return [];
     const allLessons = modules
       .slice().sort((a, b) => a.order - b.order)
       .flatMap((m) =>
         (m.lessons || []).slice().sort((a, b) => a.order - b.order)
           .map((l) => ({ ...l, moduleTitle: m.title }))
       );
-    setNextLessons(allLessons.filter((l) => !completedIds.has(l.id)).slice(0, 3));
+    return allLessons.filter((l) => !completedIds.has(l.id)).slice(0, 3);
   }, [modules, completedIds]);
 
   const progress = getTotalProgress(modules);
@@ -392,7 +391,7 @@ export default function DashboardPage() {
   );
 }
 
-function SectionTitle({ label, noBorder }) {
+function SectionTitle({ label, noBorder = false }) {
   if (noBorder) {
     return (
       <span style={{

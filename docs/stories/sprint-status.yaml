@@ -6,7 +6,7 @@
 # Migrado do frontmatter AIOX em 2026-09-01. Atualize com bmad-sprint-planning.
 
 generated: 09-01-2026 10:00
-last_updated: 09-03-2026
+last_updated: 09-04-2026
 project: Mentoria IA
 project_key: NOKEY
 tracking_system: file-system
@@ -99,7 +99,7 @@ development_status:
 
   epic-13: in-progress
   13-1-definir-o-contrato-de-lint-e-typecheck-para-javascript-jsx: done
-  13-2-implementar-os-gates-e-eliminar-o-baseline-bloqueante: review
+  13-2-implementar-os-gates-e-eliminar-o-baseline-bloqueante: done
   13-4-garantir-descoberta-e-ambiente-corretos-dos-testes: backlog
   13-3-bloquear-deploy-quando-os-gates-falharem: backlog
   epic-13-retrospective: optional

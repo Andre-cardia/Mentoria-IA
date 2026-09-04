@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 const ADMIN_NAV = [
   { to: '/admin/alunos',     label: 'Alunos' },
@@ -21,6 +21,7 @@ const ALUNO_NAV = [
   { to: '/modulos',   label: '← Área do Aluno' },
 ];
 
+/** @returns {import('react').CSSProperties} */
 const linkStyle = (isActive, collapsed = false) => ({
   display: 'block', padding: collapsed ? '10px 8px' : '10px 14px', borderRadius: '4px',
   textDecoration: 'none', fontFamily: 'Space Grotesk, sans-serif',

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import Layout from '../components/Layout';
 
+/** @type {import('react').CSSProperties} */
 const inputStyle = {
   width: '100%', background: 'var(--panel-2)',
   border: '1px solid var(--line-strong)', borderRadius: '4px',
@@ -146,7 +147,7 @@ export default function MinhaContaPage() {
 
       if (uploadError) {
         console.error('[MinhaContaPage] storage error:', uploadError);
-        throw new Error(uploadError.message || `Erro no upload (${uploadError.error || uploadError.statusCode || 'desconhecido'})`);
+        throw new Error(uploadError.message || `Erro no upload (${uploadError.statusCode || 'desconhecido'})`);
       }
 
       // 3. Obter URL pública (+ cache-bust para forçar reload)

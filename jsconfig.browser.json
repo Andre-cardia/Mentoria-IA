@@ -1,0 +1,17 @@
+{
+  "extends": "./jsconfig.quality.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client", "react", "react-dom"]
+  },
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/.quality-gate-canary-*/*.js",
+    "src/.quality-gate-canary-*/*.jsx",
+    "*.jsx"
+  ]
+}

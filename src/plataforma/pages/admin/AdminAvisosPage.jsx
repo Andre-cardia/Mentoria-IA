@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../lib/supabase';
 import AdminLayout from '../../components/AdminLayout';
 
@@ -24,12 +24,12 @@ export default function AdminAvisosPage() {
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => { load(); }, []);
-
-  async function load() {
+  const load = useCallback(async () => {
     const { data } = await supabase.from('announcements').select('*').order('published_at', { ascending: false });
     setAnnouncements(data ?? []);
-  }
+  }, []);
+
+  useEffect(() => { void Promise.resolve().then(load); }, [load]);
 
   async function save(e) {
     e.preventDefault();

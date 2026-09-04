@@ -82,6 +82,7 @@ const proof = [
 function useTypeSequence(words, speed = 70) {
   const [text, setText] = useState("");
   const wordsRef = useRef(words);
+  const speedRef = useRef(speed);
 
   useEffect(() => {
     const sequence = wordsRef.current;
@@ -114,7 +115,7 @@ function useTypeSequence(words, speed = 70) {
         }
       }
 
-      timer = setTimeout(tick, deleting ? 28 : speed);
+      timer = setTimeout(tick, deleting ? 28 : speedRef.current);
     };
 
     timer = setTimeout(tick, 500);
@@ -122,7 +123,6 @@ function useTypeSequence(words, speed = 70) {
       mounted = false;
       clearTimeout(timer);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return text;
@@ -164,7 +164,7 @@ export default function LandingPageMentoriaIA() {
   return (
     <div
       className="min-h-screen bg-[var(--bg)] text-[var(--text)] selection:bg-[var(--accent)] selection:text-black"
-      style={{
+      style={/** @type {import('react').CSSProperties & Record<`--${string}`, string | number>} */ ({
         ["--bg"]: "#060606",
         ["--bg-2"]: "#0b0b0b",
         ["--panel"]: "#101010",
@@ -181,7 +181,7 @@ export default function LandingPageMentoriaIA() {
         ["--warning"]: "#f59e0b",
         ["--warning-soft"]: "rgba(245,158,11,.08)",
         fontFamily: '"Space Grotesk", "Arial Narrow", sans-serif',
-      }}
+      })}
     >
       <style>{`
         html { scroll-behavior: smooth; }
@@ -617,7 +617,7 @@ export default function LandingPageMentoriaIA() {
                         src={instructorAndre}
                         alt="André Cardia — Especialista em Ciência de Dados e Inteligência Artificial"
                         className="h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
-                        onError={(e) => { e.target.style.display='none'; e.target.parentElement.style.background='#1a1a1a'; }}
+                        onError={(e) => { e.currentTarget.style.display='none'; e.currentTarget.parentElement.style.background='#1a1a1a'; }}
                       />
                     </div>
                     <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-[var(--accent)]" />
@@ -659,7 +659,7 @@ export default function LandingPageMentoriaIA() {
                         src={instructorCelso}
                         alt="Celso Ferreira — CTO e Especialista em IA e Desenvolvimento de Plataformas"
                         className="h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
-                        onError={(e) => { e.target.style.display='none'; e.target.parentElement.style.background='#1a1a1a'; }}
+                        onError={(e) => { e.currentTarget.style.display='none'; e.currentTarget.parentElement.style.background='#1a1a1a'; }}
                       />
                     </div>
                     <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-[var(--accent)]" />

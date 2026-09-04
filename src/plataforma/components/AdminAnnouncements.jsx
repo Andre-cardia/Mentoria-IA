@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 
 const TYPE_CONFIG = {
@@ -123,12 +123,9 @@ export default function AdminAnnouncements() {
       return new Set();
     }
   });
+  const dismissedIdsRef = useRef(dismissedIds);
 
-  useEffect(() => {
-    loadAnnouncements();
-  }, []);
-
-  async function loadAnnouncements() {
+  const loadAnnouncements = useCallback(async () => {
     const { data, error } = await supabase
       .from('announcements')
       .select('*')
@@ -143,14 +140,19 @@ export default function AdminAnnouncements() {
     }
 
     // Filtrar avisos não dispensados
-    const active = (data || []).filter((a) => !dismissedIds.has(a.id));
+    const active = (data || []).filter((a) => !dismissedIdsRef.current.has(a.id));
 
     setAnnouncements(active);
-  }
+  }, []);
+
+  useEffect(() => {
+    void Promise.resolve().then(loadAnnouncements);
+  }, [loadAnnouncements]);
 
   function handleDismiss(id) {
-    const newDismissed = new Set(dismissedIds);
+    const newDismissed = new Set(dismissedIdsRef.current);
     newDismissed.add(id);
+    dismissedIdsRef.current = newDismissed;
     setDismissedIds(newDismissed);
     localStorage.setItem('dismissed_featured_announcements', JSON.stringify([...newDismissed]));
     setAnnouncements((prev) => prev.filter((a) => a.id !== id));

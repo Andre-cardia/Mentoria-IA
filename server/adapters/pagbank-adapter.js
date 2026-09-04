@@ -32,18 +32,23 @@ export class PagBankAdapter extends IPaymentGateway {
       body: JSON.stringify(payload),
     });
 
+    /** @type {{ id?: string, links?: Array<{ rel?: string, href?: string }> }} */
     const data = await response.json();
 
     if (!response.ok) {
-      const error = new Error("PagBank retornou erro ao criar checkout");
-      error.pagbank = data;
+      const error = Object.assign(
+        new Error("PagBank retornou erro ao criar checkout"),
+        { pagbank: data },
+      );
       throw error;
     }
 
     const payLink = data?.links?.find((l) => l.rel === "PAY")?.href;
     if (!payLink) {
-      const error = new Error("PagBank não retornou link de pagamento (rel=PAY)");
-      error.pagbank = data;
+      const error = Object.assign(
+        new Error("PagBank não retornou link de pagamento (rel=PAY)"),
+        { pagbank: data },
+      );
       throw error;
     }
 

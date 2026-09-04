@@ -22,6 +22,7 @@ import RichTextEditor from '../../components/RichTextEditor';
 
 // ─── Estilos base ────────────────────────────────────────────────────────────
 
+/** @type {import('react').CSSProperties} */
 const inputSx = {
   width: '100%', background: 'var(--panel-2)',
   border: '1px solid var(--line-strong)', borderRadius: '4px',
@@ -114,6 +115,7 @@ function SortableModuleItem({ mod, children }) {
     isDragging,
   } = useSortable({ id: mod.id });
 
+  /** @type {import('react').CSSProperties} */
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,

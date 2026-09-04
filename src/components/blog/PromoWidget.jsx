@@ -1,15 +1,10 @@
 import { useRef, useCallback, useState } from 'react';
 
-export default function PromoWidget({
-  variant = 'text',
-  image,
-  video,
-  title,
-  description,
-  badge,
-  cta,
-  href,
-}) {
+/**
+ * @param {{ variant?: string, image?: string, video?: string, title?: string, description?: string, badge?: string, cta?: string, href?: string }} props
+ */
+export default function PromoWidget(props) {
+  const { variant = 'text', image, video, title, description, badge, cta, href } = props;
   return (
     <div style={styles.container}>
       {variant === 'image' && (
@@ -99,6 +94,7 @@ function TextVariant({ badge, title, description, cta, href }) {
   );
 }
 
+/** @type {Record<string, import('react').CSSProperties>} */
 const styles = {
   container: {
     borderRadius: 8,

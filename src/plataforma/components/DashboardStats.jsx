@@ -5,7 +5,7 @@ function getGreeting() {
   return 'Boa noite';
 }
 
-function StatCard({ label, value, accent }) {
+function StatCard({ label, value, accent = false }) {
   return (
     <div style={{
       flex: 1, minWidth: '90px',

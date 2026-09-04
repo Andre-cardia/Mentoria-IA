@@ -13,34 +13,34 @@ import ForgotPasswordPage from './plataforma/pages/ForgotPasswordPage';
 import ResetPasswordPage from './plataforma/pages/ResetPasswordPage';
 
 // Lazy-load para code splitting
-const DashboardPage    = lazy(() => import('./plataforma/pages/DashboardPage'));
-const CursosPage       = lazy(() => import('./plataforma/pages/CursosPage'));
-const CursoPage        = lazy(() => import('./plataforma/pages/CursoPage'));
-const ForumPage        = lazy(() => import('./plataforma/pages/ForumPage'));
-const MateriaisPage    = lazy(() => import('./plataforma/pages/MateriaisPage'));
-const AvisosPage       = lazy(() => import('./plataforma/pages/AvisosPage'));
-const AdminAlunosPage    = lazy(() => import('./plataforma/pages/admin/AdminAlunosPage'));
-const AdminUsuariosPage  = lazy(() => import('./plataforma/pages/admin/AdminUsuariosPage'));
-const AdminLeadsPage     = lazy(() => import('./plataforma/pages/admin/AdminLeadsPage'));
-const AdminModulosPage   = lazy(() => import('./plataforma/pages/admin/AdminModulosPage'));
-const AdminAulasPage   = lazy(() => import('./plataforma/pages/admin/AdminAulasPage'));
-const AdminMateriaisPage = lazy(() => import('./plataforma/pages/admin/AdminMateriaisPage'));
-const AdminAvisosPage    = lazy(() => import('./plataforma/pages/admin/AdminAvisosPage'));
-const LessonPage         = lazy(() => import('./plataforma/pages/LessonPage'));
-const AdminProgressoPage     = lazy(() => import('./plataforma/pages/admin/AdminProgressoPage'));
-const MinhaContaPage         = lazy(() => import('./plataforma/pages/MinhaContaPage'));
-const AdminBlogPage          = lazy(() => import('./plataforma/pages/admin/AdminBlogPage'));
-const AdminBlogEditorPage    = lazy(() => import('./plataforma/pages/admin/AdminBlogEditorPage'));
-const PlataformaBlogPage     = lazy(() => import('./plataforma/pages/PlataformaBlogPage'));
-const PlataformaBlogPostPage = lazy(() => import('./plataforma/pages/PlataformaBlogPostPage'));
-const CrmReportsPage         = lazy(() => import('./plataforma/pages/admin/CrmReportsPage'));
+export const DashboardPage    = lazy(() => import('./plataforma/pages/DashboardPage'));
+export const CursosPage       = lazy(() => import('./plataforma/pages/CursosPage'));
+export const CursoPage        = lazy(() => import('./plataforma/pages/CursoPage'));
+export const ForumPage        = lazy(() => import('./plataforma/pages/ForumPage'));
+export const MateriaisPage    = lazy(() => import('./plataforma/pages/MateriaisPage'));
+export const AvisosPage       = lazy(() => import('./plataforma/pages/AvisosPage'));
+export const AdminAlunosPage    = lazy(() => import('./plataforma/pages/admin/AdminAlunosPage'));
+export const AdminUsuariosPage  = lazy(() => import('./plataforma/pages/admin/AdminUsuariosPage'));
+export const AdminLeadsPage     = lazy(() => import('./plataforma/pages/admin/AdminLeadsPage'));
+export const AdminModulosPage   = lazy(() => import('./plataforma/pages/admin/AdminModulosPage'));
+export const AdminAulasPage   = lazy(() => import('./plataforma/pages/admin/AdminAulasPage'));
+export const AdminMateriaisPage = lazy(() => import('./plataforma/pages/admin/AdminMateriaisPage'));
+export const AdminAvisosPage    = lazy(() => import('./plataforma/pages/admin/AdminAvisosPage'));
+export const LessonPage         = lazy(() => import('./plataforma/pages/LessonPage'));
+export const AdminProgressoPage     = lazy(() => import('./plataforma/pages/admin/AdminProgressoPage'));
+export const MinhaContaPage         = lazy(() => import('./plataforma/pages/MinhaContaPage'));
+export const AdminBlogPage          = lazy(() => import('./plataforma/pages/admin/AdminBlogPage'));
+export const AdminBlogEditorPage    = lazy(() => import('./plataforma/pages/admin/AdminBlogEditorPage'));
+export const PlataformaBlogPage     = lazy(() => import('./plataforma/pages/PlataformaBlogPage'));
+export const PlataformaBlogPostPage = lazy(() => import('./plataforma/pages/PlataformaBlogPostPage'));
+export const CrmReportsPage         = lazy(() => import('./plataforma/pages/admin/CrmReportsPage'));
 
-function LegacyLessonRedirect() {
+export function LegacyLessonRedirect() {
   const { moduleId, lessonId } = useParams();
   return <Navigate to={`/cursos/${moduleId}/aulas/${lessonId}`} replace />;
 }
 
-const Fallback = () => (
+export const Fallback = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg)' }}>
     <span style={{ color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.875rem' }}>Carregando...</span>
   </div>

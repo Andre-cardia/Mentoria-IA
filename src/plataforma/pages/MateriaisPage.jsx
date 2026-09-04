@@ -22,7 +22,8 @@ export default function MateriaisPage() {
         for (const m of materials) {
           if (!m.module_id) { extra.push(m); continue; }
           const key = m.module_id;
-          if (!grouped[key]) grouped[key] = { title: m.modules.title, order: m.modules.order, items: [] };
+          const module = /** @type {{ id: unknown, title: string, order: number }} */ (/** @type {unknown} */ (m.modules));
+          if (!grouped[key]) grouped[key] = { title: module.title, order: module.order, items: [] };
           grouped[key].items.push(m);
         }
 

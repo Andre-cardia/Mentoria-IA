@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import Layout from '../components/Layout';
 
 export default function ForumPage() {
@@ -78,6 +78,7 @@ export default function ForumPage() {
     return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  /** @type {import('react').CSSProperties} */
   const inputSx = {
     width: '100%', background: 'var(--panel-2)',
     border: '1px solid var(--line-strong)', borderRadius: '4px',

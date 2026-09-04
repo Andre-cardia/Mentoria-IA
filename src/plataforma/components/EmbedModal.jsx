@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { processEmbedUrl } from './extensions/Iframe';
 
+/** @type {import('react').CSSProperties} */
 const inputSx = {
   width: '100%',
   background: 'var(--panel-2)',
@@ -16,7 +17,6 @@ const inputSx = {
 };
 
 const btnSx = (variant = 'primary') => ({
-  border: 'none',
   borderRadius: '4px',
   padding: '10px 18px',
   fontFamily: 'Space Grotesk, sans-serif',

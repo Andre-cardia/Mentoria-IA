@@ -1,10 +1,8 @@
-import React from "react";
-
 export default function TermosPage() {
   return (
     <div
       className="min-h-screen bg-[var(--bg)] text-[var(--text)] selection:bg-[var(--accent)] selection:text-black"
-      style={{
+      style={/** @type {import('react').CSSProperties & Record<`--${string}`, string | number>} */ ({
         ["--bg"]: "#060606",
         ["--bg-2"]: "#0b0b0b",
         ["--panel"]: "#101010",
@@ -21,7 +19,7 @@ export default function TermosPage() {
         ["--warning"]: "#f59e0b",
         ["--warning-soft"]: "rgba(245,158,11,.08)",
         fontFamily: '"Space Grotesk", "Arial Narrow", sans-serif',
-      }}
+      })}
     >
       <style>{`
         html { scroll-behavior: smooth; }

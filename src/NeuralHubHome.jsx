@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import neuralhubBg from './assets/neuralhub-background.png'
 import nhLogoImg from './assets/logo-neuralhub.png'
 import neuralBlob from './assets/motion-hero/neural-blob-transparent.png'
@@ -6,8 +6,6 @@ import instructorAndre from './assets/instructor-andre.jpg'
 import instructorCelso from './assets/instructor-celso.jpg'
 import logoMicrosoft from './assets/microsoft-logo.svg'
 import logoNvidia from './assets/nvidialogo.svg'
-import logoInnovation from './assets/innovationlogo.png'
-import logoAbstrato from './assets/abstrato.png'
 import logoFreedom from './assets/Logo-Freedom-White.png'
 import logoMsStartups from './assets/Microsoftstartups.webp'
 
@@ -231,15 +229,19 @@ function useTypewriter(phrases, typingSpeed = 48, pauseMs = 2200, deletingSpeed 
         const t = setTimeout(() => setCharIdx(c => c + 1), typingSpeed)
         return () => clearTimeout(t)
       } else {
-        setPaused(true)
+        const t = setTimeout(() => setPaused(true), 0)
+        return () => clearTimeout(t)
       }
     } else {
       if (charIdx > 0) {
         const t = setTimeout(() => setCharIdx(c => c - 1), deletingSpeed)
         return () => clearTimeout(t)
       } else {
-        setDeleting(false)
-        setPhraseIdx(i => (i + 1) % phrases.length)
+        const t = setTimeout(() => {
+          setDeleting(false)
+          setPhraseIdx(i => (i + 1) % phrases.length)
+        }, 0)
+        return () => clearTimeout(t)
       }
     }
   }, [charIdx, deleting, paused, phraseIdx, phrases, typingSpeed, pauseMs, deletingSpeed])
@@ -372,8 +374,8 @@ function Nav() {
               ...grotesk, fontSize: '.875rem', color: C.muted, textDecoration: 'none',
               transition: 'color .2s',
             }}
-              onMouseEnter={e => e.target.style.color = C.text}
-              onMouseLeave={e => e.target.style.color = C.muted}
+              onMouseEnter={e => e.currentTarget.style.color = C.text}
+              onMouseLeave={e => e.currentTarget.style.color = C.muted}
             >{l.label}</a>
           ))}
           <a className="nh-nav-cta" href="https://mentoria.neuralhub.ia.br/plataforma/login" target="_blank" rel="noopener noreferrer" style={{
@@ -1127,57 +1129,6 @@ const BridgeCollapse = () => (
     <text x="18" y="474"
       fontFamily="'Space Grotesk', sans-serif" fontSize="14"
       fill="rgba(245,242,234,.8)">infraestrutura que converta intenção em ação real.</text>
-  </svg>
-)
-
-/* ─── SVG icons corporativos — stroke outline, brand #ff6a00 ── */
-const IconExperts = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff6a00" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="8" r="4"/>
-    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-    <path d="M16 3.5c1.5.8 2.5 2.3 2.5 4s-1 3.2-2.5 4"/>
-  </svg>
-)
-const IconContext = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff6a00" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="7" height="7" rx="1"/>
-    <rect x="14" y="3" width="7" height="7" rx="1"/>
-    <rect x="3" y="14" width="7" height="7" rx="1"/>
-    <path d="M17.5 14v2.5H14m3.5 0v2.5H21"/>
-  </svg>
-)
-const IconResult = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff6a00" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="9"/>
-    <circle cx="12" cy="12" r="4.5"/>
-    <circle cx="12" cy="12" r="1.5" fill="#ff6a00" stroke="none"/>
-  </svg>
-)
-const IconMethod = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff6a00" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="5" height="5" rx="1"/>
-    <rect x="16" y="3" width="5" height="5" rx="1"/>
-    <rect x="9.5" y="16" width="5" height="5" rx="1"/>
-    <path d="M5.5 8v4h13V8"/>
-    <path d="M12 12v4"/>
-  </svg>
-)
-const IconScale = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff6a00" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 18h18"/>
-    <path d="M7 18V9"/>
-    <path d="M12 18V5"/>
-    <path d="M17 18v-6"/>
-  </svg>
-)
-const IconPartner = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff6a00" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 9l-3 3 3 3"/>
-    <path d="M18 9l3 3-3 3"/>
-    <path d="M3 12h18"/>
-    <circle cx="12" cy="5" r="2"/>
-    <circle cx="12" cy="19" r="2"/>
-    <path d="M12 7v10"/>
   </svg>
 )
 

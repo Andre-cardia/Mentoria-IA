@@ -72,7 +72,7 @@ const HERO_BACKGROUND =
 
 export default function ProposalPage() {
   const [form, setForm] = useState(initialForm);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState(/** @type {Record<string, string>} */ ({}));
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -130,7 +130,7 @@ export default function ProposalPage() {
       source: "neural-hub-proposta",
     };
 
-    let error = null;
+    let error;
     try {
       const { supabase } = await import("../lib/supabase.js");
       ({ error } = await supabase.from("proposal_requests").insert([payload]));
@@ -152,7 +152,7 @@ export default function ProposalPage() {
   return (
     <div
       className="min-h-screen bg-[var(--bg)] text-[var(--text)] selection:bg-[var(--accent)] selection:text-black"
-      style={{
+      style={/** @type {import('react').CSSProperties & Record<`--${string}`, string | number>} */ ({
         "--bg": "#060606",
         "--bg-2": "#0b0b0b",
         "--panel": "#101010",
@@ -167,7 +167,7 @@ export default function ProposalPage() {
         "--error": "#ef4444",
         "--error-soft": "rgba(239,68,68,.08)",
         fontFamily: '"Space Grotesk", "Arial Narrow", sans-serif',
-      }}
+      })}
     >
       <Helmet>
         <title>Solicitar proposta | Neural Hub</title>

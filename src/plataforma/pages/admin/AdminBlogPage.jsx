@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
 import AdminLayout from '../../components/AdminLayout';
@@ -25,9 +25,7 @@ export default function AdminBlogPage() {
   const [pendingComments, setPendingComments] = useState([]);
   const [activeTab, setActiveTab] = useState('posts'); // 'posts' | 'comments'
 
-  useEffect(() => { loadPosts(); loadPendingComments(); }, []);
-
-  async function loadPosts() {
+  const loadPosts = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase
       .from('posts')
@@ -35,16 +33,21 @@ export default function AdminBlogPage() {
       .order('updated_at', { ascending: false });
     setPosts(data ?? []);
     setLoading(false);
-  }
+  }, []);
 
-  async function loadPendingComments() {
+  const loadPendingComments = useCallback(async () => {
     const { data } = await supabase
       .from('post_comments')
       .select('id, content, user_name, created_at, post_id, posts(title)')
       .eq('status', 'pending')
       .order('created_at', { ascending: true });
     setPendingComments(data ?? []);
-  }
+  }, []);
+
+  useEffect(() => {
+    void Promise.resolve().then(loadPosts);
+    void Promise.resolve().then(loadPendingComments);
+  }, [loadPosts, loadPendingComments]);
 
   async function handleDelete(post) {
     if (!window.confirm(`Excluir o post "${post.title}"? Esta ação é irreversível.`)) return;

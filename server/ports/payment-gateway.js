@@ -22,6 +22,7 @@ export class IPaymentGateway {
    * @returns {Promise<CheckoutResult>}
    */
   async createCheckout(plan) {
+    void plan;
     throw new Error("IPaymentGateway.createCheckout() não implementado");
   }
 }

@@ -19,11 +19,12 @@ const toolbarBtnSx = (active = false) => ({
   transition: 'all 0.2s',
 });
 
-function ToolbarButton({ active, onClick, children, title }) {
+function ToolbarButton({ active = false, disabled = false, onClick, children, title }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       title={title}
       style={toolbarBtnSx(active)}
     >
@@ -63,7 +64,9 @@ export default function RichTextEditor({
 
   function handleInsertEmbed(embedConfig) {
     if (editor) {
-      editor.chain().focus().setIframe(embedConfig).run();
+      /** @type {{ setIframe: (options: typeof embedConfig) => { run: () => boolean } }} */
+      const commands = /** @type {typeof commands} */ (/** @type {unknown} */ (editor.chain().focus()));
+      commands.setIframe(embedConfig).run();
     }
   }
 

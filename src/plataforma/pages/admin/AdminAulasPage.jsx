@@ -24,9 +24,11 @@ export default function AdminAulasPage() {
   }, []);
 
   useEffect(() => {
-    if (!selectedModule) { setLessons([]); return; }
-    supabase.from('lessons').select('*').eq('module_id', selectedModule).order('order')
-      .then(({ data }) => setLessons(data ?? []));
+    Promise.resolve().then(() => {
+      if (!selectedModule) { setLessons([]); return; }
+      return supabase.from('lessons').select('*').eq('module_id', selectedModule).order('order')
+        .then(({ data }) => setLessons(data ?? []));
+    });
   }, [selectedModule]);
 
   async function save(e) {

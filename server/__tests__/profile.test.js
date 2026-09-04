@@ -22,6 +22,7 @@ const mockS3 = {
   getUploadUrl: vi.fn(),
 };
 
+/** @type {Record<string, any>} */
 const mockSupabase = {
   from: vi.fn(() => mockSupabase),
   select: vi.fn(() => mockSupabase),

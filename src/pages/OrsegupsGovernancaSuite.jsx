@@ -271,7 +271,7 @@ const assessmentSteps = [
   ['Relatório de resultados', 'Relatório executivo, alinhamento com stakeholders e próximos passos.'],
 ]
 
-const questions = [
+const questions = /** @type {Array<[string, string[], string, string]>} */ ([
   ['A governança de IA começa adequadamente por:', ['Escolher a ferramenta mais popular.', 'Definir finalidade, contexto, impacto e responsabilidade.', 'Treinar o usuário em prompts avançados.', 'Publicar um comunicado sobre inovação.'], 'B', 'Governança começa pelo problema e pelo contexto, não pelo produto.'],
   ['Uma resposta de IA bem escrita:', ['É necessariamente verdadeira.', 'Dispensa revisão quando o modelo é conhecido.', 'Pode ser convincente e ainda conter erro ou invenção.', 'Tem validade jurídica automática.'], 'C', 'Fluência não é prova de factualidade, autoridade ou adequação.'],
   ['Alucinação é:', ['Falha de conexão com a internet.', 'Saída inventada ou não sustentada apresentada como resposta.', 'Qualquer resposta curta.', 'Uma técnica de anonimização.'], 'B', 'A alucinação exige verificação contra fonte e limites claros.'],
@@ -312,7 +312,7 @@ const questions = [
   ['A melhor resposta a uma saída incorreta que afetou uma pessoa é:', ['Ocultar o erro.', 'Interromper propagação, preservar evidência, revisar impacto e corrigir processo.', 'Culpar o usuário sem investigar.', 'Apagar os logs.'], 'B', 'Incidente e contenção, avaliação, comunicação, correção e aprendizagem.'],
   ['A maturidade de governança aumenta quando a organização:', ['Possui mais checklists, sem evidência.', 'Conecta política, execução, medição, auditoria e melhoria.', 'Proíbe toda experimentação.', 'Depende de uma única pessoa.'], 'B', 'Maturidade e capacidade institucional, não volume de documentos.'],
   ['A evidência mais forte de que um controle está operando é:', ['A existência de uma política assinada, mesmo sem registros.', 'Um registro verificável de execução, responsável, resultado e tratamento de exceções.', 'A declaração do fornecedor de que o processo é seguro.', 'A percepção de que ninguém reclamou.'], 'B', 'Governança precisa demonstrar execução: dono, periodicidade, evidência, resultado e exceção tratada.'],
-].map((item, index) => ({ id: index + 1, question: item[0], options: item[1], answer: item[2], comment: item[3] }))
+]).map((item, index) => ({ id: index + 1, question: item[0], options: item[1], answer: item[2], comment: item[3] }))
 
 function Eyebrow({ children }) {
   return <span className="og-eyebrow">{children}</span>
@@ -416,7 +416,7 @@ function DomainOrbit({ active, onSelect }) {
           type="button"
           className={active === index ? 'active' : ''}
           key={domain.short}
-          style={{ '--i': index }}
+          style={/** @type {import('react').CSSProperties & Record<'--i', number>} */ ({ '--i': index })}
           onClick={() => onSelect(index)}
         >
           <span>{index + 1}</span>
@@ -628,7 +628,7 @@ export function OrsegupsGovernancaPage() {
         <section className="og-section og-split reverse">
           <div className="og-panel">
             <div className="og-pdca">
-              {['Plan', 'Do', 'Check', 'Act'].map((item, index) => <span key={item} style={{ '--i': index }}>{item}</span>)}
+              {['Plan', 'Do', 'Check', 'Act'].map((item, index) => <span key={item} style={/** @type {import('react').CSSProperties & Record<'--i', number>} */ ({ '--i': index })}>{item}</span>)}
             </div>
             <div className="og-mini-grid">
               {nistCards.map(([label, copy]) => (
@@ -806,7 +806,7 @@ export function OrsegupsGovernancaTestePage() {
           </div>
 
           <div className="og-result-panel">
-            <div className="og-score-ring" style={{ '--score': `${resultPercent}%` }}><strong>{resultPercent}%</strong></div>
+            <div className="og-score-ring" style={/** @type {import('react').CSSProperties & Record<'--score', string>} */ ({ '--score': `${resultPercent}%` })}><strong>{resultPercent}%</strong></div>
             <div>
               <span>{submitted ? 'Resultado final' : 'Finalização do teste'}</span>
               <h3>{submitted ? label : 'Recomendação de estudo'}</h3>
@@ -912,7 +912,7 @@ export function OrsegupsGovernancaFrameworkPage() {
 
         <section className="og-section og-split reverse">
           <div className="og-panel">
-            <div className="og-score-ring large" style={{ '--score': `${(average / 5) * 100}%` }}><strong>{average.toFixed(1)}</strong></div>
+            <div className="og-score-ring large" style={/** @type {import('react').CSSProperties & Record<'--score', string>} */ ({ '--score': `${(average / 5) * 100}%` })}><strong>{average.toFixed(1)}</strong></div>
             <h3>{maturityLabel}</h3>
             <p className="og-caption">Média dos cinco domínios. Use 1 para inicial e 5 para domínio robusto, com evidência recorrente.</p>
           </div>

@@ -212,28 +212,30 @@ export default function LessonQA({ lessonId }) {
   }, [lessonId, currentOffset]);
 
   useEffect(() => {
-    setLoading(true);
-    setCurrentOffset(0);
-    supabase
-      .from('lesson_qa')
-      .select(`
-        id, body, is_official, created_at, user_id, user_name,
-        replies:lesson_qa!parent_id(
-          id, body, is_official, created_at, user_id, user_name
-        )
-      `)
-      .eq('lesson_id', lessonId)
-      .is('parent_id', null)
-      .order('created_at', { ascending: true })
-      .range(0, PAGE_SIZE - 1)
-      .then(({ data, error }) => {
-        if (!error && data) {
-          setQuestions(data);
-          setHasMore(data.length === PAGE_SIZE);
-          setCurrentOffset(data.length);
-        }
-        setLoading(false);
-      });
+    void Promise.resolve().then(() => {
+      setLoading(true);
+      setCurrentOffset(0);
+      return supabase
+        .from('lesson_qa')
+        .select(`
+          id, body, is_official, created_at, user_id, user_name,
+          replies:lesson_qa!parent_id(
+            id, body, is_official, created_at, user_id, user_name
+          )
+        `)
+        .eq('lesson_id', lessonId)
+        .is('parent_id', null)
+        .order('created_at', { ascending: true })
+        .range(0, PAGE_SIZE - 1)
+        .then(({ data, error }) => {
+          if (!error && data) {
+            setQuestions(data);
+            setHasMore(data.length === PAGE_SIZE);
+            setCurrentOffset(data.length);
+          }
+          setLoading(false);
+        });
+    });
   }, [lessonId]);
 
   async function loadMore() {

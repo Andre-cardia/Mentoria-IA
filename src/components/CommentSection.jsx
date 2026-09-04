@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 
@@ -9,22 +9,17 @@ function fmtDate(d) {
 
 /**
  * CommentSection — usado em BlogPostPage (public) e PlataformaBlogPostPage.
- * @param {string} postId
- * @param {string} [loginHref='/plataforma/login'] — link para login
+ * @param {{ postId: string, loginHref?: string }} props
  */
-export default function CommentSection({ postId, loginHref = '/plataforma/login' }) {
+export default function CommentSection(props) {
+  const { postId, loginHref = '/plataforma/login' } = props;
   const [comments, setComments] = useState([]);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [content, setContent] = useState('');
   const [sending, setSending] = useState(false);
 
-  useEffect(() => {
-    loadComments();
-    loadUser();
-  }, [postId]);
-
-  async function loadComments() {
+  const loadComments = useCallback(async () => {
     const { data } = await supabase
       .from('post_comments')
       .select('id, user_name, content, created_at')
@@ -32,9 +27,9 @@ export default function CommentSection({ postId, loginHref = '/plataforma/login'
       .eq('status', 'approved')
       .order('created_at', { ascending: true });
     setComments(data ?? []);
-  }
+  }, [postId]);
 
-  async function loadUser() {
+  const loadUser = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     setUser(user);
@@ -44,7 +39,12 @@ export default function CommentSection({ postId, loginHref = '/plataforma/login'
       .eq('user_id', user.id)
       .maybeSingle();
     setProfile(prof);
-  }
+  }, []);
+
+  useEffect(() => {
+    void Promise.resolve().then(loadComments);
+    void Promise.resolve().then(loadUser);
+  }, [loadComments, loadUser]);
 
   async function handleSubmit(e) {
     e.preventDefault();

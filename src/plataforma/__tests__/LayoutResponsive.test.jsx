@@ -10,7 +10,7 @@ vi.mock('../../lib/supabase', () => ({
   },
 }));
 
-vi.mock('../context/AuthContext', () => ({
+vi.mock('../context/useAuth', () => ({
   useAuth: () => ({
     user: { id: 'student-1', email: 'aluno@example.com' },
     isAdmin: false,

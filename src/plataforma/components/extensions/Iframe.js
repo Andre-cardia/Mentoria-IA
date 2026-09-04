@@ -41,14 +41,14 @@ export const Iframe = Node.create({
   },
 
   addCommands() {
-    return {
+    return /** @type {Partial<import('@tiptap/core').RawCommands>} */ (/** @type {unknown} */ ({
       setIframe: (options) => ({ commands }) => {
         return commands.insertContent({
           type: this.name,
           attrs: options,
         });
       },
-    };
+    }));
   },
 });
 

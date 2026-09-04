@@ -12,7 +12,7 @@ const authState = {
   signOut: vi.fn(),
 };
 
-vi.mock('../context/AuthContext', () => ({
+vi.mock('../context/useAuth', () => ({
   useAuth: () => authState,
 }));
 

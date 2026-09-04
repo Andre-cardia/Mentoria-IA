@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 
+/** @type {import('react').CSSProperties} */
 const inputSx = {
   background: 'var(--panel-2)', border: '1px solid var(--line-strong)',
   borderRadius: '4px', padding: '8px 12px', color: 'var(--text)',

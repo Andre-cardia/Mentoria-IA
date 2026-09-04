@@ -12,6 +12,9 @@ const ROLE_HELP = {
   comercial: 'Acesso restrito ao CRM Neural Hub.',
 };
 
+/** @typedef {{ id: string, full_name?: string, email?: string, role?: keyof typeof ROLE_LABEL, created_at?: string }} PlatformUser */
+
+/** @type {import('react').CSSProperties} */
 const inputStyle = {
   width: '100%',
   background: 'var(--bg-2)',
@@ -64,7 +67,7 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-function UserForm({ initial = {}, loading, onCancel, onSave }) {
+function UserForm({ initial = /** @type {{ id?: string, full_name?: string, email?: string, role?: string }} */ ({}), loading, onCancel, onSave }) {
   const isNew = !initial.id;
   const [fullName, setFullName] = useState(initial.full_name ?? '');
   const [email, setEmail] = useState(initial.email ?? '');
@@ -136,7 +139,7 @@ function UserForm({ initial = {}, loading, onCancel, onSave }) {
 }
 
 export default function AdminUsuariosPage() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState(/** @type {PlatformUser[]} */ ([]));
   const [currentUserId, setCurrentUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -161,7 +164,7 @@ export default function AdminUsuariosPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { void Promise.resolve().then(load); }, [load]);
 
   const filteredUsers = useMemo(() => users.filter((user) => {
     const haystack = [user.full_name, user.email, user.role].filter(Boolean).join(' ').toLowerCase();

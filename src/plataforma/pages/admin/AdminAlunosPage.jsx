@@ -9,6 +9,9 @@ const STATUS_COLOR = {
   cancelled: { color: '#f87171', bg: 'rgba(248,113,113,.1)', border: 'rgba(248,113,113,.25)' },
 };
 
+/** @typedef {{ user_id: string, full_name?: string, email?: string, phone?: string, origin?: string, status?: keyof typeof STATUS_COLOR, created_at?: string }} Student */
+/** @typedef {{ email: string, plan?: string, amount?: number, purchased_at?: string }} PendingRegistration */
+
 const inputStyle = {
   width: '100%', background: 'var(--bg-2)', border: '1px solid var(--line-strong)',
   borderRadius: '4px', padding: '10px 14px', color: 'var(--text)',
@@ -108,7 +111,7 @@ function ChangePasswordForm({ onSave, onCancel, loading }) {
 }
 
 // ── Formulário de aluno (criar / editar) ──────────────────────
-function StudentForm({ initial = {}, onSave, onCancel, loading }) {
+function StudentForm({ initial = /** @type {{ full_name?: string, email?: string, phone?: string, origin?: string, status?: string, user_id?: string }} */ ({}), onSave, onCancel, loading }) {
   const [fullName, setFullName] = useState(initial.full_name ?? '');
   const [email, setEmail] = useState(initial.email ?? '');
   const [password, setPassword] = useState('');
@@ -193,8 +196,8 @@ function StudentForm({ initial = {}, onSave, onCancel, loading }) {
 
 // ── Página principal ──────────────────────────────────────────
 export default function AdminAlunosPage() {
-  const [students, setStudents] = useState([]);
-  const [pendingRegistration, setPendingRegistration] = useState([]);
+  const [students, setStudents] = useState(/** @type {Student[]} */ ([]));
+  const [pendingRegistration, setPendingRegistration] = useState(/** @type {PendingRegistration[]} */ ([]));
   const [tab, setTab] = useState('enrolled'); // 'enrolled' | 'pending'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -213,7 +216,7 @@ export default function AdminAlunosPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { void Promise.resolve().then(load); }, [load]);
 
   const filtered = tab === 'enrolled'
     ? students.filter(s =>

@@ -65,7 +65,7 @@ export default function LeadCaptureMentoriaIA() {
     nome: "", sobrenome: "", email: "", whatsapp: "",
     escolaridade: "", ramo: "", empresa: "",
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState(/** @type {Record<string, string>} */ ({}));
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState(null);

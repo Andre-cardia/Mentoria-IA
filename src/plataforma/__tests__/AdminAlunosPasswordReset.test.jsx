@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/useAuth';
 
 vi.mock('../../../lib/supabase', () => ({
   supabase: {
@@ -14,7 +14,10 @@ vi.mock('../../../lib/supabase', () => ({
   },
 }));
 
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn();
+
+/** @type {import('vitest').Mock} */
+const mockFetch = /** @type {typeof mockFetch} */ (/** @type {unknown} */ (globalThis.fetch));
 
 import AdminAlunosPage from '../pages/admin/AdminAlunosPage';
 
@@ -66,7 +69,7 @@ function renderPage() {
 describe('AdminAlunosPage — redefinição de senha', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch.mockResolvedValue({
+    mockFetch.mockResolvedValue({
       ok: true,
       json: async () => ({ students: mockStudents, pendingRegistration: [] }),
     });
@@ -96,7 +99,7 @@ describe('AdminAlunosPage — redefinição de senha', () => {
 
     expect(screen.getByText('As senhas não coincidem')).toBeTruthy();
     // fetch foi chamado apenas para carregar alunos, não para POST da senha
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
   });
 
   it('exibe erro inline quando senha tem menos de 8 caracteres (sem chamar API)', async () => {
@@ -109,11 +112,11 @@ describe('AdminAlunosPage — redefinição de senha', () => {
     await userEvent.click(screen.getByRole('button', { name: /redefinir/i }));
 
     expect(screen.getByText('Senha deve ter pelo menos 8 caracteres')).toBeTruthy();
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
   });
 
   it('chama POST /api/admin/students/:id/password ao submeter senha válida', async () => {
-    global.fetch
+    mockFetch
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ students: mockStudents, pendingRegistration: [] }),
@@ -136,7 +139,7 @@ describe('AdminAlunosPage — redefinição de senha', () => {
     await userEvent.click(screen.getByRole('button', { name: /redefinir/i }));
 
     await waitFor(() => {
-      const postCall = global.fetch.mock.calls.find(
+      const postCall = mockFetch.mock.calls.find(
         ([url, opts]) => url.includes('/password') && opts?.method === 'POST'
       );
       expect(postCall).toBeTruthy();
@@ -145,7 +148,7 @@ describe('AdminAlunosPage — redefinição de senha', () => {
   });
 
   it('fecha modal após sucesso', async () => {
-    global.fetch
+    mockFetch
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ students: mockStudents, pendingRegistration: [] }),
@@ -173,7 +176,7 @@ describe('AdminAlunosPage — redefinição de senha', () => {
   });
 
   it('exibe erro da API no modal sem fechá-lo', async () => {
-    global.fetch
+    mockFetch
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ students: mockStudents, pendingRegistration: [] }),

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -7,12 +7,13 @@ import Placeholder from '@tiptap/extension-placeholder';
 import slugify from 'slugify';
 import { toast } from 'sonner';
 import { supabase } from '../../../lib/supabase';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth';
 import AdminLayout from '../../components/AdminLayout';
 import { Iframe } from '../../components/extensions/Iframe';
 import EmbedModal from '../../components/EmbedModal';
 import '../../components/RichTextEditor.css';
 
+/** @type {import('react').CSSProperties} */
 const inputSx = {
   width: '100%', background: 'var(--panel-2)', border: '1px solid var(--line-strong)',
   borderRadius: '4px', padding: '10px 14px', color: 'var(--text)',
@@ -21,7 +22,7 @@ const inputSx = {
 };
 
 const btnSx = (variant = 'primary') => ({
-  border: 'none', borderRadius: '4px', padding: '10px 18px',
+  borderRadius: '4px', padding: '10px 18px',
   fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, fontSize: '.9rem', cursor: 'pointer',
   background: variant === 'primary' ? 'var(--accent)' : 'var(--panel-2)',
   color: variant === 'primary' ? '#000' : 'var(--text)',
@@ -37,11 +38,12 @@ const toolbarBtnSx = (active = false) => ({
   minWidth: '30px',
 });
 
-function ToolbarButton({ active, onClick, children, title }) {
+function ToolbarButton({ active = false, disabled = false, onClick, children, title }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       title={title}
       style={toolbarBtnSx(active)}
     >
@@ -218,7 +220,7 @@ export default function AdminBlogEditorPage() {
       setLoading(false);
     }
     loadPost();
-  }, [isEdit, id, editor]);
+  }, [isEdit, id, editor, navigate]);
 
   // Auto-slug from title
   function handleTitleChange(e) {
@@ -267,7 +269,9 @@ export default function AdminBlogEditorPage() {
 
   function handleInsertEmbed(embedConfig) {
     if (editor) {
-      editor.chain().focus().setIframe(embedConfig).run();
+      /** @type {{ setIframe: (options: typeof embedConfig) => { run: () => boolean } }} */
+      const commands = /** @type {typeof commands} */ (/** @type {unknown} */ (editor.chain().focus()));
+      commands.setIframe(embedConfig).run();
       setShowEmbedModal(false);
     }
   }
