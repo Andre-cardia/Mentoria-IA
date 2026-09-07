@@ -148,9 +148,19 @@ export default function AuditoriaPage() {
       if (!isSupabaseConfigured) {
         console.warn("[Auditoria] Supabase não configurado no ambiente local (verifique VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no arquivo .env).");
       } else {
-        const { error } = await supabase.from("proposal_requests").insert([payload]);
+        let { error } = await supabase.from("proposal_requests").insert([payload]);
         if (error) {
-          console.error("[Auditoria] Erro ao gravar lead em proposal_requests:", error);
+          console.warn("[Auditoria] Erro na gravação com source default, tentando fallback:", error);
+          const fallbackRes = await supabase.from("proposal_requests").insert([{
+            ...payload,
+            source: "crm-manual",
+            context: `[Origem: /auditoria] ${payload.context}`,
+          }]);
+          error = fallbackRes.error;
+        }
+
+        if (error) {
+          console.error("[Auditoria] Erro definitivo ao gravar lead em proposal_requests:", error);
         }
 
         // Grava também na tabela auxiliar leads caso exista no banco

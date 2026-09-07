@@ -239,11 +239,19 @@ export default function AdminLeadsPage() {
 
   function validateCreateForm() {
     const errors = {};
-    Object.entries(createForm).forEach(([field, value]) => {
-      if (!String(value ?? '').trim()) errors[field] = 'Campo obrigatório';
-    });
-    if (createForm.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(createForm.email.trim())) {
+    if (!createForm.name?.trim()) {
+      errors.name = 'Nome é obrigatório';
+    }
+    if (!createForm.email?.trim()) {
+      errors.email = 'E-mail é obrigatório';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(createForm.email.trim())) {
       errors.email = 'E-mail inválido';
+    }
+    if (!createForm.whatsapp?.trim()) {
+      errors.whatsapp = 'WhatsApp é obrigatório';
+    }
+    if (!createForm.company?.trim()) {
+      errors.company = 'Empresa é obrigatória';
     }
     return errors;
   }
@@ -254,24 +262,38 @@ export default function AdminLeadsPage() {
     if (Object.keys(errors).length > 0) return;
 
     setSavingLead(true);
-    const payload = Object.fromEntries(
-      Object.entries(createForm).map(([field, value]) => [field, String(value).trim()])
-    );
+    const payload = {
+      name: createForm.name.trim(),
+      email: createForm.email.trim().toLowerCase(),
+      whatsapp: createForm.whatsapp.trim(),
+      company: createForm.company.trim(),
+      role: createForm.role?.trim() || 'Não informado',
+      company_size: createForm.company_size?.trim() || '1-10 pessoas',
+      urgency: createForm.urgency?.trim() || 'Estou pesquisando possibilidades',
+      status: createForm.status || 'new',
+      objective: createForm.objective?.trim() || 'Contato comercial',
+      context: createForm.context?.trim() || 'Lead cadastrado manualmente no CRM',
+      source: 'crm-manual',
+    };
 
     const { data, error } = await supabase
       .from('proposal_requests')
-      .insert([{ ...payload, source: 'crm-manual' }])
+      .insert([payload])
       .select('*')
-      .single();
+      .maybeSingle();
 
     setSavingLead(false);
     if (error) {
       console.error('[AdminLeads] create error:', error);
-      toast.error('Não foi possível criar o lead.');
+      toast.error(`Não foi possível criar o lead: ${error.message || 'Erro no banco'}`);
       return;
     }
 
-    setLeads((items) => [data, ...items]);
+    if (data) {
+      setLeads((items) => [data, ...items]);
+    } else {
+      await loadLeads();
+    }
     setCreateForm(EMPTY_LEAD_FORM);
     setCreateErrors({});
     setShowCreateLead(false);
@@ -507,7 +529,9 @@ function CreateLeadModal({ form, errors, saving, onChange, onClose, onSubmit }) 
 
   useEffect(() => {
     panelRef.current?.focus();
+  }, []);
 
+  useEffect(() => {
     function onKeyDown(event) {
       if (event.key === 'Escape') onClose();
     }
