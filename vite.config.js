@@ -19,6 +19,8 @@ const devRewrites = {
         req.url = '/index.html'
       } else if (req.url === '/neuralhub' || req.url.startsWith('/neuralhub/')) {
         req.url = '/neuralhub.html'
+      } else if (req.url === '/auditoria' || req.url.startsWith('/auditoria/')) {
+        req.url = '/auditoria.html'
       }
       next()
     })
@@ -28,11 +30,28 @@ const devRewrites = {
 export default defineConfig({
   plugins: [react(), devRewrites],
   test: {
-    environment: 'happy-dom',
-    globals: true,
-    setupFiles: './src/test/setup.js',
-    include: ['src/**/*.test.{js,jsx,ts,tsx}', 'server/**/*.test.{js,ts}', 'api/__tests__/admin-students.test.js'],
     coverage: { provider: 'v8', reporter: ['text', 'html'] },
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'browser',
+          globals: false,
+          environment: 'happy-dom',
+          setupFiles: './src/test/setup.js',
+          include: ['src/**/*.test.{js,jsx,ts,tsx}'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'node',
+          globals: false,
+          environment: 'node',
+          include: ['server/**/*.test.{js,ts}', 'api/**/*.test.{js,ts}'],
+        },
+      },
+    ],
   },
   server: {
     proxy: {
@@ -53,6 +72,7 @@ export default defineConfig({
         termos:     resolve(__dirname, 'termos.html'),
         plataforma: resolve(__dirname, 'plataforma.html'),
         neuralhub:  resolve(__dirname, 'neuralhub.html'),
+        auditoria:  resolve(__dirname, 'auditoria.html'),
       },
     },
   },

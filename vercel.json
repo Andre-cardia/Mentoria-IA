@@ -10,6 +10,8 @@
     }
   ],
   "rewrites": [
+    { "source": "/auditoria", "destination": "/auditoria.html" },
+    { "source": "/auditoria/(.*)", "destination": "/auditoria.html" },
     {
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "neuralhub.ia.br" }],

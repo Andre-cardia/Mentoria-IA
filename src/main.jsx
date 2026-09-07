@@ -7,6 +7,7 @@ import LandingPageMentoriaIA from '../landing_page_mentoria_ia_react.jsx'
 export const BlogPage     = lazy(() => import('./pages/BlogPage.jsx'))
 export const BlogPostPage = lazy(() => import('./pages/BlogPostPage.jsx'))
 export const ProposalPage = lazy(() => import('./pages/ProposalPage.jsx'))
+export const AuditoriaPage = lazy(() => import('./pages/AuditoriaPage.jsx'))
 export const OrsegupsGovernancaPage = lazy(() => import('./pages/OrsegupsGovernancaSuite.jsx').then((m) => ({ default: m.OrsegupsGovernancaPage })))
 export const OrsegupsGovernancaTestePage = lazy(() => import('./pages/OrsegupsGovernancaSuite.jsx').then((m) => ({ default: m.OrsegupsGovernancaTestePage })))
 export const OrsegupsGovernancaFrameworkPage = lazy(() => import('./pages/OrsegupsGovernancaSuite.jsx').then((m) => ({ default: m.OrsegupsGovernancaFrameworkPage })))
@@ -26,6 +27,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="/blog"       element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/solicitar-proposta" element={<ProposalPage />} />
+            <Route path="/auditoria"  element={<AuditoriaPage />} />
             <Route path="/governanca-ia" element={<OrsegupsGovernancaPage />} />
             <Route path="/governanca-ia/teste" element={<OrsegupsGovernancaTestePage />} />
             <Route path="/governanca-ia/framework" element={<OrsegupsGovernancaFrameworkPage />} />
