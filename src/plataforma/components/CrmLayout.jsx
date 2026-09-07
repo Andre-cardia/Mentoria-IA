@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useAuth } from '../context/useAuth';
+import FollowUpAlertNotifier from './crm/FollowUpAlertNotifier';
 
 const CRM_NAV = [
   { to: '/crm/leads', label: 'Leads' },
+  { to: '/crm/clientes', label: 'Clientes' },
   { to: '/crm/relatorios', label: 'Relatórios' },
 ];
 
@@ -176,6 +178,7 @@ export default function CrmLayout({ children }) {
         {children}
       </main>
 
+      <FollowUpAlertNotifier />
       <Toaster position="bottom-right" richColors duration={3000} />
     </div>
   );
