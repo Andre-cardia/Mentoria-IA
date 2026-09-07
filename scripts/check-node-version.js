@@ -1,6 +1,6 @@
 import { pathToFileURL } from 'node:url'
 
-const SUPPORTED_NODE_RANGE = '>=24.20.0 <25'
+const SUPPORTED_NODE_RANGE = '>=24.19.0 <25'
 const STABLE_VERSION_PATTERN = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
 
 export function validateNodeVersion(version) {
@@ -13,7 +13,7 @@ export function validateNodeVersion(version) {
   const major = Number(match[1])
   const minor = Number(match[2])
 
-  return major === 24 && minor >= 20
+  return major === 24 && minor >= 19
 }
 
 function runPreflight(version = process.versions.node) {

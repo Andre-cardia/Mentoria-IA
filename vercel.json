@@ -1,5 +1,6 @@
 {
-  "buildCommand": "npm run build",
+  "installCommand": "npm install --engine-strict=false",
+  "buildCommand": "npx vite build",
   "outputDirectory": "dist",
   "redirects": [
     {
