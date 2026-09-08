@@ -1,0 +1,12 @@
+---
+description: Auditoria de Segurança para Apps Vibe Code e No-Code (Neural Hub)
+globs: **/*
+---
+
+# Regra de Auditoria de Cibersegurança Vibe Code (Neural Hub)
+
+Ao ser solicitado a auditar a segurança deste projeto:
+1. Verifique todas as tabelas em `supabase/migrations/` ou schemas SQL e garanta que `ENABLE ROW LEVEL SECURITY` está ativo e que nenhuma política use `USING (true)`.
+2. Varra arquivos em `src/` e `app/` garantindo que nenhuma chave com prefixo `sk-`, `sk_live_` ou `service_role` esteja em código cliente.
+3. Garanta que endpoints de API validem preços e permissões no servidor.
+4. Gere um relatório resumindo as vulnerabilidades encontradas no formato do checklist Neural Hub (7 dimensões).

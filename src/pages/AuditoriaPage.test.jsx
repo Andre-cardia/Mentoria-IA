@@ -37,7 +37,7 @@ function renderWithProviders(ui) {
   return render(<HelmetProvider>{ui}</HelmetProvider>);
 }
 
-describe("AuditoriaPage", () => {
+describe("AuditoriaPage & Subpages", () => {
   let storageMock;
 
   beforeEach(() => {
@@ -47,8 +47,8 @@ describe("AuditoriaPage", () => {
     vi.restoreAllMocks();
   });
 
-  it("renderiza a hero section, os incidentes e o formulário de cadastro inicialmente bloqueado", () => {
-    renderWithProviders(<AuditoriaPage />);
+  it("renderiza a Landing Page com hero section, incidentes, visão das 7 dimensões e formulário de cadastro", () => {
+    renderWithProviders(<AuditoriaPage initialRoute="/auditoria" />);
 
     expect(
       screen.getByRole("heading", {
@@ -58,19 +58,34 @@ describe("AuditoriaPage", () => {
 
     expect(screen.getByText(/CVE-2025-48757/i)).toBeInTheDocument();
     expect(screen.getByText(/Desligamento Repentino \(Caso Manus\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/As 7 Dimensões Críticas de Segurança para Aplicações Vibe Code/i)).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("link", { name: /Liberar checklist e Skill de segurança/i }).length
+    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getByLabelText(/Nome Completo/i)).toBeInTheDocument();
+  });
+
+  it("renderiza a página do checklist com formulário de cadastro inicialmente bloqueado", () => {
+    renderWithProviders(<AuditoriaPage initialRoute="/auditoria/checklist" />);
+
+    expect(
+      screen.getByRole("heading", {
+        name: /Checklist Interativo de Cibersegurança/i,
+      })
+    ).toBeInTheDocument();
 
     expect(screen.getByLabelText(/Nome Completo/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/E-mail Corporativo/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/WhatsApp/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Empresa/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Nome da Empresa/i)).toBeInTheDocument();
   });
 
-  it("exibe erros de validação quando o formulário é submetido em branco", async () => {
+  it("exibe erros de validação quando o formulário do checklist é submetido em branco", async () => {
     const user = userEvent.setup();
-    renderWithProviders(<AuditoriaPage />);
+    renderWithProviders(<AuditoriaPage initialRoute="/auditoria/checklist" />);
 
     const submitBtn = screen.getByRole("button", {
-      name: /Liberar Checklist Interativo & PDF/i,
+      name: /Liberar checklist e Skill de segurança/i,
     });
     await user.click(submitBtn);
 
@@ -82,15 +97,15 @@ describe("AuditoriaPage", () => {
 
   it("desbloqueia o checklist interativo após preenchimento válido do formulário", async () => {
     const user = userEvent.setup();
-    renderWithProviders(<AuditoriaPage />);
+    renderWithProviders(<AuditoriaPage initialRoute="/auditoria/checklist" />);
 
     await user.type(screen.getByLabelText(/Nome Completo/i), "João Silva");
     await user.type(screen.getByLabelText(/E-mail Corporativo/i), "joao@empresa.com");
     await user.type(screen.getByLabelText(/WhatsApp/i), "11999998888");
-    await user.type(screen.getByLabelText(/Empresa/i), "TechCorp");
+    await user.type(screen.getByLabelText(/Nome da Empresa/i), "TechCorp");
 
     const submitBtn = screen.getByRole("button", {
-      name: /Liberar Checklist Interativo & PDF/i,
+      name: /Liberar checklist e Skill de segurança/i,
     });
     await user.click(submitBtn);
 
@@ -116,7 +131,7 @@ describe("AuditoriaPage", () => {
     });
     vi.stubGlobal("localStorage", storageMock);
 
-    renderWithProviders(<AuditoriaPage />);
+    renderWithProviders(<AuditoriaPage initialRoute="/auditoria/checklist" />);
 
     expect(screen.getByText(/0 de 30 concluídos/i)).toBeInTheDocument();
 
@@ -129,11 +144,8 @@ describe("AuditoriaPage", () => {
     expect(screen.getByText(/1 de 30 concluídos/i)).toBeInTheDocument();
   });
 
-  it("aciona window.print() ao clicar em Baixar Checklist em PDF", async () => {
+  it("não exibe botão de download de PDF e disponibiliza a aba de instalação da Skill para Codex", async () => {
     const user = userEvent.setup();
-    const printMock = vi.fn();
-    window.print = printMock;
-
     storageMock = createLocalStorageMock({
       nh_auditoria_lead_v1: JSON.stringify({
         name: "Carlos Teste",
@@ -144,13 +156,42 @@ describe("AuditoriaPage", () => {
     });
     vi.stubGlobal("localStorage", storageMock);
 
-    renderWithProviders(<AuditoriaPage />);
+    renderWithProviders(<AuditoriaPage initialRoute="/auditoria/checklist" />);
 
-    const printButtons = screen.getAllByRole("button", {
-      name: /Baixar Checklist em PDF/i,
+    // Verifica que botão de download em PDF não existe
+    expect(screen.queryByRole("button", { name: /baixar.*pdf/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Baixar Checklist em PDF/i)).not.toBeInTheDocument();
+
+    // Verifica que a aba Codex está presente e não existe Windsurf
+    expect(screen.getByRole("button", { name: /Codex/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Windsurf/i })).not.toBeInTheDocument();
+
+    // Clica na aba Codex e verifica o comando de instalação
+    await user.click(screen.getByRole("button", { name: /Codex/i }));
+    expect(screen.getByText(/\.codex\/skills\/vibe-security-audit\/SKILL\.md/i)).toBeInTheDocument();
+  });
+
+  it("permite navegar para o checklist interativo a partir da landing page quando já cadastrado", async () => {
+    const user = userEvent.setup();
+    storageMock = createLocalStorageMock({
+      nh_auditoria_lead_v1: JSON.stringify({
+        name: "Carlos Teste",
+        email: "carlos@teste.com",
+        whatsapp: "11977776666",
+        company: "Alpha Corp",
+      }),
     });
-    await user.click(printButtons[0]);
+    vi.stubGlobal("localStorage", storageMock);
 
-    expect(printMock).toHaveBeenCalledTimes(1);
+    renderWithProviders(<AuditoriaPage initialRoute="/auditoria" />);
+
+    expect(screen.getByText(/Seu diagnóstico corporativo para a empresa/i)).toBeInTheDocument();
+
+    const openChecklistBtn = screen.getByRole("link", {
+      name: /Abrir Meu Checklist de Auditoria/i,
+    });
+    await user.click(openChecklistBtn);
+
+    expect(screen.getByText(/Checklist de Auditoria Vibe Code/i)).toBeInTheDocument();
   });
 });

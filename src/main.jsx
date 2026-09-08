@@ -28,6 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/solicitar-proposta" element={<ProposalPage />} />
             <Route path="/auditoria"  element={<AuditoriaPage />} />
+            <Route path="/auditoria/*" element={<AuditoriaPage />} />
             <Route path="/governanca-ia" element={<OrsegupsGovernancaPage />} />
             <Route path="/governanca-ia/teste" element={<OrsegupsGovernancaTestePage />} />
             <Route path="/governanca-ia/framework" element={<OrsegupsGovernancaFrameworkPage />} />
