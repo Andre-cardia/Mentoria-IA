@@ -304,12 +304,15 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
             <div className="h-px w-24 bg-[var(--accent)] mb-6 animate-pulseLine" />
 
             <h1 className="text-3xl font-extrabold uppercase leading-[1.05] tracking-[-0.03em] text-[var(--text)] sm:text-5xl md:text-6xl drop-shadow-[0_4px_30px_rgba(0,0,0,0.95)]">
+              <span className="block text-lg sm:text-2xl md:text-3xl text-zinc-300 font-bold tracking-normal mb-2">
+                Seu app feito com IA está vulnerável agora?
+              </span>
               Diagnóstico de Segurança para Aplicações <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff6a00] via-[#ff8d3b] to-[#ffaa66] drop-shadow-[0_0_35px_rgba(255,106,0,0.45)]">Vibe Code & No-Code</span>
             </h1>
 
             <div className="mt-6 border-l-2 border-[var(--accent)] pl-5 font-mono text-base md:text-lg leading-relaxed text-zinc-300 max-w-3xl backdrop-blur-md bg-black/55 p-4 rounded-r border border-l-0 border-[var(--line)] shadow-xl">
-              <strong className="text-[var(--accent)]">Antes de colocar em produção — ou hoje, se já estiver no ar.</strong><br />
-              Vibe code é excelente para validar ideias rápido. Mas no dia em que entra dado real de cliente, o app deixa de ser protótipo e passa a ser responsabilidade legal e operacional. E responsabilidade se audita.
+              <strong className="text-[var(--accent)]">Audite 30 pontos críticos em 3 minutos antes que seus dados ou clientes vazem.</strong><br />
+              Criar com Cursor, Lovable, v0 ou Bolt é rápido. Mas uma única tabela sem RLS ou uma chave exposta no front-end transfere toda a responsabilidade jurídica e financeira para você. Audite seu app e instale a Skill autônoma de segurança no seu agente de IA.
             </div>
 
             {/* Real incidents alert cards with glassmorphism & HUD hover indicators */}
@@ -327,6 +330,10 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
                 <p className="mt-2 text-xs text-[var(--muted)] leading-relaxed font-mono">
                   Políticas RLS criadas automaticamente com brechas que deixavam tabelas inteiras abertas na internet pública.
                 </p>
+                <div className="mt-3 pt-2.5 border-t border-zinc-800/80 font-mono text-[11px] text-[var(--accent)] flex items-start gap-1.5">
+                  <span>⚠️</span>
+                  <span>Você tem certeza de que TODAS as suas tabelas têm RLS ativo hoje?</span>
+                </div>
               </div>
 
               <div className="rounded border border-[var(--line)] bg-black/75 backdrop-blur-md p-5 hover:border-[rgba(255,106,0,.5)] hover:shadow-[0_0_30px_rgba(255,106,0,.18)] transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden">
@@ -342,6 +349,10 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
                 <p className="mt-2 text-xs text-[var(--muted)] leading-relaxed font-mono">
                   Exposição acidental de código-fonte e histórico de prompts com segredos, senhas e estratégias corporativas.
                 </p>
+                <div className="mt-3 pt-2.5 border-t border-zinc-800/80 font-mono text-[11px] text-[var(--accent)] flex items-start gap-1.5">
+                  <span>⚠️</span>
+                  <span>Suas chaves OpenAI, Stripe ou Resend estão protegidas no navegador?</span>
+                </div>
               </div>
 
               <div className="rounded border border-[var(--line)] bg-black/75 backdrop-blur-md p-5 hover:border-[rgba(255,106,0,.5)] hover:shadow-[0_0_30px_rgba(255,106,0,.18)] transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden">
@@ -357,6 +368,10 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
                 <p className="mt-2 text-xs text-[var(--muted)] leading-relaxed font-mono">
                   Perda de automações e dados em janela de duas semanas. Sem backup e export Git externo, a empresa fica refém.
                 </p>
+                <div className="mt-3 pt-2.5 border-t border-zinc-800/80 font-mono text-[11px] text-[var(--accent)] flex items-start gap-1.5">
+                  <span>⚠️</span>
+                  <span>Se a ferramenta de IA sair do ar amanhã, você tem backup do schema e dados?</span>
+                </div>
               </div>
             </div>
 
@@ -388,11 +403,11 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
               </span>
               <span className="text-zinc-700">•</span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="text-[var(--accent)] font-bold">✓</span> Skill para Claude Code / Cursor / BMAD
+                <span className="text-[var(--accent)] font-bold">✓</span> Skill para Claude, Cursor, Codex e BMAD
               </span>
               <span className="text-zinc-700">•</span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="text-[var(--accent)] font-bold">✓</span> Relatório PDF para Diretoria
+                <span className="text-[var(--accent)] font-bold">✓</span> 100% Gratuito & Acesso Imediato
               </span>
             </div>
           </div>
@@ -429,13 +444,13 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-6 space-y-6">
               <div className="inline-block font-mono text-[11px] uppercase tracking-[0.26em] text-[var(--accent)] font-semibold">
-                // Desbloqueio do Diagnóstico & CRM
+                // Acesso Imediato · Ferramenta + Skill
               </div>
               <h2 className="text-3xl md:text-4xl font-extrabold uppercase tracking-tight text-[var(--text)]">
-                Cadastre sua empresa para liberar o checklist e a Skill para Agentes de IA.
+                Onde devemos liberar seu Diagnóstico e a Skill de IA?
               </h2>
               <p className="font-mono text-sm leading-relaxed text-[var(--muted)]">
-                Ao preencher, os dados da sua empresa são registrados no CRM com segurança e você tem acesso imediato à ferramenta interativa (30 verificações) e às instruções para instalar a Skill automatizada no harness de sua preferência (Claude Code, Cursor, BMAD ou Codex).
+                Tenha acesso instantâneo à ferramenta interativa com 30 verificações e copie em 1 clique o comando de instalação da Skill oficial para Claude Code, Cursor, Codex ou BMAD auditar seu repositório de forma autônoma.
               </p>
 
               <div className="border border-[var(--line)] bg-[var(--panel)] p-6 rounded space-y-4 font-mono text-xs">
@@ -508,10 +523,10 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
                   <>
                     <div className="border-b border-[var(--line)] pb-4 mb-6">
                       <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--accent)] font-bold">
-                        Formulário de Acesso Corporativo
+                        Acesso Imediato sem Espera
                       </span>
                       <h3 className="text-xl font-bold uppercase tracking-tight text-[var(--text)] mt-1">
-                        Preencha seus dados para liberar o checklist
+                        Desbloqueie o Checklist e a Skill de Segurança
                       </h3>
                     </div>
 
@@ -555,7 +570,7 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <label htmlFor="auditoria-landing-whatsapp" className="block font-mono text-xs uppercase tracking-wider text-[var(--muted)] mb-1.5">
-                            WhatsApp com DDD *
+                            WhatsApp com DDD * <span className="text-zinc-500 font-normal lowercase">(para envio de alertas)</span>
                           </label>
                           <input
                             id="auditoria-landing-whatsapp"
@@ -722,13 +737,13 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
         <div className="mx-auto max-w-[1500px] px-4 py-16 md:px-8 md:py-24">
           <div className="max-w-3xl mb-12">
             <div className="font-mono text-xs uppercase tracking-[0.24em] text-[var(--accent)] font-bold">
-              // Neural Hub Enterprise
+              // Neural Hub Enterprise · Auditoria & Mitigação
             </div>
             <h2 className="text-3xl md:text-5xl font-extrabold uppercase tracking-tight text-[var(--text)] mt-3">
-              Capacite sua equipe e estruture soluções de IA com segurança militar.
+              Encontrou brechas críticas ou precisa de um laudo técnico assinado?
             </h2>
             <p className="font-mono text-sm leading-relaxed text-[var(--muted)] mt-4">
-              A Neural Hub acelera empresas e executivos na adoção de inteligência artificial de ponta a ponta — do treinamento hands-on à consultoria de infraestrutura cognitiva.
+              Se o seu app já fatura, lida com dados confidenciais de clientes ou precisa comprovar conformidade com a LGPD para investidores e clientes corporativos, nossos especialistas blindam sua infraestrutura de ponta a ponta.
             </p>
           </div>
 
