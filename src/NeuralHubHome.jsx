@@ -8,6 +8,8 @@ import logoMicrosoft from './assets/microsoft-logo.svg'
 import logoNvidia from './assets/nvidialogo.svg'
 import logoFreedom from './assets/Logo-Freedom-White.png'
 import logoMsStartups from './assets/Microsoftstartups.webp'
+import abyssDesktop from './assets/sessao-abismo.png'
+import abyssMobile from './assets/sessao-abismo-mobile.png'
 
 const GLOBAL_STYLES = `
   @keyframes nhRise {
@@ -1041,153 +1043,17 @@ function Problem() {
   )
 }
 
-/* ─── SVG: ponte se desintegrando ────────────────────────── */
-const BridgeCollapse = () => (
-  <svg viewBox="0 0 560 480" fill="none" xmlns="http://www.w3.org/2000/svg"
-    style={{ width: '100%', height: 'auto', display: 'block' }}>
-
-    {/* Labels topo */}
-    <text x="50" y="32" fontFamily="'Space Grotesk', sans-serif" fontSize="16" fontWeight="700" fill="#f5f2ea" letterSpacing="2">INTENÇÃO</text>
-    <text x="340" y="32" fontFamily="'Space Grotesk', sans-serif" fontSize="16" fontWeight="700" fill="#ff6a00" letterSpacing="2">VALOR REAL</text>
-
-    {/* Paredes do canyon */}
-    <path d="M0 50 L195 50 L155 400 L0 400 Z" fill="#1a1a1a" stroke="rgba(255,255,255,.08)" strokeWidth="1"/>
-    <path d="M365 50 L560 50 L560 400 L405 400 Z" fill="#1a1a1a" stroke="rgba(255,255,255,.08)" strokeWidth="1"/>
-
-    {/* Linhas de profundidade */}
-    <line x1="110" y1="50" x2="88"  y2="400" stroke="rgba(255,255,255,.05)" strokeWidth="1"/>
-    <line x1="155" y1="50" x2="128" y2="400" stroke="rgba(255,255,255,.05)" strokeWidth="1"/>
-    <line x1="415" y1="50" x2="438" y2="400" stroke="rgba(255,255,255,.05)" strokeWidth="1"/>
-    <line x1="458" y1="50" x2="485" y2="400" stroke="rgba(255,255,255,.05)" strokeWidth="1"/>
-
-    {/* Glow laranja no abismo */}
-    <ellipse cx="280" cy="330" rx="90" ry="44" fill="rgba(255,106,0,.07)"/>
-
-    {/* Fragmento central grande */}
-    <g opacity="0.9">
-      <line x1="210" y1="95" x2="350" y2="215" stroke="#ff6a00" strokeWidth="3"/>
-      <line x1="226" y1="95" x2="366" y2="215" stroke="#ff6a00" strokeWidth="3"/>
-      <line x1="210" y1="95"  x2="226" y2="95"  stroke="#ff6a00" strokeWidth="3"/>
-      <line x1="350" y1="215" x2="366" y2="215" stroke="#ff6a00" strokeWidth="3"/>
-      <line x1="236" y1="118" x2="246" y2="118" stroke="#ff6a00" strokeWidth="2.5"/>
-      <line x1="266" y1="147" x2="278" y2="147" stroke="#ff6a00" strokeWidth="2.5"/>
-      <line x1="298" y1="178" x2="312" y2="178" stroke="#ff6a00" strokeWidth="2.5"/>
-      <line x1="236" y1="118" x2="266" y2="147" stroke="#ff6a00" strokeWidth="2" strokeDasharray="5 3"/>
-      <line x1="246" y1="118" x2="278" y2="147" stroke="#ff6a00" strokeWidth="2" strokeDasharray="5 3"/>
-      <line x1="266" y1="147" x2="298" y2="178" stroke="#ff6a00" strokeWidth="2" strokeDasharray="5 3"/>
-    </g>
-
-    {/* Fragmento esquerda */}
-    <g opacity="0.7" transform="rotate(-18, 200, 162)">
-      <line x1="168" y1="138" x2="244" y2="138" stroke="#c45000" strokeWidth="2.5"/>
-      <line x1="168" y1="158" x2="244" y2="158" stroke="#c45000" strokeWidth="2.5"/>
-      <line x1="180" y1="138" x2="180" y2="158" stroke="#c45000" strokeWidth="2"/>
-      <line x1="202" y1="138" x2="202" y2="158" stroke="#c45000" strokeWidth="2"/>
-      <line x1="224" y1="138" x2="224" y2="158" stroke="#c45000" strokeWidth="2"/>
-      <line x1="180" y1="138" x2="202" y2="158" stroke="#c45000" strokeWidth="1.5" strokeDasharray="3 3"/>
-      <line x1="202" y1="138" x2="224" y2="158" stroke="#c45000" strokeWidth="1.5" strokeDasharray="3 3"/>
-    </g>
-
-    {/* Fragmento direita */}
-    <g opacity="0.7" transform="rotate(22, 352, 182)">
-      <line x1="316" y1="165" x2="398" y2="165" stroke="#c45000" strokeWidth="2.5"/>
-      <line x1="316" y1="185" x2="398" y2="185" stroke="#c45000" strokeWidth="2.5"/>
-      <line x1="330" y1="165" x2="330" y2="185" stroke="#c45000" strokeWidth="2"/>
-      <line x1="355" y1="165" x2="355" y2="185" stroke="#c45000" strokeWidth="2"/>
-      <line x1="380" y1="165" x2="380" y2="185" stroke="#c45000" strokeWidth="2"/>
-      <line x1="330" y1="165" x2="355" y2="185" stroke="#c45000" strokeWidth="1.5" strokeDasharray="3 3"/>
-      <line x1="355" y1="165" x2="380" y2="185" stroke="#c45000" strokeWidth="1.5" strokeDasharray="3 3"/>
-    </g>
-
-    {/* Fragmentos soltos */}
-    <g opacity="0.5">
-      <line x1="248" y1="224" x2="275" y2="252" stroke="#ff6a00" strokeWidth="2" transform="rotate(-30,261,238)"/>
-      <line x1="261" y1="224" x2="288" y2="252" stroke="#ff6a00" strokeWidth="2" transform="rotate(-30,274,238)"/>
-      <line x1="248" y1="224" x2="261" y2="224" stroke="#ff6a00" strokeWidth="2"/>
-    </g>
-    <g opacity="0.4">
-      <line x1="292" y1="258" x2="312" y2="278" stroke="#c45000" strokeWidth="2" transform="rotate(15,302,268)"/>
-      <line x1="302" y1="258" x2="322" y2="278" stroke="#c45000" strokeWidth="2" transform="rotate(15,312,268)"/>
-      <line x1="292" y1="258" x2="302" y2="258" stroke="#c45000" strokeWidth="2"/>
-    </g>
-
-    {/* Partículas */}
-    <circle cx="262" cy="295" r="3.5" fill="#ff6a00" opacity=".6"/>
-    <circle cx="284" cy="322" r="2.5" fill="#ff6a00" opacity=".4"/>
-    <circle cx="306" cy="278" r="2"   fill="#c45000" opacity=".5"/>
-    <circle cx="240" cy="268" r="2.5" fill="#c45000" opacity=".4"/>
-    <circle cx="320" cy="305" r="3"   fill="#ff6a00" opacity=".35"/>
-
-    {/* Key insight box */}
-    <rect x="0" y="418" width="4" height="58" fill="#ff6a00" rx="2"/>
-    <text x="18" y="436"
-      fontFamily="'Space Mono', monospace" fontSize="12" fontWeight="700"
-      fill="rgba(255,255,255,.5)" letterSpacing="1.5">KEY INSIGHT</text>
-    <text x="18" y="456"
-      fontFamily="'Space Grotesk', sans-serif" fontSize="14"
-      fill="rgba(245,242,234,.8)">O problema não é a tecnologia. É a falta de</text>
-    <text x="18" y="474"
-      fontFamily="'Space Grotesk', sans-serif" fontSize="14"
-      fill="rgba(245,242,234,.8)">infraestrutura que converta intenção em ação real.</text>
-  </svg>
-)
-
-/* ─── 8. O PROBLEMA ───────────────────────────────────────── */
-const PROBLEM_ITEMS = [
-  'As empresas modernas enfrentam um paradoxo comum:',
-  'Sabem que precisam utilizar IA para sobreviver.',
-  'Já realizaram testes com ferramentas, pilotos e MVPs.',
-  'Não conseguiram escalar os resultados.',
-  'Continuam dependentes de "pessoas-chave" e processos frágeis.',
-]
-
 function Differentials() {
   return (
-    <section style={{ padding: `${SECTION_PAD} 0`, background: C.bg }}>
-      <div style={{ ...CONTAINER }}>
-        <div className="nh-two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(48px, 6vw, 96px)', alignItems: 'center' }}>
-
-          {/* LEFT — texto */}
-          <div>
-            <span style={{ ...mono, fontSize: '.68rem', letterSpacing: '.18em', color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: '20px' }}>
-              O Problema
-            </span>
-            <h2 className="nh-section-title" style={{
-              ...grotesk, fontWeight: 700,
-              fontSize: 'clamp(1.8rem, 3vw, 2.8rem)',
-              lineHeight: 1.1, letterSpacing: '-.02em', color: C.text,
-              textTransform: 'uppercase',
-              marginBottom: '36px',
-            }}>
-              O ABISMO ENTRE<br />INTENÇÃO E{' '}
-              <span style={{ color: C.accent }}>EXECUÇÃO</span>
-            </h2>
-
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '18px' }}>
-              {PROBLEM_ITEMS.map((item, i) => (
-                <li key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-                  <span style={{
-                    width: '6px', height: '6px', borderRadius: '1px',
-                    background: C.text, flexShrink: 0, marginTop: '8px',
-                  }} />
-                  <span style={{ ...grotesk, fontSize: 'clamp(1rem, 1.3vw, 1.1rem)', color: C.muted, lineHeight: 1.7 }}>
-                    {item}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* RIGHT — ilustração ponte */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <span style={{ ...mono, fontSize: '.68rem', letterSpacing: '.18em', color: C.muted, textTransform: 'uppercase' }}>
-              Metáfora Visual
-            </span>
-            <BridgeCollapse />
-          </div>
-
-        </div>
-      </div>
+    <section aria-label="O abismo entre intenção e execução" style={{ background: C.bg, lineHeight: 0 }}>
+      <picture>
+        <source media="(max-width: 900px)" srcSet={abyssMobile} />
+        <img
+          src={abyssDesktop}
+          alt="O abismo entre intenção e execução: empresas testam IA, mas precisam de infraestrutura para transformar intenção em ação real."
+          style={{ width: '100%', height: 'auto', display: 'block' }}
+        />
+      </picture>
     </section>
   )
 }
