@@ -20,6 +20,7 @@ export default defineConfig([
     '_bmad-output/**',
     '.agents/**',
     '.claude/**',
+    'public/bmadguide/output/**',
   ]),
   {
     files: ['**/*.{js,jsx}'],

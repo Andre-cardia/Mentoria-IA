@@ -123,6 +123,48 @@ const GLOBAL_STYLES = `
     margin-left: 1px;
   }
 
+  .nh-materials { position: relative; }
+  .nh-materials > summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 0;
+    color: #8b867c;
+    font-size: .875rem;
+    list-style: none;
+    cursor: pointer;
+    transition: color .2s;
+  }
+  .nh-materials > summary::-webkit-details-marker { display: none; }
+  .nh-materials > summary:hover, .nh-materials[open] > summary { color: #f5f2ea; }
+  .nh-materials > summary:focus-visible, .nh-materials-submenu a:focus-visible {
+    outline: 2px solid #ff6a00;
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+  .nh-materials[open] > summary svg { transform: rotate(180deg); }
+  .nh-materials-submenu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 170px;
+    padding: 6px;
+    background: #101010;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 6px;
+    box-shadow: 0 12px 32px rgba(0,0,0,.4);
+  }
+  .nh-materials-submenu a {
+    display: block;
+    padding: 10px 14px;
+    border-radius: 4px;
+    color: #f5f2ea;
+    font-size: .875rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nh-materials-submenu a:hover { background: rgba(255,106,0,.14); color: #ff6a00; }
+
   @media (prefers-reduced-motion: reduce) {
     .nh-rise,.nh-rise-2,.nh-rise-3,.nh-glow,.nh-pulse-line,.nh-float,
     .nh-fade-in, .nh-marquee-track, .nh-blob-img {
@@ -130,12 +172,16 @@ const GLOBAL_STYLES = `
     }
   }
 
-  @media (max-width: 900px) {
-    .nh-nav-inner, .nh-hero-grid { box-sizing: border-box !important; }
+  @media (max-width: 1100px) {
+    .nh-nav-inner { box-sizing: border-box !important; }
     .nh-nav-inner { height: auto !important; min-height: 64px !important; padding: 10px 18px !important; gap: 16px !important; }
     .nh-nav-links { gap: 12px !important; }
     .nh-nav-links > a:not(.nh-nav-cta) { display: none !important; }
     .nh-nav-cta { box-sizing: border-box !important; padding: 9px 12px !important; font-size: .72rem !important; overflow-wrap: anywhere !important; }
+  }
+
+  @media (max-width: 900px) {
+    .nh-hero-grid { box-sizing: border-box !important; }
     .nh-hero-grid { display: flex !important; flex-direction: column !important; padding: 84px 20px 0 !important; gap: 12px !important; align-items: stretch !important; }
     .nh-hero-copy { max-width: calc(100vw - 40px) !important; padding: 28px 0 10px !important; }
     .nh-hero-copy h1, .nh-hero-copy p { max-width: calc(100vw - 40px) !important; }
@@ -167,9 +213,12 @@ const GLOBAL_STYLES = `
   }
 
   @media (max-width: 560px) {
+    .nh-nav-inner { gap: 10px !important; }
+    .nh-nav-links { gap: 10px !important; }
+    .nh-materials > summary { font-size: .75rem; }
     .nh-brand-word { display: none !important; }
     .nh-nav-logo { height: 40px !important; }
-    .nh-nav-cta { max-width: 46vw !important; text-align: center !important; line-height: 1.25 !important; white-space: normal !important; }
+    .nh-nav-cta { max-width: 34vw !important; text-align: center !important; line-height: 1.25 !important; white-space: normal !important; }
     .nh-section-title { font-size: clamp(1.75rem, 11vw, 2.45rem) !important; line-height: 1.02 !important; }
     .nh-stats-grid { grid-template-columns: 1fr !important; row-gap: 0 !important; }
     .nh-stat-cell, .nh-stat-cell:nth-child(odd) { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,.08) !important; padding: 22px 0 !important; }
@@ -380,6 +429,28 @@ function Nav() {
               onMouseLeave={e => e.currentTarget.style.color = C.muted}
             >{l.label}</a>
           ))}
+          <details
+            className="nh-materials"
+            onBlur={e => {
+              if (!e.currentTarget.contains(e.relatedTarget)) e.currentTarget.open = false
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Escape') {
+                e.currentTarget.open = false
+                e.currentTarget.querySelector('summary').focus()
+              }
+            }}
+          >
+            <summary>
+              Materiais
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                <path d="m3 4.5 3 3 3-3" />
+              </svg>
+            </summary>
+            <div className="nh-materials-submenu">
+              <a href="/bmadguide/output/bmad-guide-neural-hub/index.html">Bmad guide</a>
+            </div>
+          </details>
           <a className="nh-nav-cta" href="https://mentoria.neuralhub.ia.br/plataforma/login" target="_blank" rel="noopener noreferrer" style={{
             ...grotesk, fontWeight: 600, fontSize: '.875rem',
             background: C.accent, color: '#000',
