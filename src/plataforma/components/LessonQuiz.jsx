@@ -135,7 +135,7 @@ export default function LessonQuiz({ lessonId }) {
             </div>
             {result.pointsEarned > 0 && (
               <div style={{ marginTop: '8px', fontWeight: 700, color: 'var(--accent-text)' }}>
-                🚀 +{result.pointsEarned} pontos na Corrida Estelar
+                +{result.pointsEarned} pontos na Corrida Estelar
               </div>
             )}
             {result.score < 70 && (

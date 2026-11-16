@@ -47,7 +47,7 @@ export default function DashboardStats({ userName, completed, total, diasEstudan
           {getGreeting()}
         </div>
         <h1 style={{ fontSize: '1.8rem', fontWeight: 700, margin: '0 0 18px', lineHeight: 1.1 }}>
-          {userName} 👋
+          {userName}
         </h1>
 
         {/* Barra de progresso */}

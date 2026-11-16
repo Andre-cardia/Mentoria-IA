@@ -4,6 +4,8 @@ import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 import { useLessonProgress } from '../hooks/useLessonProgress';
 import { groupModulesByTrack, TRACK_LEVEL_LABEL } from '../lib/tracks';
+import { GALAXIES } from '../lib/starRace';
+import StellarGlyph from '../components/StellarGlyph';
 
 function ProgressBar({ pct }) {
   return (
@@ -69,7 +71,8 @@ function ModuleCard({ mod, progress, onOpen }) {
   );
 }
 
-function TrackSection({ track, modules, getModuleProgress, onOpenModule }) {
+function TrackSection({ track, index, modules, getModuleProgress, onOpenModule }) {
+  const galaxy = GALAXIES.find((g) => g.level === track.level);
   const totals = modules.reduce(
     (acc, mod) => {
       const mp = getModuleProgress(mod.id, mod.lessons ?? []);
@@ -82,6 +85,14 @@ function TrackSection({ track, modules, getModuleProgress, onOpenModule }) {
   return (
     <section aria-labelledby={`trilha-${track.id}`} style={{ marginBottom: '48px' }}>
       <div style={{ marginBottom: '16px' }}>
+        {galaxy && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: galaxy.color }}>
+            <StellarGlyph name="galaxy" size={18} />
+            <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+              Galáxia {String(index + 1).padStart(2, '0')}
+            </span>
+          </div>
+        )}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '6px' }}>
           <h2 id={`trilha-${track.id}`} style={{ fontSize: '1.4rem', fontWeight: 700, margin: 0 }}>{track.title}</h2>
           {TRACK_LEVEL_LABEL[track.level] && (
@@ -168,9 +179,10 @@ export default function CursosPage() {
 
         {!loading && !error && modules.length > 0 && (
           <>
-            {groups.map(({ track, modules: trackModules }) => (
+            {groups.map(({ track, modules: trackModules }, index) => (
               <TrackSection
                 key={track.id}
+                index={index}
                 track={track}
                 modules={trackModules}
                 getModuleProgress={getModuleProgress}

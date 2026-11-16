@@ -6,6 +6,7 @@ import { useLessonProgress } from '../hooks/useLessonProgress';
 import Layout from '../components/Layout';
 import DashboardStats from '../components/DashboardStats';
 import AdminAnnouncements from '../components/AdminAnnouncements';
+import StellarGlyph from '../components/StellarGlyph';
 
 const WHATSAPP_URL = 'https://chat.whatsapp.com/CzkXZ1ol61YC1zw5dUjy7v?mode=gi_t';
 
@@ -182,12 +183,13 @@ export default function DashboardPage() {
   const [modules, setModules]             = useState([]);
   const [latestLessons, setLatestLessons] = useState([]);
   const [ranking, setRanking]             = useState([]);
+  const [mission, setMission]             = useState(null);
   const [blogPosts, setBlogPosts]         = useState([]);
 
   useEffect(() => {
     if (!user) return;
     async function load() {
-      const [profileRes, progressRes, modulesRes, latestRes, rankingRes, blogRes] = await Promise.all([
+      const [profileRes, progressRes, modulesRes, latestRes, rankingRes, blogRes, missionRes] = await Promise.all([
         supabase.from('profiles').select('full_name').eq('user_id', user.id).single(),
         supabase.from('lesson_progress').select('completed_at').eq('user_id', user.id),
         supabase.from('modules').select('id, title, order, lessons(id, title, lesson_type, order, module_id)').order('order'),
@@ -202,6 +204,7 @@ export default function DashboardPage() {
           .lte('published_at', new Date().toISOString())
           .order('published_at', { ascending: false })
           .limit(3),
+        supabase.rpc('get_my_gamification', { p_period: 'all' }),
       ]);
 
       const name = profileRes.data?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Aluno';
@@ -214,6 +217,7 @@ export default function DashboardPage() {
       if (modulesRes.data) setModules(modulesRes.data);
       if (latestRes.data)  setLatestLessons(latestRes.data);
       if (rankingRes.data) setRanking(rankingRes.data);
+      if (missionRes?.data?.[0]) setMission(missionRes.data[0]);
       if (blogRes.data)    setBlogPosts(blogRes.data);
 
       setLoading(false);
@@ -249,6 +253,38 @@ export default function DashboardPage() {
               total={progress.total}
               diasEstudando={diasEstudando}
             />
+
+            {/* ── Status da missão (Corrida Estelar) ─────────────── */}
+            {mission && (
+              <Link
+                to="/ranking"
+                aria-label="Abrir a Corrida Estelar"
+                style={{
+                  display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '14px 28px',
+                  background: '#05070d', color: '#f2f4f8', borderRadius: '8px',
+                  padding: '16px 20px', margin: '0 0 28px', textDecoration: 'none',
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#ff8a3d' }}>
+                  <StellarGlyph name="orbit" size={22} />
+                  <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', letterSpacing: '.18em', textTransform: 'uppercase', color: '#f2f4f8', fontWeight: 700 }}>
+                    Corrida Estelar
+                  </span>
+                </span>
+                {[
+                  ['Pontos', Number(mission.points) || 0],
+                  ['Posição', mission.rank_pos ? `${String(mission.rank_pos).padStart(2, '0')} / ${String(mission.participants).padStart(2, '0')}` : '—'],
+                ].map(([label, value]) => (
+                  <span key={label} style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
+                    <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', letterSpacing: '.18em', textTransform: 'uppercase', color: '#8b93a7' }}>{label}</span>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{value}</span>
+                  </span>
+                ))}
+                <span style={{ marginLeft: 'auto', fontFamily: 'Space Mono, monospace', fontSize: '.68rem', letterSpacing: '.18em', textTransform: 'uppercase', color: '#8b93a7' }}>
+                  Abrir painel →
+                </span>
+              </Link>
+            )}
 
             {/* ── Continue de onde parou: a ação principal da tela ── */}
             <section style={{ marginBottom: '32px' }}>
@@ -365,7 +401,7 @@ export default function DashboardPage() {
                           color: i < 3 ? 'var(--accent-text)' : 'var(--muted)',
                           fontWeight: i < 3 ? 700 : 400, minWidth: '20px',
                         }}>
-                          {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
+                          {String(i + 1).padStart(2, '0')}
                         </span>
                         <span style={{ flex: 1, fontSize: '.875rem', fontWeight: entry.is_current_user ? 600 : 400, color: 'var(--text)' }}>
                           {entry.user_name}

@@ -45,9 +45,9 @@ describe('RankingPage', () => {
     setup();
     expect(await screen.findByText('130 pts')).toBeInTheDocument();
     expect(screen.getByText(/2º lugar no ranking geral, entre 14 participantes/)).toBeInTheDocument();
-    expect(screen.getByRole('listitem', { name: 'Ritmo de estudo: conquistada' })).toBeInTheDocument();
+    expect(screen.getByRole('listitem', { name: 'Em órbita: conquistada' })).toBeInTheDocument();
     expect(screen.getByRole('listitem', { name: 'Presença: 6 de 7' })).toBeInTheDocument();
-    expect(screen.getByText(/Próxima medalha:/)).toHaveTextContent('Presença');
+    expect(screen.getByText(/Próxima insígnia:/)).toHaveTextContent('Presença');
   });
 
   it('mostra a corrida com a posição do aluno em cada galáxia', async () => {

@@ -148,12 +148,12 @@ function buildApex(texture) {
 }
 
 function buildShip(isCurrentUser, texture) {
-  const accent = isCurrentUser ? 0xff6a00 : 0x6fb6ff;
+  const accent = isCurrentUser ? 0xff6a00 : 0x9aa3b5;
   const hullMaterial = new THREE.MeshStandardMaterial({
-    color: isCurrentUser ? 0xfff0e2 : 0xdfe6f2, metalness: 0.75, roughness: 0.28,
+    color: 0xf2f4f8, metalness: 0.7, roughness: 0.3,
   });
   const trimMaterial = new THREE.MeshStandardMaterial({
-    color: accent, metalness: 0.5, roughness: 0.35, emissive: accent, emissiveIntensity: 0.55,
+    color: accent, metalness: 0.6, roughness: 0.35, emissive: accent, emissiveIntensity: isCurrentUser ? 0.5 : 0.05,
   });
   const glassMaterial = new THREE.MeshStandardMaterial({
     color: 0x0c1830, metalness: 0.9, roughness: 0.08, emissive: 0x1d4f8f, emissiveIntensity: 0.5,
@@ -190,7 +190,7 @@ function buildShip(isCurrentUser, texture) {
   cockpit.scale.set(0.9, 0.7, 1.9);
   cockpit.position.set(0, 0.24, 0.45);
 
-  const engineColor = isCurrentUser ? 0xffb347 : 0x7fd0ff;
+  const engineColor = isCurrentUser ? 0xffb347 : 0xdfe9ff;
   const trail = new THREE.Mesh(
     new THREE.ConeGeometry(0.22, 4.5, 20, 1, true),
     new THREE.MeshBasicMaterial({
@@ -229,20 +229,19 @@ function makeLabel(text, variant) {
     position: 'absolute', left: '0', top: '0', pointerEvents: 'none', whiteSpace: 'nowrap',
     fontFamily: 'Space Grotesk, sans-serif', willChange: 'transform',
   };
+  const tag = {
+    fontFamily: 'Space Mono, monospace', fontSize: '10px', letterSpacing: '.14em',
+    textTransform: 'uppercase', padding: '3px 7px',
+  };
   const variants = {
-    me: {
-      fontSize: '12px', fontWeight: '700', letterSpacing: '.08em', padding: '4px 11px',
-      borderRadius: '999px', background: '#ff6a00', color: '#1a0a00',
-      boxShadow: '0 0 18px rgba(255,106,0,.65)',
-    },
+    me: { ...tag, fontWeight: '700', background: '#ff6a00', color: '#140800' },
     racer: {
-      fontSize: '12px', fontWeight: '500', padding: '3px 10px', borderRadius: '999px',
-      background: 'rgba(8,12,28,.62)', color: '#e8edf8',
-      border: '1px solid rgba(255,255,255,.16)', backdropFilter: 'blur(6px)',
+      ...tag, background: 'rgba(5,7,13,.7)', color: '#d7dcea',
+      border: '1px solid rgba(255,255,255,.22)',
     },
     galaxy: {
-      fontSize: '12px', fontWeight: '600', letterSpacing: '.2em', textTransform: 'uppercase',
-      color: 'rgba(240,244,255,.92)', textShadow: '0 1px 10px rgba(0,0,0,.9)',
+      fontFamily: 'Space Mono, monospace', fontSize: '11px', fontWeight: '700', letterSpacing: '.28em',
+      textTransform: 'uppercase', color: 'rgba(240,244,255,.9)', textShadow: '0 1px 10px rgba(0,0,0,.9)',
     },
   };
   Object.assign(el.style, base, variants[variant]);
@@ -290,7 +289,7 @@ export default function StarRace({ racers = [] }) {
     scene.add(buildStars(texture));
 
     // Névoas distantes, para o fundo não ser preto chapado.
-    [[-260, 60, -320, 0x3b5bdb, 420], [280, -40, -300, 0x9d4edd, 460], [40, 140, -380, 0xff6a00, 300]]
+    [[-260, 60, -320, 0x3b5bdb, 420], [280, -40, -300, 0x4a5a8a, 460]]
       .forEach(([x, y, z, color, scale]) => {
         const haze = glowSprite(texture, color, scale, 0.045);
         haze.position.set(x, y, z);
@@ -505,17 +504,17 @@ export default function StarRace({ racers = [] }) {
   }
 
   const hudButton = {
-    fontFamily: 'Space Grotesk, sans-serif', fontSize: '13px', fontWeight: 600,
-    padding: '8px 14px', cursor: 'pointer', borderRadius: '999px',
-    background: 'rgba(10,14,30,.6)', color: '#eef2fb',
-    border: '1px solid rgba(255,255,255,.2)', backdropFilter: 'blur(8px)',
+    fontFamily: 'Space Mono, monospace', fontSize: '10px', fontWeight: 700,
+    letterSpacing: '.16em', textTransform: 'uppercase',
+    padding: '9px 14px', cursor: 'pointer', borderRadius: 0,
+    background: 'rgba(5,7,13,.65)', color: '#f2f4f8',
+    border: '1px solid rgba(255,255,255,.35)',
   };
 
   return (
     <div style={{
       position: 'relative', height: 'min(66vh, 580px)', minHeight: '340px',
-      background: '#03040a', borderRadius: '16px', overflow: 'hidden',
-      boxShadow: '0 18px 50px rgba(8,12,30,.35)',
+      background: '#03040a', overflow: 'hidden',
     }}>
       <div ref={mountRef} style={{ position: 'absolute', inset: 0, cursor: 'grab', touchAction: 'none' }} />
       {/* Escurece as bordas para dar profundidade */}
@@ -525,7 +524,7 @@ export default function StarRace({ racers = [] }) {
         <button type="button" style={hudButton} onClick={() => apiRef.current?.showShip()}>Minha nave</button>
         <button type="button" style={hudButton} onClick={() => apiRef.current?.showAll()}>Ver a rota inteira</button>
       </div>
-      <div aria-hidden="true" style={{ position: 'absolute', right: '16px', bottom: '20px', fontFamily: 'Space Grotesk, sans-serif', fontSize: '12px', color: 'rgba(220,228,245,.6)' }}>
+      <div aria-hidden="true" style={{ position: 'absolute', right: '16px', bottom: '20px', fontFamily: 'Space Mono, monospace', fontSize: '10px', letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(220,228,245,.5)' }}>
         Arraste para girar · role para aproximar
       </div>
     </div>

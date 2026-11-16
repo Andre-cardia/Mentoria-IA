@@ -2,7 +2,6 @@
 // (supabase/migrations/20261116000035_quiz_points.sql): se mudar aqui, mude lá.
 export const POINT_RULES = [
   { metric: 'lessons',     label: 'Aula concluída',            points: 10 },
-  { metric: 'quizzes',     label: 'Quiz aprovado (70% ou mais)', points: 20, note: 'uma vez por quiz' },
   { metric: 'posts',       label: 'Post no fórum',             points: 5, dailyCap: 5 },
   { metric: 'questions',   label: 'Dúvida em uma aula',        points: 3, dailyCap: 5 },
   { metric: 'answers',     label: 'Resposta (fórum ou aula)',  points: 3, dailyCap: 5 },
@@ -17,25 +16,24 @@ export const RANKING_PERIODS = [
 
 export const EMPTY_STATS = { lessons: 0, access_days: 0, posts: 0, questions: 0, answers: 0, quizzes: 0, points: 0 };
 
+// Insígnias de missão. `glyph` é o símbolo em traço (ver StellarGlyph.jsx)
+// e `tier` o grau dentro da mesma série.
 export const BADGES = [
-  { id: 'aula-1',     icon: '🚀', title: 'Primeiro passo',   metric: 'lessons',     target: 1,   description: 'Conclua sua primeira aula' },
-  { id: 'aula-10',    icon: '📚', title: 'Ritmo de estudo',  metric: 'lessons',     target: 10,  description: 'Conclua 10 aulas' },
-  { id: 'aula-25',    icon: '🔥', title: 'Dedicação',        metric: 'lessons',     target: 25,  description: 'Conclua 25 aulas' },
-  { id: 'aula-50',    icon: '🏅', title: 'Maratonista',      metric: 'lessons',     target: 50,  description: 'Conclua 50 aulas' },
-  { id: 'aula-100',   icon: '🏆', title: 'Centurião',        metric: 'lessons',     target: 100, description: 'Conclua 100 aulas' },
-  { id: 'quiz-1',     icon: '🎯', title: 'Na mosca',         metric: 'quizzes',     target: 1,   description: 'Seja aprovado em um quiz' },
-  { id: 'quiz-5',     icon: '🧠', title: 'Mente afiada',     metric: 'quizzes',     target: 5,   description: 'Seja aprovado em 5 quizzes' },
-  { id: 'quiz-15',    icon: '🎓', title: 'Domínio total',    metric: 'quizzes',     target: 15,  description: 'Seja aprovado em 15 quizzes' },
-  { id: 'acesso-7',   icon: '📅', title: 'Presença',         metric: 'access_days', target: 7,   description: 'Acesse a plataforma em 7 dias' },
-  { id: 'acesso-30',  icon: '🗓️', title: 'Hábito formado',   metric: 'access_days', target: 30,  description: 'Acesse a plataforma em 30 dias' },
-  { id: 'acesso-100', icon: '💎', title: 'Sempre por aqui',  metric: 'access_days', target: 100, description: 'Acesse a plataforma em 100 dias' },
-  { id: 'post-1',     icon: '💬', title: 'Voz ativa',        metric: 'posts',       target: 1,   description: 'Publique seu primeiro post no fórum' },
-  { id: 'post-10',    icon: '📣', title: 'Puxa conversa',    metric: 'posts',       target: 10,  description: 'Publique 10 posts no fórum' },
-  { id: 'duvida-1',   icon: '❓', title: 'Curiosidade',      metric: 'questions',   target: 1,   description: 'Envie sua primeira dúvida em uma aula' },
-  { id: 'duvida-10',  icon: '🔎', title: 'Investigador',     metric: 'questions',   target: 10,  description: 'Envie 10 dúvidas em aulas' },
-  { id: 'resposta-1', icon: '🤝', title: 'Mão amiga',        metric: 'answers',     target: 1,   description: 'Responda um colega pela primeira vez' },
-  { id: 'resposta-10', icon: '🧭', title: 'Referência',      metric: 'answers',     target: 10,  description: 'Responda 10 vezes no fórum ou nas aulas' },
-  { id: 'resposta-50', icon: '🌟', title: 'Mentor da turma', metric: 'answers',     target: 50,  description: 'Responda 50 vezes no fórum ou nas aulas' },
+  { id: 'aula-1',      glyph: 'trajectory', tier: 'I',   title: 'Decolagem',         metric: 'lessons',     target: 1,   description: 'Conclua sua primeira aula' },
+  { id: 'aula-10',     glyph: 'trajectory', tier: 'II',  title: 'Em órbita',         metric: 'lessons',     target: 10,  description: 'Conclua 10 aulas' },
+  { id: 'aula-25',     glyph: 'trajectory', tier: 'III', title: 'Velocidade de cruzeiro', metric: 'lessons', target: 25, description: 'Conclua 25 aulas' },
+  { id: 'aula-50',     glyph: 'trajectory', tier: 'IV',  title: 'Espaço profundo',   metric: 'lessons',     target: 50,  description: 'Conclua 50 aulas' },
+  { id: 'aula-100',    glyph: 'trajectory', tier: 'V',   title: 'Comandante',        metric: 'lessons',     target: 100, description: 'Conclua 100 aulas' },
+  { id: 'acesso-7',    glyph: 'orbit',      tier: 'I',   title: 'Presença',          metric: 'access_days', target: 7,   description: 'Acesse a plataforma em 7 dias' },
+  { id: 'acesso-30',   glyph: 'orbit',      tier: 'II',  title: 'Órbita estável',    metric: 'access_days', target: 30,  description: 'Acesse a plataforma em 30 dias' },
+  { id: 'acesso-100',  glyph: 'orbit',      tier: 'III', title: 'Residente',         metric: 'access_days', target: 100, description: 'Acesse a plataforma em 100 dias' },
+  { id: 'post-1',      glyph: 'signal',     tier: 'I',   title: 'Primeiro sinal',    metric: 'posts',       target: 1,   description: 'Publique seu primeiro post no fórum' },
+  { id: 'post-10',     glyph: 'signal',     tier: 'II',  title: 'Transmissão',       metric: 'posts',       target: 10,  description: 'Publique 10 posts no fórum' },
+  { id: 'duvida-1',    glyph: 'scan',       tier: 'I',   title: 'Sondagem',          metric: 'questions',   target: 1,   description: 'Envie sua primeira dúvida em uma aula' },
+  { id: 'duvida-10',   glyph: 'scan',       tier: 'II',  title: 'Exploração',        metric: 'questions',   target: 10,  description: 'Envie 10 dúvidas em aulas' },
+  { id: 'resposta-1',  glyph: 'link',       tier: 'I',   title: 'Apoio de solo',     metric: 'answers',     target: 1,   description: 'Responda um colega pela primeira vez' },
+  { id: 'resposta-10', glyph: 'link',       tier: 'II',  title: 'Controle de missão', metric: 'answers',    target: 10,  description: 'Responda 10 vezes no fórum ou nas aulas' },
+  { id: 'resposta-50', glyph: 'link',       tier: 'III', title: 'Diretor de voo',    metric: 'answers',     target: 50,  description: 'Responda 50 vezes no fórum ou nas aulas' },
 ];
 
 function toCount(value) {
