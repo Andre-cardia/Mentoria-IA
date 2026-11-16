@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { APEX_NAME, APEX_U, GALAXIES, galaxyCenterU } from '../lib/starRace';
 
-// Cada pixel do cenário ocupa PIXEL × PIXEL pixels de tela: é isso, junto com
-// `image-rendering: pixelated`, que dá o visual de jogo retrô.
-const PIXEL = 3;
-const SPACE = 0x05060d;
-const MAX_LABELS = 6;
+const SPACE = 0x03040a;
+const MAX_LABELS = 8;
+const GALAXY_RADIUS = 26;
 
 const ROUTE_POINTS = [
   [-120, 0, 12], [-60, 0, 0], [0, 10, -32], [60, 0, 0], [112, 8, 14],
@@ -22,87 +24,192 @@ function seeded(seed) {
   };
 }
 
-function buildStars() {
-  const rand = seeded(7);
-  const positions = [];
-  for (let i = 0; i < 1400; i += 1) {
-    const dir = new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).normalize();
-    dir.multiplyScalar(220 + rand() * 160);
-    positions.push(dir.x, dir.y, dir.z);
-  }
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  return new THREE.Points(geometry, new THREE.PointsMaterial({ color: 0xcfd8ff, size: 1.6, sizeAttenuation: false }));
+function gaussian(rand) {
+  return (rand() + rand() + rand() + rand() - 2) / 2;
 }
 
-function buildGalaxy(color, seed) {
-  const rand = seeded(seed);
-  const tint = new THREE.Color(color);
-  const white = new THREE.Color(0xffffff);
-  const positions = [];
-  const colors = [];
-  const radius = 24;
-  for (let i = 0; i < 1600; i += 1) {
-    const r = Math.pow(rand(), 0.7) * radius;
-    const angle = r * 0.22 + (i % 3) * ((Math.PI * 2) / 3) + (rand() - 0.5) * 0.7;
-    const thickness = (1 - r / radius) * 4 + 0.6;
-    positions.push(Math.cos(angle) * r, (rand() - 0.5) * thickness, Math.sin(angle) * r);
-    const c = white.clone().lerp(tint, Math.min(1, r / (radius * 0.25)));
-    colors.push(c.r, c.g, c.b);
-  }
+// Ponto de luz macio, usado em estrelas, brilhos e rastros.
+function glowTexture() {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(0.2, 'rgba(255,255,255,.75)');
+  gradient.addColorStop(0.5, 'rgba(255,255,255,.18)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function glowSprite(texture, color, scale, opacity) {
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: texture, color, transparent: true, opacity,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  }));
+  sprite.scale.setScalar(scale);
+  return sprite;
+}
+
+function pointCloud(positions, colors, texture, size, opacity) {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-  const material = new THREE.PointsMaterial({
-    size: 2, sizeAttenuation: false, vertexColors: true,
-    transparent: true, opacity: 0.85, depthWrite: false,
-  });
+  return new THREE.Points(geometry, new THREE.PointsMaterial({
+    size, map: texture, vertexColors: true, transparent: true, opacity,
+    blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
+  }));
+}
+
+function buildStars(texture) {
+  const rand = seeded(7);
+  const palette = [0xffffff, 0xcfd8ff, 0xffe9c4, 0xa9c4ff].map((hex) => new THREE.Color(hex));
+  const positions = [];
+  const colors = [];
+  for (let i = 0; i < 5200; i += 1) {
+    const dir = new THREE.Vector3(gaussian(rand), gaussian(rand) * 0.7, gaussian(rand)).normalize();
+    dir.multiplyScalar(260 + rand() * 340);
+    positions.push(dir.x, dir.y, dir.z);
+    const c = palette[Math.floor(rand() * palette.length)].clone().multiplyScalar(0.45 + rand() * 0.55);
+    colors.push(c.r, c.g, c.b);
+  }
+  return pointCloud(positions, colors, texture, 2.4, 0.85);
+}
+
+function buildGalaxy(color, seed, texture) {
+  const rand = seeded(seed);
+  const tint = new THREE.Color(color);
+  const core = new THREE.Color(0xfff4e0);
+  const edge = tint.clone().multiplyScalar(0.45);
+  const positions = [];
+  const colors = [];
+  const arms = 2;
+
+  // Braços espirais
+  for (let i = 0; i < 11000; i += 1) {
+    const r = Math.pow(rand(), 0.62) * GALAXY_RADIUS;
+    const k = r / GALAXY_RADIUS;
+    const spread = 0.9 + k * 2.6;
+    const angle = (i % arms) * ((Math.PI * 2) / arms) + r * 0.2;
+    positions.push(
+      Math.cos(angle) * r + gaussian(rand) * spread,
+      gaussian(rand) * (1.3 - k) * 1.6,
+      Math.sin(angle) * r + gaussian(rand) * spread,
+    );
+    const c = k < 0.3
+      ? core.clone().lerp(tint, k / 0.3)
+      : tint.clone().lerp(edge, (k - 0.3) / 0.7);
+    c.multiplyScalar(0.55 + rand() * 0.45);
+    colors.push(c.r, c.g, c.b);
+  }
+  // Bojo central
+  for (let i = 0; i < 2400; i += 1) {
+    const r = Math.pow(rand(), 1.6) * GALAXY_RADIUS * 0.3;
+    const dir = new THREE.Vector3(gaussian(rand), gaussian(rand) * 0.6, gaussian(rand)).normalize();
+    positions.push(dir.x * r, dir.y * r, dir.z * r);
+    const c = core.clone().lerp(tint, Math.min(1, r / (GALAXY_RADIUS * 0.3)) * 0.6);
+    colors.push(c.r, c.g, c.b);
+  }
+
   const group = new THREE.Group();
-  group.add(new THREE.Points(geometry, material));
-  group.add(new THREE.Mesh(new THREE.SphereGeometry(1.8, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffffff })));
+  const disc = new THREE.Group(); // gira sobre o próprio eixo, já inclinado
+  disc.add(pointCloud(positions, colors, texture, 0.7, 0.42));
+  disc.add(glowSprite(texture, 0xfff1d6, 8, 0.7));
+  disc.add(glowSprite(texture, tint, 30, 0.22));
+  group.add(disc);
+  group.userData = { disc };
   return group;
 }
 
-function buildApex() {
+function buildApex(texture) {
   const group = new THREE.Group();
   const star = new THREE.Mesh(
-    new THREE.OctahedronGeometry(4.5, 0),
-    new THREE.MeshBasicMaterial({ color: 0xffd34d }),
+    new THREE.IcosahedronGeometry(2.6, 1),
+    new THREE.MeshBasicMaterial({ color: 0xfff3c4 }),
   );
-  const halo = new THREE.Mesh(
-    new THREE.TorusGeometry(8, 0.35, 4, 24),
-    new THREE.MeshBasicMaterial({ color: 0xff8a3d }),
-  );
-  halo.rotation.x = Math.PI / 2.4;
-  group.add(star, halo);
-  group.userData = { star, halo };
+  const ringMaterial = new THREE.MeshBasicMaterial({ color: 0xffb347, transparent: true, opacity: 0.85 });
+  const ringA = new THREE.Mesh(new THREE.TorusGeometry(6.5, 0.07, 8, 96), ringMaterial);
+  const ringB = new THREE.Mesh(new THREE.TorusGeometry(9, 0.05, 8, 96), ringMaterial);
+  ringA.rotation.x = Math.PI / 2.3;
+  ringB.rotation.set(Math.PI / 1.8, 0.5, 0);
+  group.add(star, ringA, ringB);
+  group.add(glowSprite(texture, 0xfff3c4, 20, 1));
+  group.add(glowSprite(texture, 0xff9a3d, 40, 0.3));
+  group.add(glowSprite(texture, 0xff6a00, 90, 0.07));
+  const light = new THREE.PointLight(0xffc27a, 900, 90);
+  group.add(light);
+  group.userData = { ringA, ringB };
   return group;
 }
 
-function buildShip(isCurrentUser) {
-  const body = new THREE.MeshLambertMaterial({ color: isCurrentUser ? 0xff6a00 : 0xb8c2d6, flatShading: true });
-  const dark = new THREE.MeshLambertMaterial({ color: isCurrentUser ? 0x7a2e00 : 0x55607a, flatShading: true });
+function buildShip(isCurrentUser, texture) {
+  const accent = isCurrentUser ? 0xff6a00 : 0x6fb6ff;
+  const hullMaterial = new THREE.MeshStandardMaterial({
+    color: isCurrentUser ? 0xfff0e2 : 0xdfe6f2, metalness: 0.75, roughness: 0.28,
+  });
+  const trimMaterial = new THREE.MeshStandardMaterial({
+    color: accent, metalness: 0.5, roughness: 0.35, emissive: accent, emissiveIntensity: 0.55,
+  });
+  const glassMaterial = new THREE.MeshStandardMaterial({
+    color: 0x0c1830, metalness: 0.9, roughness: 0.08, emissive: 0x1d4f8f, emissiveIntensity: 0.5,
+  });
   const group = new THREE.Group();
 
-  const hull = new THREE.Mesh(new THREE.ConeGeometry(0.7, 2.6, 4), body);
-  hull.rotation.x = Math.PI / 2; // ponta para +Z, a direção do voo
+  // Fuselagem: perfil torneado, com o nariz apontando para +Z (direção do voo).
+  const profile = [
+    [0, -1.5], [0.34, -1.42], [0.46, -0.9], [0.5, -0.1], [0.42, 0.7], [0.24, 1.35], [0, 1.9],
+  ].map(([x, y]) => new THREE.Vector2(x, y));
+  const hull = new THREE.Mesh(new THREE.LatheGeometry(profile, 28), hullMaterial);
+  hull.rotation.x = Math.PI / 2;
+  hull.scale.set(1, 1, 0.62); // achata a fuselagem na vertical
 
-  const wings = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.18, 0.9), dark);
-  wings.position.z = -0.7;
+  const wingShape = new THREE.Shape();
+  wingShape.moveTo(0, 0.55);
+  wingShape.lineTo(1.9, -0.95);
+  wingShape.lineTo(1.9, -1.3);
+  wingShape.lineTo(0, -0.85);
+  wingShape.closePath();
+  const wingGeometry = new THREE.ExtrudeGeometry(wingShape, { depth: 0.07, bevelEnabled: false });
+  wingGeometry.rotateX(Math.PI / 2); // deita a asa no plano XZ
+  const wingRight = new THREE.Mesh(wingGeometry, trimMaterial);
+  wingRight.position.set(0.3, 0.02, -0.1);
+  const wingLeft = wingRight.clone();
+  wingLeft.scale.x = -1;
+  wingLeft.position.x = -0.3;
 
-  const fin = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.8, 0.8), dark);
-  fin.position.set(0, 0.4, -0.8);
+  const fin = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.75, 0.9), trimMaterial);
+  fin.position.set(0, 0.42, -1);
+  fin.rotation.x = -0.35;
 
-  const flame = new THREE.Mesh(
-    new THREE.ConeGeometry(0.35, 1.4, 4),
-    new THREE.MeshBasicMaterial({ color: isCurrentUser ? 0xffd34d : 0x7dd3fc }),
+  const cockpit = new THREE.Mesh(new THREE.SphereGeometry(0.3, 20, 14), glassMaterial);
+  cockpit.scale.set(0.9, 0.7, 1.9);
+  cockpit.position.set(0, 0.24, 0.45);
+
+  const engineColor = isCurrentUser ? 0xffb347 : 0x7fd0ff;
+  const trail = new THREE.Mesh(
+    new THREE.ConeGeometry(0.22, 4.5, 20, 1, true),
+    new THREE.MeshBasicMaterial({
+      color: engineColor, transparent: true, opacity: 0.32,
+      blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide,
+    }),
   );
-  flame.rotation.x = -Math.PI / 2;
-  flame.position.z = -1.9;
+  trail.rotation.x = -Math.PI / 2; // ponta para trás
+  trail.position.z = -3.7;
+  const engine = glowSprite(texture, engineColor, 1.8, 0.9);
+  engine.position.z = -1.6;
 
-  group.add(hull, wings, fin, flame);
-  group.userData = { flame };
-  if (isCurrentUser) group.scale.setScalar(1.7);
+  group.add(hull, wingRight, wingLeft, fin, cockpit, trail, engine);
+  group.userData = { trail, engine };
+
+  if (isCurrentUser) {
+    group.scale.setScalar(1.6);
+    group.add(glowSprite(texture, 0xff6a00, 5, 0.14));
+  }
   return group;
 }
 
@@ -118,22 +225,27 @@ function hasWebGL() {
 function makeLabel(text, variant) {
   const el = document.createElement('div');
   el.textContent = text;
-  const palette = {
-    me:     ['#ff6a00', '#1a0a00'],
-    racer:  ['rgba(10,14,28,.85)', '#e5eaf5'],
-    galaxy: ['transparent', '#e5eaf5'],
-  }[variant];
-  Object.assign(el.style, {
+  const base = {
     position: 'absolute', left: '0', top: '0', pointerEvents: 'none', whiteSpace: 'nowrap',
-    fontFamily: 'Space Mono, monospace', fontWeight: '700',
-    fontSize: variant === 'galaxy' ? '11px' : '10px',
-    letterSpacing: variant === 'galaxy' ? '.12em' : '0',
-    textTransform: variant === 'galaxy' ? 'uppercase' : 'none',
-    padding: variant === 'galaxy' ? '0' : '2px 6px',
-    background: palette[0], color: palette[1],
-    textShadow: variant === 'galaxy' ? '0 0 6px #000, 0 0 2px #000' : 'none',
-    willChange: 'transform',
-  });
+    fontFamily: 'Space Grotesk, sans-serif', willChange: 'transform',
+  };
+  const variants = {
+    me: {
+      fontSize: '12px', fontWeight: '700', letterSpacing: '.08em', padding: '4px 11px',
+      borderRadius: '999px', background: '#ff6a00', color: '#1a0a00',
+      boxShadow: '0 0 18px rgba(255,106,0,.65)',
+    },
+    racer: {
+      fontSize: '12px', fontWeight: '500', padding: '3px 10px', borderRadius: '999px',
+      background: 'rgba(8,12,28,.62)', color: '#e8edf8',
+      border: '1px solid rgba(255,255,255,.16)', backdropFilter: 'blur(6px)',
+    },
+    galaxy: {
+      fontSize: '12px', fontWeight: '600', letterSpacing: '.2em', textTransform: 'uppercase',
+      color: 'rgba(240,244,255,.92)', textShadow: '0 1px 10px rgba(0,0,0,.9)',
+    },
+  };
+  Object.assign(el.style, base, variants[variant]);
   return el;
 }
 
@@ -155,31 +267,41 @@ export default function StarRace({ racers = [] }) {
 
     let renderer;
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'low-power' });
+      renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     } catch {
       return undefined; // sem WebGL de fato: fica só o fundo, o resto da página segue
     }
-    renderer.setPixelRatio(1);
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    renderer.setPixelRatio(pixelRatio);
     renderer.setClearColor(SPACE);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.9;
     const canvas = renderer.domElement;
-    Object.assign(canvas.style, { width: '100%', height: '100%', display: 'block', imageRendering: 'pixelated' });
+    Object.assign(canvas.style, { width: '100%', height: '100%', display: 'block' });
     canvas.setAttribute('aria-hidden', 'true');
     mount.appendChild(canvas);
 
+    const texture = glowTexture();
     const scene = new THREE.Scene();
-    scene.add(new THREE.AmbientLight(0xffffff, 1.4));
+    scene.add(new THREE.HemisphereLight(0xbfd4ff, 0x1a1030, 1.1));
     const sun = new THREE.DirectionalLight(0xffffff, 2.2);
     sun.position.set(40, 80, 60);
     scene.add(sun);
-    scene.add(buildStars());
+    scene.add(buildStars(texture));
+
+    // Névoas distantes, para o fundo não ser preto chapado.
+    [[-260, 60, -320, 0x3b5bdb, 420], [280, -40, -300, 0x9d4edd, 460], [40, 140, -380, 0xff6a00, 300]]
+      .forEach(([x, y, z, color, scale]) => {
+        const haze = glowSprite(texture, color, scale, 0.045);
+        haze.position.set(x, y, z);
+        scene.add(haze);
+      });
 
     const route = new THREE.CatmullRomCurve3(ROUTE_POINTS);
-    const routeLine = new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints(route.getSpacedPoints(160)),
-      new THREE.LineDashedMaterial({ color: 0x6b7aa8, dashSize: 2.5, gapSize: 2, transparent: true, opacity: 0.7 }),
-    );
-    routeLine.computeLineDistances();
-    scene.add(routeLine);
+    scene.add(new THREE.Mesh(
+      new THREE.TubeGeometry(route, 320, 0.09, 8),
+      new THREE.MeshBasicMaterial({ color: 0x8ea2ff, transparent: true, opacity: 0.32, blending: THREE.AdditiveBlending, depthWrite: false }),
+    ));
 
     const labels = [];
     const addLabel = (text, variant, anchor, lift) => {
@@ -189,23 +311,25 @@ export default function StarRace({ racers = [] }) {
     };
 
     const galaxies = GALAXIES.map((galaxy, index) => {
-      const group = buildGalaxy(galaxy.color, 11 + index * 17);
-      group.position.copy(route.getPointAt(galaxyCenterU(index)));
-      group.rotation.set(0.5 - index * 0.35, 0, 0.25 * (index - 1));
+      const group = buildGalaxy(galaxy.color, 11 + index * 17, texture);
+      // O disco fica abaixo da rota: as naves sobrevoam a galáxia em vez de atravessar o núcleo.
+      group.position.copy(route.getPointAt(galaxyCenterU(index))).add(new THREE.Vector3(0, -9, -4));
+      group.rotation.set(0.62 + index * 0.08, 0, 0.22 * (index - 1));
       scene.add(group);
-      addLabel(galaxy.name, 'galaxy', group.position, 20);
+      addLabel(galaxy.name, 'galaxy', group.position, 26);
       return group;
     });
 
-    const apex = buildApex();
+    const apex = buildApex(texture);
     apex.position.copy(route.getPointAt(APEX_U)).add(new THREE.Vector3(6, 3, 0));
     scene.add(apex);
-    addLabel(APEX_NAME, 'galaxy', apex.position, 11);
+    addLabel(APEX_NAME, 'galaxy', apex.position, 13);
 
     // Naves: cada uma na sua posição da rota, em "faixas" ao redor dela
     // para que alunos com o mesmo progresso não fiquem sobrepostos.
     const up = new THREE.Vector3(0, 1, 0);
     let myShip = null;
+    let myU = 0;
     let labelCount = 0;
     const ships = racers.map((racer, index) => {
       const u = THREE.MathUtils.clamp(racer.position.u, 0.02, 0.98);
@@ -213,43 +337,70 @@ export default function StarRace({ racers = [] }) {
       const tangent = route.getTangentAt(u);
       const side = new THREE.Vector3().crossVectors(tangent, up).normalize();
       const lift = new THREE.Vector3().crossVectors(side, tangent).normalize();
-      const lane = racer.isCurrentUser ? 0 : 3 + (index % 5) * 1.7;
+      const lane = racer.isCurrentUser ? 0 : 3.2 + (index % 5) * 1.8;
       const angle = index * 2.399963;
-      const ship = buildShip(racer.isCurrentUser);
+      const ship = buildShip(racer.isCurrentUser, texture);
       ship.position.copy(center)
         .addScaledVector(side, Math.cos(angle) * lane)
-        .addScaledVector(lift, Math.sin(angle) * lane);
+        .addScaledVector(lift, Math.sin(angle) * lane * 0.6);
       // Quem chegou ao ápice estaciona ao redor da estrela.
-      if (racer.position.certified) ship.position.copy(apex.position).add(new THREE.Vector3(Math.cos(angle) * 11, Math.sin(angle) * 4, Math.sin(angle) * 11));
+      if (racer.position.certified) {
+        ship.position.copy(apex.position).add(new THREE.Vector3(Math.cos(angle) * 12, Math.sin(angle) * 4, Math.sin(angle) * 12));
+      }
       ship.lookAt(ship.position.clone().add(tangent));
-      ship.userData.baseY = ship.position.y;
+      ship.userData.base = ship.position.clone();
       ship.userData.phase = index * 1.3;
       scene.add(ship);
 
       if (racer.isCurrentUser) {
         myShip = ship;
-        addLabel('VOCÊ', 'me', ship.position, 3.4);
+        myU = u;
+        addLabel('VOCÊ', 'me', ship.position, 3.6);
       } else if (labelCount < MAX_LABELS) {
         labelCount += 1;
-        addLabel(racer.name, 'racer', ship.position, 3);
+        addLabel(racer.name, 'racer', ship.position, 2.4);
       }
       return ship;
     });
 
-    const camera = new THREE.PerspectiveCamera(50, 1, 0.5, 900);
+    // Trecho já percorrido pelo aluno, aceso em laranja.
+    if (myShip && myU > 0.03) {
+      const traveled = new THREE.CatmullRomCurve3(
+        Array.from({ length: 80 }, (_, i) => route.getPointAt(0.02 + ((myU - 0.02) * i) / 79)),
+      );
+      scene.add(new THREE.Mesh(
+        new THREE.TubeGeometry(traveled, 200, 0.08, 8),
+        new THREE.MeshBasicMaterial({ color: 0xff7a1a, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false }),
+      ));
+    }
+
+    const camera = new THREE.PerspectiveCamera(48, 1, 0.3, 1600);
     const controls = new OrbitControls(camera, canvas);
     controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
     controls.enablePan = false;
-    controls.minDistance = 12;
-    controls.maxDistance = 260;
+    controls.minDistance = 9;
+    controls.maxDistance = 520;
 
-    const overview = { position: new THREE.Vector3(10, 95, 175), target: new THREE.Vector3(10, 2, -8) };
+    const composer = new EffectComposer(renderer);
+    composer.setPixelRatio(pixelRatio);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.42, 0.55, 0.78);
+    composer.addPass(bloom);
+    composer.addPass(new OutputPass());
+
+    // Em telas estreitas a câmera recua para a rota inteira caber.
+    function overviewView() {
+      const target = new THREE.Vector3(8, -2, -10);
+      const reach = Math.max(1, 1.75 / camera.aspect);
+      return { position: target.clone().add(new THREE.Vector3(0, 105, 185).multiplyScalar(reach)), target };
+    }
     function shipView() {
-      if (!myShip) return overview;
+      if (!myShip) return overviewView();
       const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(myShip.quaternion);
       return {
-        position: myShip.position.clone().addScaledVector(forward, -26).add(new THREE.Vector3(10, 13, 6)),
-        target: myShip.position.clone().addScaledVector(forward, 8),
+        position: myShip.userData.base.clone().addScaledVector(forward, -19).add(new THREE.Vector3(7, 8, 5)),
+        target: myShip.userData.base.clone().addScaledVector(forward, 10),
       };
     }
     let flight = null; // transição de câmera em andamento
@@ -262,22 +413,23 @@ export default function StarRace({ racers = [] }) {
       }
       flight = { ...view };
     }
-    flyTo(shipView(), true);
-    apiRef.current = { showShip: () => flyTo(shipView()), showAll: () => flyTo(overview) };
-    controls.addEventListener('start', () => { flight = null; });
-
     const size = new THREE.Vector2(1, 1);
     function resize() {
       const width = Math.max(mount.clientWidth, 1);
       const height = Math.max(mount.clientHeight, 1);
       size.set(width, height);
-      renderer.setSize(Math.ceil(width / PIXEL), Math.ceil(height / PIXEL), false);
+      renderer.setSize(width, height, false);
+      composer.setSize(width, height);
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
     }
     resize();
     const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(resize) : null;
     observer?.observe(mount);
+
+    flyTo(shipView(), true);
+    apiRef.current = { showShip: () => flyTo(shipView()), showAll: () => flyTo(overviewView()) };
+    controls.addEventListener('start', () => { flight = null; });
 
     const projected = new THREE.Vector3();
     function placeLabels() {
@@ -288,9 +440,9 @@ export default function StarRace({ racers = [] }) {
         const visible = projected.z < 1 && Math.abs(projected.x) < 1.05 && Math.abs(projected.y) < 1.05;
         el.style.display = visible ? 'block' : 'none';
         if (!visible) continue;
-        const x = Math.round((projected.x * 0.5 + 0.5) * size.x);
-        const y = Math.round((-projected.y * 0.5 + 0.5) * size.y);
-        el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%)`;
+        const x = (projected.x * 0.5 + 0.5) * size.x;
+        const y = (-projected.y * 0.5 + 0.5) * size.y;
+        el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -100%)`;
       }
     }
 
@@ -301,21 +453,24 @@ export default function StarRace({ racers = [] }) {
       frame = requestAnimationFrame(tick);
       const t = clock.getElapsedTime();
       if (!calm) {
-        galaxies.forEach((galaxy, index) => { galaxy.rotation.y = t * (0.05 + index * 0.012); });
-        apex.userData.star.rotation.y = t * 0.8;
-        apex.userData.halo.rotation.z = t * 0.4;
+        galaxies.forEach((galaxy, index) => { galaxy.userData.disc.rotation.y = t * (0.035 + index * 0.008); });
+        apex.userData.ringA.rotation.z = t * 0.35;
+        apex.userData.ringB.rotation.z = -t * 0.22;
         ships.forEach((ship) => {
-          ship.position.y = ship.userData.baseY + Math.sin(t * 1.6 + ship.userData.phase) * 0.35;
-          ship.userData.flame.scale.y = 0.7 + Math.abs(Math.sin(t * 9 + ship.userData.phase)) * 0.6;
+          const { base, phase, trail, engine } = ship.userData;
+          ship.position.y = base.y + Math.sin(t * 1.3 + phase) * 0.28;
+          const pulse = 0.85 + Math.sin(t * 11 + phase) * 0.15;
+          trail.scale.set(1, pulse, 1);
+          engine.scale.setScalar(1.8 * pulse);
         });
       }
       if (flight) {
-        camera.position.lerp(flight.position, 0.07);
-        controls.target.lerp(flight.target, 0.07);
+        camera.position.lerp(flight.position, 0.06);
+        controls.target.lerp(flight.target, 0.06);
         if (camera.position.distanceTo(flight.position) < 0.4) flight = null;
       }
       controls.update();
-      renderer.render(scene, camera);
+      composer.render();
       placeLabels();
     }
     tick();
@@ -332,6 +487,9 @@ export default function StarRace({ racers = [] }) {
         if (Array.isArray(material)) material.forEach((m) => m.dispose());
         else material?.dispose?.();
       });
+      texture.dispose();
+      bloom.dispose();
+      composer.dispose();
       renderer.dispose();
       canvas.remove();
       labels.forEach(({ el }) => el.remove());
@@ -340,28 +498,35 @@ export default function StarRace({ racers = [] }) {
 
   if (!supported) {
     return (
-      <div style={{ padding: '32px 24px', textAlign: 'center', color: '#c8d0e4', background: '#05060d', borderRadius: '12px', fontSize: '.95rem' }}>
+      <div style={{ padding: '32px 24px', textAlign: 'center', color: '#c8d0e4', background: '#03040a', borderRadius: '16px', fontSize: '.95rem' }}>
         Seu navegador não conseguiu abrir o cenário 3D. Sua posição e o ranking seguem logo abaixo.
       </div>
     );
   }
 
   const hudButton = {
-    fontFamily: 'Space Mono, monospace', fontSize: '11px', fontWeight: 700, letterSpacing: '.06em',
-    textTransform: 'uppercase', padding: '7px 10px', cursor: 'pointer',
-    background: 'rgba(10,14,28,.85)', color: '#e5eaf5', border: '2px solid #6b7aa8', borderRadius: 0,
+    fontFamily: 'Space Grotesk, sans-serif', fontSize: '13px', fontWeight: 600,
+    padding: '8px 14px', cursor: 'pointer', borderRadius: '999px',
+    background: 'rgba(10,14,30,.6)', color: '#eef2fb',
+    border: '1px solid rgba(255,255,255,.2)', backdropFilter: 'blur(8px)',
   };
 
   return (
-    <div style={{ position: 'relative', height: 'min(62vh, 520px)', minHeight: '320px', background: '#05060d', border: '2px solid #1b2340', borderRadius: '12px', overflow: 'hidden' }}>
+    <div style={{
+      position: 'relative', height: 'min(66vh, 580px)', minHeight: '340px',
+      background: '#03040a', borderRadius: '16px', overflow: 'hidden',
+      boxShadow: '0 18px 50px rgba(8,12,30,.35)',
+    }}>
       <div ref={mountRef} style={{ position: 'absolute', inset: 0, cursor: 'grab', touchAction: 'none' }} />
+      {/* Escurece as bordas para dar profundidade */}
+      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%)' }} />
       <div ref={overlayRef} aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', left: '12px', bottom: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+      <div style={{ position: 'absolute', left: '16px', bottom: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
         <button type="button" style={hudButton} onClick={() => apiRef.current?.showShip()}>Minha nave</button>
         <button type="button" style={hudButton} onClick={() => apiRef.current?.showAll()}>Ver a rota inteira</button>
       </div>
-      <div aria-hidden="true" style={{ position: 'absolute', right: '12px', bottom: '14px', fontFamily: 'Space Mono, monospace', fontSize: '10px', color: '#8f9bbd' }}>
-        arraste para girar · role para aproximar
+      <div aria-hidden="true" style={{ position: 'absolute', right: '16px', bottom: '20px', fontFamily: 'Space Grotesk, sans-serif', fontSize: '12px', color: 'rgba(220,228,245,.6)' }}>
+        Arraste para girar · role para aproximar
       </div>
     </div>
   );

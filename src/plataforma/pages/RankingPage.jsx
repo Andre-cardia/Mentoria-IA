@@ -304,7 +304,9 @@ export default function RankingPage() {
         <div style={{ ...mono, fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
           Comunidade
         </div>
-        <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '8px' }}>Corrida Estelar</h1>
+        <h1 style={{ fontSize: '2rem', fontWeight: 700, lineHeight: 1.2, marginBottom: '8px' }}>
+          Corrida Estelar pela Certificação em AI Engineer
+        </h1>
         <p style={{ color: 'var(--muted)', fontSize: '1rem', marginBottom: '24px' }}>
           Cada trilha é uma galáxia. Conclua as aulas para levar sua nave até a {APEX_NAME}.
         </p>
