@@ -1,10 +1,14 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
+import { APEX_NAME, GALAXIES, buildRacers, levelTotals, positionLabel } from '../lib/starRace';
 import {
   POINT_RULES, RANKING_PERIODS,
   computeBadges, formatPoints, nextBadge, normalizeStats,
 } from '../lib/gamification';
+
+// O cenário 3D (three.js) só é baixado por quem abre esta página.
+const StarRace = lazy(() => import('../components/StarRace'));
 
 const mono = { fontFamily: 'Space Mono, monospace' };
 const card = { background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '12px' };
@@ -21,7 +25,7 @@ function SectionTitle({ id, children }) {
   return <h2 id={id} style={{ fontSize: '1.15rem', fontWeight: 700, margin: '0 0 14px 0' }}>{children}</h2>;
 }
 
-function positionLabel(position) {
+function podiumLabel(position) {
   if (position === 1) return '🥇';
   if (position === 2) return '🥈';
   if (position === 3) return '🥉';
@@ -153,7 +157,7 @@ function RankingList({ period, onPeriodChange, rows, loading }) {
                 }}
               >
                 <span style={{ minWidth: '36px', fontWeight: 700, fontSize: position <= 3 ? '1.2rem' : '.9rem', color: 'var(--muted)' }}>
-                  {positionLabel(position)}
+                  {podiumLabel(position)}
                 </span>
                 <span style={{ flex: 1, minWidth: 0, fontWeight: row.is_current_user ? 700 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {row.user_name}
@@ -169,6 +173,57 @@ function RankingList({ period, onPeriodChange, rows, loading }) {
             );
           })}
         </ol>
+      )}
+    </section>
+  );
+}
+
+function RaceSection({ racers, totals }) {
+  const mine = racers.find((racer) => racer.isCurrentUser);
+  return (
+    <section aria-labelledby="corrida" style={{ marginBottom: '32px' }}>
+      <h2 id="corrida" style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>
+        Mapa da corrida
+      </h2>
+      <Suspense fallback={<div style={{ height: '320px', background: '#05060d', borderRadius: '12px' }} />}>
+        <StarRace racers={racers} />
+      </Suspense>
+
+      {mine && (
+        <>
+          <p style={{ margin: '16px 0 14px 0', fontSize: '1.05rem', fontWeight: 600 }}>
+            🚀 {positionLabel(mine.position)}
+            <span style={{ color: 'var(--muted)', fontWeight: 400 }}> · {mine.position.pct}% da jornada</span>
+          </p>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '12px' }}>
+            {GALAXIES.map((galaxy, index) => {
+              const pct = Math.round(mine.position.fractions[index] * 100);
+              return (
+                <li key={galaxy.level} style={{ ...card, padding: '14px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span aria-hidden="true" style={{ width: '10px', height: '10px', background: galaxy.color, flexShrink: 0 }} />
+                    <span style={{ fontWeight: 700, fontSize: '.95rem' }}>{galaxy.name}</span>
+                  </div>
+                  <div
+                    role="progressbar" aria-label={galaxy.name} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}
+                    style={{ height: '6px', background: 'var(--line)', overflow: 'hidden', marginBottom: '6px' }}
+                  >
+                    <div style={{ height: '100%', width: `${pct}%`, background: galaxy.color }} />
+                  </div>
+                  <span style={{ ...mono, fontSize: '.75rem', color: 'var(--muted)' }}>
+                    {pct}% · {totals[galaxy.level]} aula{totals[galaxy.level] === 1 ? '' : 's'}
+                  </span>
+                </li>
+              );
+            })}
+            <li style={{ ...card, padding: '14px 16px', borderColor: mine.position.certified ? 'rgba(255,106,0,.45)' : 'var(--line)', background: mine.position.certified ? 'var(--accent-soft)' : 'var(--panel)' }}>
+              <div style={{ fontWeight: 700, fontSize: '.95rem', marginBottom: '6px' }}>⭐ {APEX_NAME}</div>
+              <span style={{ fontSize: '.85rem', color: 'var(--muted)' }}>
+                {mine.position.certified ? 'Você chegou ao ápice da jornada!' : 'O ápice: conclua o Projeto de Certificação'}
+              </span>
+            </li>
+          </ul>
+        </>
       )}
     </section>
   );
@@ -199,6 +254,22 @@ export default function RankingPage() {
   const [rows, setRows] = useState([]);
   const [loadingRows, setLoadingRows] = useState(true);
   const [error, setError] = useState('');
+  const [race, setRace] = useState({ rows: [], tracks: [] });
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      supabase.rpc('get_star_race', { p_limit: 30 }),
+      supabase.from('tracks').select('level, modules(lessons(id))'),
+    ]).then(([raceRes, tracksRes]) => {
+      if (!active || raceRes.error || tracksRes.error) return;
+      setRace({ rows: raceRes.data ?? [], tracks: tracksRes.data ?? [] });
+    });
+    return () => { active = false; };
+  }, []);
+
+  const totals = useMemo(() => levelTotals(race.tracks), [race.tracks]);
+  const racers = useMemo(() => buildRacers(race.rows, totals), [race.rows, totals]);
 
   useEffect(() => {
     let active = true;
@@ -233,13 +304,14 @@ export default function RankingPage() {
         <div style={{ ...mono, fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
           Comunidade
         </div>
-        <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '8px' }}>Ranking e medalhas</h1>
-        <p style={{ color: 'var(--muted)', fontSize: '1rem', marginBottom: '28px' }}>
-          Ganhe pontos estudando e ajudando a turma.
+        <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '8px' }}>Corrida Estelar</h1>
+        <p style={{ color: 'var(--muted)', fontSize: '1rem', marginBottom: '24px' }}>
+          Cada trilha é uma galáxia. Conclua as aulas para levar sua nave até a {APEX_NAME}.
         </p>
 
         {error && <p role="alert" style={{ color: 'var(--danger)', marginBottom: '20px' }}>{error}</p>}
 
+        {racers.length > 0 && <RaceSection racers={racers} totals={totals} />}
         {me && <Summary me={me} />}
         {me && <BadgeGrid badges={computeBadges(me)} />}
         <RankingList period={period} onPeriodChange={changePeriod} rows={rows} loading={loadingRows} />

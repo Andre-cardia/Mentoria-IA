@@ -381,7 +381,7 @@ export default function DashboardPage() {
                   </div>
                 )}
                 <Link to="/ranking" style={{ display: 'inline-block', marginTop: '12px', fontSize: '.875rem', fontWeight: 600, color: 'var(--accent-text)' }}>
-                  Ver ranking e medalhas →
+                  Abrir a Corrida Estelar →
                 </Link>
               </section>
 

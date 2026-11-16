@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { to: '/inicio',       label: 'Início',      icon: 'home' },
   { to: '/cursos',       label: 'Trilhas',     icon: 'trilhas' },
   { to: '/formacoes',    label: 'Formações',   icon: 'formacoes', badge: 'Em breve' },
-  { to: '/ranking',      label: 'Ranking',     icon: 'ranking' },
+  { to: '/ranking',      label: 'Corrida Estelar', icon: 'ranking' },
   { to: '/forum',        label: 'Fórum',       icon: 'forum' },
   { to: '/materiais',    label: 'Materiais',   icon: 'materiais' },
   { to: '/avisos',       label: 'Avisos',      icon: 'avisos' },
