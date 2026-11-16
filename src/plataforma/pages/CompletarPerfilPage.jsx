@@ -66,7 +66,7 @@ export default function CompletarPerfilPage() {
         </div>
 
         <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '6px', padding: '32px' }}>
-          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
             Bem-vindo
           </div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '8px', lineHeight: 1.2 }}>
@@ -114,7 +114,7 @@ export default function CompletarPerfilPage() {
             </div>
 
             {error && (
-              <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem' }}>
+              <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem' }}>
                 {error}
               </p>
             )}

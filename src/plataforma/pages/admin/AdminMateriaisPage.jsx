@@ -99,7 +99,7 @@ export default function AdminMateriaisPage() {
       <div style={{ maxWidth: '820px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
           <div>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>Admin</div>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>Admin</div>
             <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>Materiais</h1>
           </div>
           <button onClick={() => setShowForm(!showForm)} style={{ padding: '9px 20px', background: 'var(--accent)', color: '#000', border: 'none', borderRadius: '4px', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: '.875rem', cursor: 'pointer' }}>
@@ -137,7 +137,7 @@ export default function AdminMateriaisPage() {
                 background: 'var(--panel-2)', border: `1px solid ${file ? 'var(--accent)' : 'var(--line-strong)'}`,
                 borderRadius: '4px', padding: '12px 16px', cursor: 'pointer',
               }}>
-                <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--accent)', background: 'var(--accent-soft)', border: '1px solid rgba(255,106,0,.25)', borderRadius: '3px', padding: '3px 10px' }}>
+                <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--accent-text)', background: 'var(--accent-soft)', border: '1px solid rgba(255,106,0,.25)', borderRadius: '3px', padding: '3px 10px' }}>
                   Escolher
                 </span>
                 <span style={{ color: file ? 'var(--text)' : 'var(--muted)', fontSize: '.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -148,7 +148,7 @@ export default function AdminMateriaisPage() {
             </div>
 
             {uploadProgress && (
-              <p style={{ fontFamily: 'Space Mono, monospace', fontSize: '.8rem', color: uploadProgress.startsWith('Erro') ? '#f87171' : 'var(--green)' }}>
+              <p style={{ fontFamily: 'Space Mono, monospace', fontSize: '.8rem', color: uploadProgress.startsWith('Erro') ? 'var(--danger)' : 'var(--green)' }}>
                 {uploadProgress}
               </p>
             )}
@@ -168,7 +168,7 @@ export default function AdminMateriaisPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {materials.map((m) => (
             <div key={m.id} style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '6px', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '36px', height: '36px', flexShrink: 0, background: 'var(--accent-soft)', border: '1px solid rgba(255,106,0,.25)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)' }}>
+              <div style={{ width: '36px', height: '36px', flexShrink: 0, background: 'var(--accent-soft)', border: '1px solid rgba(255,106,0,.25)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent-text)' }}>
                 FILE
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -178,7 +178,7 @@ export default function AdminMateriaisPage() {
                     fontFamily: 'Space Mono, monospace', fontSize: '.6rem', textTransform: 'uppercase',
                     background: m.module_id ? 'var(--accent-soft)' : 'var(--panel-2)',
                     border: `1px solid ${m.module_id ? 'rgba(255,106,0,.3)' : 'var(--line)'}`,
-                    color: m.module_id ? 'var(--accent)' : 'var(--muted)',
+                    color: m.module_id ? 'var(--accent-text)' : 'var(--muted)',
                     borderRadius: '3px', padding: '2px 7px',
                   }}>
                     {m.module_id ? (m.modules?.title ?? 'Curso') : 'Conteúdo Extra'}
@@ -187,7 +187,7 @@ export default function AdminMateriaisPage() {
                 {m.description && <div style={{ fontSize: '.85rem', color: 'var(--muted)' }}>{m.description}</div>}
               </div>
               <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)', flexShrink: 0 }}>{formatSize(m.file_size)}</span>
-              <button onClick={() => remove(m.id)} style={{ padding: '6px 12px', background: 'transparent', border: '1px solid rgba(248,113,113,.3)', borderRadius: '4px', color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.7rem', cursor: 'pointer', flexShrink: 0 }}>
+              <button onClick={() => remove(m.id)} style={{ padding: '6px 12px', background: 'transparent', border: '1px solid rgba(248,113,113,.3)', borderRadius: '4px', color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.7rem', cursor: 'pointer', flexShrink: 0 }}>
                 Excluir
               </button>
             </div>

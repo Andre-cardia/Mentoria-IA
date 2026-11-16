@@ -122,7 +122,7 @@ export default function PlataformaBlogPage() {
                     )}
                     {post.post_tags?.map((pt, i) => pt.tags && (
                       <span key={i} style={{
-                        fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--accent)',
+                        fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--accent-text)',
                         background: 'var(--accent-soft)', borderRadius: '3px', padding: '2px 6px',
                       }}>
                         {pt.tags.name}

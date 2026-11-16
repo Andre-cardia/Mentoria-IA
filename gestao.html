@@ -8,6 +8,48 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
     <style>
       :root {
+        /* Tema claro: cinza médio na estrutura, laranja só em ação e progresso */
+        --bg:          #E9EBEE;
+        --bg-2:        #F4F5F7;
+        --panel:       #FFFFFF;
+        --panel-2:     #F4F5F7;
+        --line:        rgba(31,35,41,.12);
+        --line-strong: rgba(31,35,41,.24);
+        --text:        #1F2329;
+        --muted:       #5B616B;
+        --hover:       rgba(31,35,41,.05);
+        --accent:        #FF6A00;   /* preenchimentos: botões, barras, item ativo */
+        --accent-text:   #B93E06;   /* laranja legível como texto sobre fundo claro */
+        --accent-soft:   rgba(255,106,0,.12);
+        --green:         #3F7D0B;
+        --success:       #15803D;
+        --danger:        #B91C1C;
+        --error:         #B91C1C;
+        --error-soft:    rgba(185,28,28,.08);
+        --warning:       #B45309;
+        --warning-soft:  rgba(180,83,9,.10);
+        --info:          #0369A1;
+        --purple:        #7E22CE;
+        --sidebar-bg:    #565C66;
+      }
+      /* Menu lateral em cinza médio: os mesmos tokens, redefinidos para fundo escuro */
+      .app-sidebar {
+        background: var(--sidebar-bg) !important;
+        color: #F4F5F7;
+        --text:        #F4F5F7;
+        --muted:       #D3D7DD;
+        --line:        rgba(255,255,255,.16);
+        --line-strong: rgba(255,255,255,.32);
+        --hover:       rgba(255,255,255,.10);
+        --panel:       rgba(255,255,255,.08);
+        --panel-2:     rgba(255,255,255,.06);
+        --bg-2:        rgba(255,255,255,.08);
+        --accent-text: #FFC59B;
+        --accent-soft: rgba(255,106,0,.30);
+      }
+      /* Tema escuro: alternativa escolhida pelo usuário (data-theme="dark" em <html>) */
+      :root[data-theme="dark"] {
+        color-scheme: dark;
         --bg:          #060606;
         --bg-2:        #0b0b0b;
         --panel:       #101010;
@@ -15,14 +57,26 @@
         --line:        rgba(255,255,255,.08);
         --line-strong: rgba(255,255,255,.16);
         --text:        #f5f2ea;
-        --muted:       #8b867c;
-        --accent:        #ff6a00;
+        --muted:       #a09a8e;
+        --hover:       rgba(255,255,255,.05);
+        --accent-text:   #FF8A3D;
         --accent-soft:   rgba(255,106,0,.14);
         --green:         #84cc16;
+        --success:       #4ade80;
+        --danger:        #f87171;
         --error:         #ef4444;
         --error-soft:    rgba(239,68,68,.08);
-        --warning:       #f59e0b;
+        --warning:       #fbbf24;
         --warning-soft:  rgba(245,158,11,.08);
+        --info:          #38bdf8;
+        --purple:        #c084fc;
+        --sidebar-bg:    #0b0b0b;
+      }
+      :root[data-theme="dark"] .app-sidebar {
+        --muted:       #a09a8e;
+        --line:        rgba(255,255,255,.08);
+        --line-strong: rgba(255,255,255,.16);
+        --hover:       rgba(255,255,255,.05);
       }
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
       body {
@@ -48,6 +102,14 @@
       }
     </style>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script>
+      // Aplica o tema salvo antes da primeira pintura, para não piscar.
+      try {
+        if (localStorage.getItem('neuralhub-theme') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch (e) { /* armazenamento indisponível: fica no tema claro */ }
+    </script>
   </head>
   <body>
     <div id="root"></div>

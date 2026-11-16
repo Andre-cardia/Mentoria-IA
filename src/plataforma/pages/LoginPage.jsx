@@ -90,7 +90,7 @@ export default function LoginPage({ area = 'ensino' }) {
           borderRadius: '6px',
           padding: '32px',
         }}>
-          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
             {isGestao ? 'Acesso da Equipe' : 'Acesso à Plataforma'}
           </div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '28px', lineHeight: 1.2 }}>
@@ -98,7 +98,7 @@ export default function LoginPage({ area = 'ensino' }) {
           </h1>
 
           {successMessage && (
-            <p style={{ color: '#4ade80', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '16px' }}>
+            <p style={{ color: 'var(--success)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '16px' }}>
               {successMessage}
             </p>
           )}
@@ -149,7 +149,7 @@ export default function LoginPage({ area = 'ensino' }) {
             </div>
 
             {error && (
-              <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem' }}>
+              <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem' }}>
                 {error}
               </p>
             )}
@@ -170,18 +170,18 @@ export default function LoginPage({ area = 'ensino' }) {
             </button>
           </form>
           <p style={{ marginTop: '16px', fontSize: '.875rem', color: 'var(--muted)', textAlign: 'center' }}>
-            <Link to="/esqueci-senha" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Esqueci minha senha</Link>
+            <Link to="/esqueci-senha" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>Esqueci minha senha</Link>
           </p>
           {isGestao ? (
             <p style={{ marginTop: '8px', fontSize: '.875rem', color: 'var(--muted)', textAlign: 'center' }}>
               É aluno?{' '}
-              <a href="/plataforma/login" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Ir para a plataforma de ensino</a>
+              <a href="/plataforma/login" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>Ir para a plataforma de ensino</a>
             </p>
           ) : (
             <>
               <p style={{ marginTop: '8px', fontSize: '.875rem', color: 'var(--muted)', textAlign: 'center' }}>
                 Ainda não tem conta?{' '}
-                <Link to="/registro" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Criar conta</Link>
+                <Link to="/registro" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>Criar conta</Link>
               </p>
               <p style={{ marginTop: '8px', fontSize: '.8rem', color: 'var(--muted)', textAlign: 'center' }}>
                 <a href="/gestao/login" style={{ color: 'var(--muted)' }}>Acesso da equipe</a>

@@ -70,7 +70,7 @@ export default function MateriaisPage() {
   return (
     <Layout>
       <div style={{ maxWidth: '780px' }}>
-        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
           Recursos
         </div>
         <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '32px' }}>Materiais</h1>
@@ -88,7 +88,7 @@ export default function MateriaisPage() {
             <div key={section.title}>
               {/* Cabeçalho de seção */}
               <div style={{ marginBottom: '16px' }}>
-                <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', textTransform: 'uppercase', letterSpacing: '.1em', color: 'var(--accent)', marginBottom: '4px' }}>
+                <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', textTransform: 'uppercase', letterSpacing: '.1em', color: 'var(--accent-text)', marginBottom: '4px' }}>
                   {section.title}
                 </div>
                 <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)' }}>
@@ -112,7 +112,7 @@ export default function MateriaisPage() {
                       width: '40px', height: '40px', flexShrink: 0,
                       background: 'var(--accent-soft)', border: '1px solid rgba(255,106,0,.25)',
                       borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--accent)',
+                      fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--accent-text)',
                     }}>
                       FILE
                     </div>

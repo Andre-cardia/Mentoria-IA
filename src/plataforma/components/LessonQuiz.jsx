@@ -142,7 +142,7 @@ export default function LessonQuiz({ lessonId }) {
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px',
         }}>
           <div>
-            <div style={{ fontSize: '2rem', fontWeight: 700, color: result.score >= 70 ? '#4ade80' : '#f87171' }}>
+            <div style={{ fontSize: '2rem', fontWeight: 700, color: result.score >= 70 ? 'var(--success)' : 'var(--danger)' }}>
               {result.score}%
             </div>
             <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--muted)', marginTop: '4px' }}>
@@ -164,7 +164,7 @@ export default function LessonQuiz({ lessonId }) {
           background: 'rgba(248,113,113,.08)',
           border: '1px solid rgba(248,113,113,.35)',
           borderRadius: '6px',
-          color: '#f87171',
+          color: 'var(--danger)',
           fontFamily: 'Space Mono, monospace',
           fontSize: '.75rem',
           lineHeight: 1.6,
@@ -182,7 +182,7 @@ export default function LessonQuiz({ lessonId }) {
           const correctOptId = result?.correctMap[q.id];
           return (
             <div key={q.id} style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '20px 24px' }}>
-              <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)', marginBottom: '8px', textTransform: 'uppercase' }}>
+              <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent-text)', marginBottom: '8px', textTransform: 'uppercase' }}>
                 Questão {qi + 1}
               </div>
               <p style={{ margin: '0 0 16px', fontSize: '1rem', fontWeight: 500, lineHeight: '1.5', color: 'var(--text)' }}>
@@ -217,13 +217,13 @@ export default function LessonQuiz({ lessonId }) {
                       <span style={{
                         width: '16px', height: '16px', borderRadius: '50%', flexShrink: 0,
                         border: isSelected || isCorrect
-                          ? `5px solid ${isCorrect ? '#4ade80' : isWrong ? '#f87171' : 'var(--accent)'}`
+                          ? `5px solid ${isCorrect ? 'var(--success)' : isWrong ? 'var(--danger)' : 'var(--accent)'}`
                           : '2px solid var(--line-strong)',
                         transition: 'border .15s',
                       }} />
                       <span style={{ flex: 1 }}>{o.label}</span>
-                      {isCorrect && <span style={{ color: '#4ade80', fontSize: '.8rem', flexShrink: 0 }}>✓ Correta</span>}
-                      {isWrong && <span style={{ color: '#f87171', fontSize: '.8rem', flexShrink: 0 }}>✕ Errada</span>}
+                      {isCorrect && <span style={{ color: 'var(--success)', fontSize: '.8rem', flexShrink: 0 }}>✓ Correta</span>}
+                      {isWrong && <span style={{ color: 'var(--danger)', fontSize: '.8rem', flexShrink: 0 }}>✕ Errada</span>}
                     </button>
                   );
                 })}
@@ -264,7 +264,7 @@ export default function LessonQuiz({ lessonId }) {
                 <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)' }}>
                   #{attempts.length - i}
                 </span>
-                <span style={{ fontWeight: 700, color: a.score >= 70 ? '#4ade80' : '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.9rem' }}>
+                <span style={{ fontWeight: 700, color: a.score >= 70 ? 'var(--success)' : 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.9rem' }}>
                   {a.score}%
                 </span>
                 <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)', marginLeft: 'auto' }}>

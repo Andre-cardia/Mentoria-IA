@@ -4,12 +4,12 @@ import CrmLayout from '../../components/CrmLayout';
 import { toast } from 'sonner';
 
 const STATUSES = [
-  { id: 'new', label: 'Novo', color: 'var(--accent)' },
-  { id: 'contacted', label: 'Contato', color: '#38bdf8' },
-  { id: 'qualified', label: 'Qualificado', color: '#a855f7' },
-  { id: 'proposal', label: 'Proposta', color: '#f59e0b' },
+  { id: 'new', label: 'Novo', color: 'var(--accent-text)' },
+  { id: 'contacted', label: 'Contato', color: 'var(--info)' },
+  { id: 'qualified', label: 'Qualificado', color: 'var(--purple)' },
+  { id: 'proposal', label: 'Proposta', color: 'var(--warning)' },
   { id: 'won', label: 'Ganho', color: '#84cc16' },
-  { id: 'lost', label: 'Perdido', color: '#ef4444' },
+  { id: 'lost', label: 'Perdido', color: 'var(--danger)' },
 ];
 
 const STATUS_BY_ID = Object.fromEntries(STATUSES.map((status) => [status.id, status]));
@@ -140,7 +140,7 @@ export default function CrmReportsPage() {
       <div style={{ width: '100%', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px', marginBottom: '28px', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
               CRM / Relatorios
             </div>
             <h1 style={{ margin: 0, fontSize: '2rem', lineHeight: 1, letterSpacing: '-.04em' }}>Metricas Comerciais</h1>
@@ -157,7 +157,7 @@ export default function CrmReportsPage() {
             <button
               onClick={loadLeads}
               disabled={loading}
-              style={{ ...inputSx, cursor: loading ? 'not-allowed' : 'pointer', color: 'var(--accent)', fontFamily: 'Space Mono, monospace', fontSize: '.72rem', letterSpacing: '.12em', textTransform: 'uppercase' }}
+              style={{ ...inputSx, cursor: loading ? 'not-allowed' : 'pointer', color: 'var(--accent-text)', fontFamily: 'Space Mono, monospace', fontSize: '.72rem', letterSpacing: '.12em', textTransform: 'uppercase' }}
             >
               {loading ? 'Atualizando...' : 'Atualizar'}
             </button>
@@ -204,7 +204,7 @@ export default function CrmReportsPage() {
 function Metric({ label, value }) {
   return (
     <div style={panelSx}>
-      <div style={{ color: 'var(--accent)', fontSize: '1.8rem', fontWeight: 700, lineHeight: 1 }}>{value}</div>
+      <div style={{ color: 'var(--accent-text)', fontSize: '1.8rem', fontWeight: 700, lineHeight: 1 }}>{value}</div>
       <div style={{ marginTop: '8px', fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase' }}>
         {label}
       </div>

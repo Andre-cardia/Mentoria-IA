@@ -3,19 +3,23 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../context/useAuth';
 import { useLessonProgress } from '../hooks/useLessonProgress';
+import NavIcon from './NavIcon';
+import ThemeToggle from './ThemeToggle';
 
 const NAV_ITEMS = [
-  { to: '/inicio',       label: 'Início' },
-  { to: '/cursos',       label: 'Cursos & Aulas' },
-  { to: '/formacoes',    label: 'Formações', badge: 'Em breve' },
-  { to: '/forum',        label: 'Fórum' },
-  { to: '/materiais',    label: 'Materiais' },
-  { to: '/avisos',       label: 'Avisos' },
-  { to: '/blog',         label: 'Blog' },
-  { to: '/minha-conta',  label: 'Minha Conta' },
+  { to: '/inicio',       label: 'Início',      icon: 'home' },
+  { to: '/cursos',       label: 'Trilhas',     icon: 'trilhas' },
+  { to: '/formacoes',    label: 'Formações',   icon: 'formacoes', badge: 'Em breve' },
+  { to: '/forum',        label: 'Fórum',       icon: 'forum' },
+  { to: '/materiais',    label: 'Materiais',   icon: 'materiais' },
+  { to: '/avisos',       label: 'Avisos',      icon: 'avisos' },
+  { to: '/blog',         label: 'Blog',        icon: 'blog' },
+  { to: '/minha-conta',  label: 'Minha Conta', icon: 'conta' },
 ];
 
 const MOBILE_MEDIA_QUERY = '(max-width: 768px)';
+const SIDEBAR_WIDTH = '248px';
+const RAIL_WIDTH = '64px';
 
 function isMobileViewport() {
   return typeof window !== 'undefined'
@@ -23,23 +27,40 @@ function isMobileViewport() {
     && window.matchMedia(MOBILE_MEDIA_QUERY).matches;
 }
 
-const linkStyle = (isActive) => ({
-  display: 'block',
-  padding: '10px 14px',
-  borderRadius: '4px',
-  textDecoration: 'none',
-  fontFamily: 'Space Grotesk, sans-serif',
-  fontSize: '.9rem',
-  fontWeight: isActive ? 600 : 400,
-  color: isActive ? 'var(--accent)' : 'var(--muted)',
-  background: isActive ? 'var(--accent-soft)' : 'transparent',
-  transition: 'color .15s, background .15s',
-});
+/** @returns {import('react').CSSProperties} */
+function linkStyle(isActive, collapsed) {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: collapsed ? 'center' : 'flex-start',
+    gap: '12px',
+    padding: collapsed ? '10px 0' : '10px 12px',
+    borderRadius: '8px',
+    textDecoration: 'none',
+    fontFamily: 'Space Grotesk, sans-serif',
+    fontSize: '.95rem',
+    fontWeight: isActive ? 700 : 500,
+    // Item ativo: laranja cheio com texto escuro (contraste alto sobre o cinza do menu).
+    color: isActive ? '#261000' : 'var(--text)',
+    background: isActive ? 'var(--accent)' : 'transparent',
+    transition: 'color .15s, background .15s',
+  };
+}
 
 function getInitials(name) {
   if (!name) return '?';
   return name.trim().split(' ').filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');
 }
+
+/** @type {import('react').CSSProperties} */
+const iconButton = {
+  flexShrink: 0,
+  background: 'transparent', border: '1px solid var(--line)',
+  borderRadius: '8px', color: 'var(--text)',
+  width: '34px', height: '34px',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  cursor: 'pointer',
+};
 
 export default function Layout({ children }) {
   const { user, isAdmin, profile, signOut } = useAuth();
@@ -70,6 +91,7 @@ export default function Layout({ children }) {
   }, []);
 
   const progress = getTotalProgress(modules);
+  const pct = progress.total > 0 ? Math.round((progress.completed / progress.total) * 100) : 0;
 
   async function handleSignOut() {
     await signOut();
@@ -79,204 +101,160 @@ export default function Layout({ children }) {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)', position: 'relative' }}>
       <style>{`
+        .mentoria-platform-sidebar a:hover { background: var(--hover); }
+        .mentoria-platform-sidebar a[aria-current="page"]:hover { background: var(--accent); }
+        .mentoria-platform-sidebar button:hover { background: var(--hover); }
         @media (max-width: 768px) {
           .mentoria-platform-sidebar {
             position: fixed !important;
             left: 0;
             z-index: 50;
           }
-
           .mentoria-platform-main {
             width: 100%;
             box-sizing: border-box;
-            padding: 24px 16px 40px 72px !important;
+            padding: 24px 16px 40px 80px !important;
             overflow-x: hidden;
           }
         }
       `}</style>
-      {/* Botão expandir — fora da aside para não ser cortado pelo overflow */}
-      {collapsed && (
-        <button
-          onClick={() => setCollapsed(false)}
-          title="Expandir menu"
-          style={{
-            position: 'fixed',
-            top: '20px', left: '56px',
-            background: 'var(--bg-2)', border: '1px solid var(--line)',
-            borderLeft: 'none',
-            borderRadius: '0 4px 4px 0',
-            color: 'var(--muted)',
-            width: '18px', height: '28px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', fontSize: '14px', lineHeight: 1,
-            transition: 'border-color .15s, color .15s',
-            zIndex: 100,
-          }}
-          onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
-          onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--line)'; e.currentTarget.style.color = 'var(--muted)'; }}
-        >
-          ›
-        </button>
-      )}
-      {/* Sidebar */}
-      <aside className="mentoria-platform-sidebar" style={{
-        width: collapsed ? '56px' : '240px',
+
+      <aside className="mentoria-platform-sidebar app-sidebar" style={{
+        width: collapsed ? RAIL_WIDTH : SIDEBAR_WIDTH,
         flexShrink: 0,
-        background: 'var(--bg-2)',
-        borderRight: '1px solid var(--line)',
         display: 'flex',
         flexDirection: 'column',
-        padding: collapsed ? '24px 12px' : '24px 16px',
+        padding: collapsed ? '20px 10px' : '20px 14px',
         position: 'sticky',
         top: 0,
         height: '100vh',
         overflowY: 'auto',
         overflowX: 'hidden',
-        transition: 'width .25s ease, padding .25s ease',
+        transition: 'width .2s ease, padding .2s ease',
       }}>
-        {/* Logo + toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'space-between', marginBottom: '36px', gap: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingLeft: collapsed ? 0 : '4px', minWidth: 0 }}>
-            <div style={{
-              width: '32px', height: '32px', flexShrink: 0,
-              background: 'var(--accent)', borderRadius: '4px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'Space Mono, monospace', fontWeight: 700, fontSize: '.875rem', color: '#000',
-            }}>M</div>
-            {!collapsed && (
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: '1rem', lineHeight: 1.1, whiteSpace: 'nowrap' }}>Mentoria IA</div>
-                <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.6rem', color: 'var(--muted)', letterSpacing: '.08em', textTransform: 'uppercase' }}>
-                  Zero-to-Hero
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Marca + recolher/expandir */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'space-between', marginBottom: '28px', gap: '8px' }}>
           {!collapsed && (
-            <button
-              onClick={() => setCollapsed(true)}
-              title="Recolher menu"
-              style={{
-                flexShrink: 0,
-                background: 'transparent', border: '1px solid var(--line)',
-                borderRadius: '4px', color: 'var(--muted)',
-                width: '26px', height: '26px',
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+              <div style={{
+                width: '34px', height: '34px', flexShrink: 0,
+                background: 'var(--accent)', borderRadius: '8px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', fontSize: '14px', lineHeight: 1,
-                transition: 'border-color .15s, color .15s',
-              }}
-              onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
-              onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--line)'; e.currentTarget.style.color = 'var(--muted)'; }}
-            >
-              ‹‹
-            </button>
+                fontWeight: 700, fontSize: '1rem', color: '#261000',
+              }}>M</div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: '1rem', lineHeight: 1.15, whiteSpace: 'nowrap' }}>Mentoria IA</div>
+                <div style={{ fontSize: '.75rem', color: 'var(--muted)' }}>Zero-to-Hero</div>
+              </div>
+            </div>
           )}
+          <button
+            onClick={() => setCollapsed((c) => !c)}
+            title={collapsed ? 'Expandir menu' : 'Recolher menu'}
+            aria-label={collapsed ? 'Expandir menu' : 'Recolher menu'}
+            style={iconButton}
+          >
+            <NavIcon name={collapsed ? 'menu' : 'recolher'} size={18} />
+          </button>
         </div>
 
-        {/* Nav */}
-        {!collapsed && (
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)', letterSpacing: '.1em', textTransform: 'uppercase', padding: '0 14px', marginBottom: '8px' }}>
-              Plataforma
-            </div>
-            {NAV_ITEMS.map(({ to, label, badge }) => (
-              <NavLink key={to} to={to} style={({ isActive }) => linkStyle(isActive)}>
-                {label}
-                {badge && (
-                  <span style={{
-                    marginLeft: '8px', fontFamily: 'Space Mono, monospace', fontSize: '.6rem',
-                    color: 'var(--accent)', border: '1px solid rgba(255,106,0,.3)',
-                    borderRadius: '3px', padding: '1px 6px', whiteSpace: 'nowrap',
-                  }}>
-                    {badge}
-                  </span>
-                )}
-              </NavLink>
-            ))}
+        {/* Navegação — recolhido mostra só os ícones */}
+        <nav aria-label="Plataforma" style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+          {NAV_ITEMS.map(({ to, label, icon, badge }) => (
+            <NavLink
+              key={to} to={to}
+              title={collapsed ? label : undefined}
+              aria-label={label}
+              style={({ isActive }) => linkStyle(isActive, collapsed)}
+            >
+              <NavIcon name={icon} />
+              {!collapsed && <span style={{ flex: 1, minWidth: 0 }}>{label}</span>}
+              {!collapsed && badge && (
+                <span style={{
+                  fontSize: '.7rem', fontWeight: 600, color: 'var(--accent-text)',
+                  border: '1px solid var(--line-strong)', borderRadius: '999px',
+                  padding: '1px 8px', whiteSpace: 'nowrap',
+                }}>
+                  {badge}
+                </span>
+              )}
+            </NavLink>
+          ))}
 
-            {isAdmin && (
-              <>
-                <div style={{ borderTop: '1px solid var(--line)', margin: '16px 0 8px' }} />
-                <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)', letterSpacing: '.1em', textTransform: 'uppercase', padding: '0 14px', marginBottom: '8px' }}>
-                  Equipe
-                </div>
-                {/* Admin e CRM vivem em outro ambiente, com login próprio. */}
-                <a href="/gestao" style={linkStyle(false)}>
-                  Abrir Gestão ↗
-                </a>
-              </>
-            )}
-          </nav>
-        )}
+          {isAdmin && (
+            <>
+              <div style={{ borderTop: '1px solid var(--line)', margin: '14px 0 10px' }} />
+              {/* Admin e CRM vivem em outro ambiente, com login próprio. */}
+              <a href="/gestao" title={collapsed ? 'Abrir Gestão' : undefined} aria-label="Abrir Gestão" style={linkStyle(false, collapsed)}>
+                <NavIcon name="gestao" />
+                {!collapsed && <span>Abrir Gestão ↗</span>}
+              </a>
+            </>
+          )}
+        </nav>
 
-        {collapsed && <div style={{ flex: 1 }} />}
-
-        {/* Progresso */}
+        {/* Progresso geral */}
         {!collapsed && progress.total > 0 && (
-          <div style={{ marginBottom: '16px', padding: '12px 14px', background: 'rgba(255,106,0,.05)', border: '1px solid rgba(255,106,0,.15)', borderRadius: '6px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.6rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                Progresso
-              </span>
-              <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)' }}>
-                {progress.completed}/{progress.total}
-              </span>
+          <div style={{ marginBottom: '14px', padding: '12px', background: 'var(--panel)', borderRadius: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '.8rem' }}>
+              <span style={{ color: 'var(--muted)' }}>Seu progresso</span>
+              <span style={{ fontWeight: 700 }}>{progress.completed}/{progress.total} aulas</span>
             </div>
-            <div style={{ height: '3px', background: 'var(--line)', borderRadius: '2px', overflow: 'hidden' }}>
-              <div style={{
-                height: '100%',
-                width: `${(progress.completed / progress.total) * 100}%`,
-                background: 'var(--accent)',
-                borderRadius: '2px',
-                transition: 'width .3s',
-              }} />
+            <div
+              role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Progresso geral"
+              style={{ height: '6px', background: 'var(--line)', borderRadius: '3px', overflow: 'hidden' }}
+            >
+              <div style={{ height: '100%', width: `${pct}%`, background: 'var(--accent)', borderRadius: '3px', transition: 'width .3s' }} />
             </div>
           </div>
         )}
 
-        {/* Footer do sidebar */}
-        {!collapsed && (
-          <div style={{ borderTop: '1px solid var(--line)', paddingTop: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', paddingLeft: '4px' }}>
-              {profile?.avatar_url ? (
-                <img
-                  src={profile.avatar_url}
-                  alt="avatar"
-                  style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
-                />
-              ) : (
-                <div style={{
-                  width: '32px', height: '32px', borderRadius: '50%',
-                  background: 'var(--accent-soft)', border: '1px solid var(--accent)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontFamily: 'Space Mono, monospace', fontWeight: 700, fontSize: '.65rem',
-                  color: 'var(--accent)', flexShrink: 0,
-                }}>
-                  {getInitials(profile?.full_name)}
-                </div>
-              )}
+        {/* Conta */}
+        <div style={{ borderTop: '1px solid var(--line)', paddingTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: collapsed ? 'center' : 'stretch' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+            {profile?.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt="avatar"
+                style={{ width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+              />
+            ) : (
+              <div style={{
+                width: '34px', height: '34px', borderRadius: '50%',
+                background: 'var(--panel)', border: '1px solid var(--line-strong)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: 700, fontSize: '.75rem', flexShrink: 0,
+              }}>
+                {getInitials(profile?.full_name)}
+              </div>
+            )}
+            {!collapsed && (
               <div style={{ fontSize: '.8rem', color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
                 {user?.email}
               </div>
-            </div>
-            <button onClick={handleSignOut} style={{
-              width: '100%', padding: '8px 14px',
+            )}
+          </div>
+          <ThemeToggle collapsed={collapsed} />
+          <button
+            onClick={handleSignOut}
+            title={collapsed ? 'Sair' : undefined}
+            aria-label="Sair"
+            style={collapsed ? iconButton : {
+              display: 'flex', alignItems: 'center', gap: '10px',
+              width: '100%', padding: '8px 12px',
               background: 'transparent', border: '1px solid var(--line)',
-              borderRadius: '4px', color: 'var(--muted)',
+              borderRadius: '8px', color: 'var(--text)',
               fontFamily: 'Space Grotesk, sans-serif', fontSize: '.875rem',
               cursor: 'pointer', textAlign: 'left',
-              transition: 'border-color .15s, color .15s',
             }}
-            onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--line-strong)'; e.currentTarget.style.color = 'var(--text)'; }}
-            onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--line)'; e.currentTarget.style.color = 'var(--muted)'; }}
-            >
-              Sair
-            </button>
-          </div>
-        )}
+          >
+            <NavIcon name="sair" size={18} />
+            {!collapsed && 'Sair'}
+          </button>
+        </div>
       </aside>
 
-      {/* Main content */}
+      {/* Conteúdo */}
       <main className="mentoria-platform-main" style={{ flex: 1, minWidth: 0, padding: '40px', overflowY: 'auto' }}>
         {children}
       </main>

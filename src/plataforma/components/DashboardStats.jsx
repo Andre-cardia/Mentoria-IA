@@ -21,7 +21,7 @@ function StatCard({ label, value, accent = false }) {
       </span>
       <span style={{
         fontFamily: 'Space Mono, monospace', fontSize: '1.5rem',
-        fontWeight: 700, color: accent ? 'var(--accent)' : 'var(--text)',
+        fontWeight: 700, color: accent ? 'var(--accent-text)' : 'var(--text)',
       }}>
         {value}
       </span>
@@ -42,7 +42,7 @@ export default function DashboardStats({ userName, completed, total, diasEstudan
         <div style={{
           fontFamily: 'Space Mono, monospace', fontSize: '.75rem',
           textTransform: 'uppercase', letterSpacing: '.14em',
-          color: 'var(--accent)', marginBottom: '6px',
+          color: 'var(--accent-text)', marginBottom: '6px',
         }}>
           {getGreeting()}
         </div>
@@ -60,7 +60,7 @@ export default function DashboardStats({ userName, completed, total, diasEstudan
               Progresso geral
             </span>
             <span style={{
-              fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--accent)',
+              fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--accent-text)',
             }}>
               {completed}/{total} aulas · {pct}%
             </span>

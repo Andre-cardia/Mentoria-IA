@@ -31,7 +31,7 @@ function LessonTypeTag({ type }) {
     <span style={{
       fontFamily: 'Space Mono, monospace', fontSize: '.58rem',
       textTransform: 'uppercase', letterSpacing: '.08em',
-      color: 'var(--accent)', background: 'rgba(255,106,0,.08)',
+      color: 'var(--accent-text)', background: 'rgba(255,106,0,.08)',
       border: '1px solid rgba(255,106,0,.2)', borderRadius: '3px',
       padding: '2px 6px',
     }}>
@@ -45,7 +45,7 @@ function LessonCard({ lesson }) {
   const thumb = getVideoThumbnail(lesson.video_url);
   const type  = lesson.lesson_type ?? 'video';
   return (
-    <Link to={`/modulos/${lesson.module_id}/aulas/${lesson.id}`} style={{ textDecoration: 'none' }}>
+    <Link to={`/cursos/${lesson.module_id}/aulas/${lesson.id}`} style={{ textDecoration: 'none' }}>
       <div
         style={{
           background: 'var(--panel)', border: '1px solid var(--line)',
@@ -91,7 +91,7 @@ function LessonCard({ lesson }) {
 /* ── Card "Continue Assistindo" ─────────────────────────────────── */
 function NextLessonCard({ lesson }) {
   return (
-    <Link to={`/modulos/${lesson.module_id}/aulas/${lesson.id}`} style={{ textDecoration: 'none' }}>
+    <Link to={`/cursos/${lesson.module_id}/aulas/${lesson.id}`} style={{ textDecoration: 'none' }}>
       <div
         style={{
           background: 'var(--panel)', border: '1px solid var(--line)',
@@ -110,7 +110,7 @@ function NextLessonCard({ lesson }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <LessonTypeTag type={lesson.lesson_type ?? 'video'} />
-          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)' }}>
+          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent-text)' }}>
             → Continuar
           </span>
         </div>
@@ -237,7 +237,7 @@ export default function DashboardPage() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: '960px' }}>
+      <div style={{ maxWidth: '1080px' }}>
         {loading ? (
           <p style={{ color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>Carregando...</p>
         ) : (
@@ -250,29 +250,60 @@ export default function DashboardPage() {
               diasEstudando={diasEstudando}
             />
 
-            {/* ── Avisos do Administrador ───────────────────────── */}
-            <AdminAnnouncements />
-
-            {/* ── Continue Assistindo ───────────────────────────── */}
-            <section style={{ marginBottom: '44px' }}>
-              <SectionTitle label="Continue Assistindo" />
+            {/* ── Continue de onde parou: a ação principal da tela ── */}
+            <section style={{ marginBottom: '32px' }}>
               {nextLessons.length === 0 ? (
                 <div style={{
-                  background: 'rgba(74,222,128,.06)', border: '1px solid rgba(74,222,128,.2)',
-                  borderRadius: '8px', padding: '24px', textAlign: 'center',
+                  background: 'rgba(21,128,61,.08)', border: '1px solid rgba(21,128,61,.3)',
+                  borderRadius: '12px', padding: '24px', textAlign: 'center',
                 }}>
-                  <div style={{ fontSize: '1.5rem', marginBottom: '8px' }}>🎉</div>
-                  <div style={{ fontWeight: 600, fontSize: '.9rem', color: '#4ade80', marginBottom: '4px' }}>Parabéns!</div>
-                  <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)' }}>
+                  <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--success)', marginBottom: '4px' }}>Parabéns!</div>
+                  <div style={{ fontSize: '.9rem', color: 'var(--muted)' }}>
                     Você concluiu todas as aulas disponíveis.
                   </div>
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
-                  {nextLessons.map((lesson) => <NextLessonCard key={lesson.id} lesson={lesson} />)}
-                </div>
+                <>
+                  <Link to={`/cursos/${nextLessons[0].module_id}/aulas/${nextLessons[0].id}`} style={{ textDecoration: 'none' }}>
+                    <div style={{
+                      background: 'var(--panel)', border: '1px solid var(--line)', borderLeft: '6px solid var(--accent)',
+                      borderRadius: '12px', padding: '22px 24px',
+                      display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap',
+                    }}>
+                      <div style={{ flex: '1 1 260px', minWidth: 0 }}>
+                        <div style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--accent-text)', marginBottom: '4px' }}>
+                          {progress.completed > 0 ? 'Continue de onde parou' : 'Comece por aqui'}
+                        </div>
+                        <div style={{ fontWeight: 700, fontSize: '1.25rem', color: 'var(--text)', lineHeight: 1.3 }}>
+                          {nextLessons[0].title}
+                        </div>
+                        <div style={{ fontSize: '.9rem', color: 'var(--muted)', marginTop: '2px' }}>
+                          {nextLessons[0].moduleTitle} · {TYPE_LABEL[nextLessons[0].lesson_type ?? 'video']}
+                        </div>
+                      </div>
+                      <span style={{
+                        padding: '12px 24px', background: 'var(--accent)', color: '#261000',
+                        borderRadius: '8px', fontWeight: 700, fontSize: '.95rem', whiteSpace: 'nowrap',
+                      }}>
+                        {progress.completed > 0 ? 'Continuar →' : 'Começar →'}
+                      </span>
+                    </div>
+                  </Link>
+
+                  {nextLessons.length > 1 && (
+                    <div style={{ marginTop: '20px' }}>
+                      <SectionTitle label="A seguir" />
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
+                        {nextLessons.slice(1).map((lesson) => <NextLessonCard key={lesson.id} lesson={lesson} />)}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </section>
+
+            {/* ── Avisos do Administrador ───────────────────────── */}
+            <AdminAnnouncements />
 
             {/* ── Últimos Lançamentos ───────────────────────────── */}
             <section style={{ marginBottom: '44px' }}>
@@ -297,7 +328,7 @@ export default function DashboardPage() {
                     to="/blog"
                     style={{
                       fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
-                      color: 'var(--accent)', textDecoration: 'none', letterSpacing: '.04em',
+                      color: 'var(--accent-text)', textDecoration: 'none', letterSpacing: '.04em',
                     }}
                   >
                     Ver todos →
@@ -331,7 +362,7 @@ export default function DashboardPage() {
                       }}>
                         <span style={{
                           fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
-                          color: i < 3 ? 'var(--accent)' : 'var(--muted)',
+                          color: i < 3 ? 'var(--accent-text)' : 'var(--muted)',
                           fontWeight: i < 3 ? 700 : 400, minWidth: '20px',
                         }}>
                           {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
@@ -339,10 +370,10 @@ export default function DashboardPage() {
                         <span style={{ flex: 1, fontSize: '.875rem', fontWeight: entry.is_current_user ? 600 : 400, color: 'var(--text)' }}>
                           {entry.user_name}
                           {entry.is_current_user && (
-                            <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.6rem', color: 'var(--accent)', marginLeft: '6px' }}>(você)</span>
+                            <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.6rem', color: 'var(--accent-text)', marginLeft: '6px' }}>(você)</span>
                           )}
                         </span>
-                        <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--accent)', fontWeight: 700 }}>
+                        <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--accent-text)', fontWeight: 700 }}>
                           {entry.points} pt{entry.points !== 1 ? 's' : ''}
                         </span>
                       </div>

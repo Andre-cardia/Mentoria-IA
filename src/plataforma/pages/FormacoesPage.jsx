@@ -4,7 +4,7 @@ export default function FormacoesPage() {
   return (
     <Layout>
       <div style={{ maxWidth: '800px' }}>
-        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
           Formação
         </div>
         <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '12px' }}>Cursos de Formação</h1>
@@ -19,7 +19,7 @@ export default function FormacoesPage() {
           <span style={{
             display: 'inline-block', marginBottom: '14px',
             fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
-            color: 'var(--accent)', background: 'var(--accent-soft)',
+            color: 'var(--accent-text)', background: 'var(--accent-soft)',
             border: '1px solid rgba(255,106,0,.25)', borderRadius: '3px',
             padding: '3px 12px',
           }}>

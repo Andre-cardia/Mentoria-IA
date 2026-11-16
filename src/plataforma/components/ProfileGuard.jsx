@@ -22,7 +22,7 @@ function BlockedPage({ status }) {
         <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>🔒</div>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px' }}>{msg.title}</h1>
         <p style={{ color: 'var(--muted)', lineHeight: 1.6, marginBottom: '24px' }}>{msg.body}</p>
-        <a href="mailto:contato@neuralhub.ia.br" style={{ color: 'var(--accent)', fontFamily: 'Space Mono, monospace', fontSize: '.85rem' }}>
+        <a href="mailto:contato@neuralhub.ia.br" style={{ color: 'var(--accent-text)', fontFamily: 'Space Mono, monospace', fontSize: '.85rem' }}>
           contato@neuralhub.ia.br
         </a>
       </div>

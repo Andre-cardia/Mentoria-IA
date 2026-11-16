@@ -37,7 +37,7 @@ function ModuleCard({ mod, progress, onOpen }) {
       }}
       onMouseOver={(e) => {
         e.currentTarget.style.borderColor = 'rgba(255,106,0,.4)';
-        e.currentTarget.style.background = 'rgba(255,255,255,.02)';
+        e.currentTarget.style.background = 'var(--hover)';
       }}
       onMouseOut={(e) => {
         e.currentTarget.style.borderColor = 'var(--line)';
@@ -56,8 +56,8 @@ function ModuleCard({ mod, progress, onOpen }) {
         <span style={{
           flexShrink: 0,
           fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
-          color: progress.completed > 0 ? 'var(--accent)' : 'var(--muted)',
-          background: 'rgba(255,255,255,.05)',
+          color: progress.completed > 0 ? 'var(--accent-text)' : 'var(--muted)',
+          background: 'var(--hover)',
           border: '1px solid var(--line)', borderRadius: '3px',
           padding: '2px 10px', whiteSpace: 'nowrap',
         }}>
@@ -87,7 +87,7 @@ function TrackSection({ track, modules, getModuleProgress, onOpenModule }) {
           {TRACK_LEVEL_LABEL[track.level] && (
             <span style={{
               fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
-              color: 'var(--accent)', background: 'var(--accent-soft)',
+              color: 'var(--accent-text)', background: 'var(--accent-soft)',
               border: '1px solid rgba(255,106,0,.25)', borderRadius: '3px',
               padding: '2px 10px',
             }}>
@@ -154,13 +154,13 @@ export default function CursosPage() {
   return (
     <Layout>
       <div style={{ maxWidth: '800px' }}>
-        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
           Conteúdo
         </div>
         <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '32px' }}>{hasTracks ? 'Trilhas' : 'Cursos'}</h1>
 
         {loading && <p style={{ color: 'var(--muted)' }}>Carregando cursos...</p>}
-        {error && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
+        {error && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
 
         {!loading && !error && modules.length === 0 && (
           <p style={{ color: 'var(--muted)', fontSize: '.95rem' }}>Nenhum curso disponível ainda.</p>

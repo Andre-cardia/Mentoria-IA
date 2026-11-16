@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 
 const STATUSES = [
   { id: 'all', label: 'Todos os estágios' },
-  { id: 'new', label: 'Novo', color: 'var(--accent)' },
+  { id: 'new', label: 'Novo', color: 'var(--accent-text)' },
   { id: 'contacted', label: 'Contato', color: '#38bdf8' },
   { id: 'qualified', label: 'Qualificado', color: '#a855f7' },
   { id: 'proposal', label: 'Proposta', color: '#f59e0b' },
@@ -209,7 +209,7 @@ export default function CrmClientesPage() {
         {/* Cabeçalho */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px', marginBottom: '24px', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.72rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.72rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
               CRM / Base de Contatos
             </div>
             <h1 style={{ margin: 0, fontSize: '2.4rem', lineHeight: 1.05, letterSpacing: '-.04em' }}>Gestão de Clientes</h1>
@@ -373,7 +373,7 @@ export default function CrmClientesPage() {
                         cursor: 'pointer',
                         transition: 'background .15s',
                       }}
-                      onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.03)')}
+                      onMouseOver={(e) => (e.currentTarget.style.background = 'var(--hover)')}
                       onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
                     >
                       {/* Cliente / Empresa */}
@@ -392,7 +392,7 @@ export default function CrmClientesPage() {
                               fontFamily: 'Space Mono, monospace',
                               fontSize: '.82rem',
                               fontWeight: 700,
-                              color: 'var(--accent)',
+                              color: 'var(--accent-text)',
                               flexShrink: 0,
                             }}
                           >
@@ -478,7 +478,7 @@ export default function CrmClientesPage() {
                             background: 'var(--panel-2)',
                             border: '1px solid var(--line-strong)',
                             borderRadius: '4px',
-                            color: 'var(--accent)',
+                            color: 'var(--accent-text)',
                             fontFamily: 'Space Mono, monospace',
                             fontSize: '.75rem',
                             padding: '6px 12px',

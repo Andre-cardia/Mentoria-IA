@@ -2,6 +2,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../context/useAuth';
 
+// A barra lateral e a página usam instâncias separadas deste hook; o evento
+// mantém as duas em sincronia quando uma aula é concluída ou desmarcada.
+const PROGRESS_EVENT = 'lesson-progress-changed';
+
+function announce(lessonId, completed) {
+  window.dispatchEvent(new CustomEvent(PROGRESS_EVENT, { detail: { lessonId, completed } }));
+}
+
 export function useLessonProgress() {
   const { user } = useAuth();
   const [completedIds, setCompletedIds] = useState(new Set());
@@ -26,6 +34,22 @@ export function useLessonProgress() {
     load();
   }, [user]);
 
+  useEffect(() => {
+    function onChange(event) {
+      const { lessonId, completed } = event.detail ?? {};
+      if (!lessonId) return;
+      setCompletedIds((prev) => {
+        if (prev.has(lessonId) === completed) return prev;
+        const next = new Set(prev);
+        if (completed) next.add(lessonId);
+        else next.delete(lessonId);
+        return next;
+      });
+    }
+    window.addEventListener(PROGRESS_EVENT, onChange);
+    return () => window.removeEventListener(PROGRESS_EVENT, onChange);
+  }, []);
+
   const isComplete = useCallback(
     (lessonId) => completedIds.has(lessonId),
     [completedIds]
@@ -46,6 +70,8 @@ export function useLessonProgress() {
         if (error) {
           console.error('[toggleComplete] DELETE falhou:', error);
           setCompletedIds((prev) => new Set([...prev, lessonId]));
+        } else {
+          announce(lessonId, false);
         }
       } else {
         // Optimistic add
@@ -54,6 +80,8 @@ export function useLessonProgress() {
         if (error) {
           console.error('[toggleComplete] INSERT falhou:', error);
           setCompletedIds((prev) => { const next = new Set(prev); next.delete(lessonId); return next; });
+        } else {
+          announce(lessonId, true);
         }
       }
       setMarking(false);

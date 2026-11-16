@@ -31,7 +31,7 @@ function QuestionCard({ q, qi, total, onUpdate, onRemove, onMove, onAddOption, o
   return (
     <div style={{ background: 'var(--panel-2)', border: '1px solid var(--line)', borderRadius: '6px', padding: '16px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-        <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)', minWidth: '24px' }}>
+        <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent-text)', minWidth: '24px' }}>
           Q{qi + 1}
         </span>
         <input
@@ -44,7 +44,7 @@ function QuestionCard({ q, qi, total, onUpdate, onRemove, onMove, onAddOption, o
           <button type="button" onClick={() => onMove(q._id, -1)} disabled={qi === 0} style={btnSmSx}>▲</button>
           <button type="button" onClick={() => onMove(q._id, 1)} disabled={qi === total - 1} style={btnSmSx}>▼</button>
           {total > 1 && (
-            <button type="button" onClick={() => onRemove(q._id)} style={{ ...btnSmSx, color: '#f87171', borderColor: 'rgba(248,113,113,.3)' }}>✕</button>
+            <button type="button" onClick={() => onRemove(q._id)} style={{ ...btnSmSx, color: 'var(--danger)', borderColor: 'rgba(248,113,113,.3)' }}>✕</button>
           )}
         </div>
       </div>
@@ -73,7 +73,7 @@ function QuestionCard({ q, qi, total, onUpdate, onRemove, onMove, onAddOption, o
               <button type="button" onClick={() => onMoveOption(q._id, o._id, -1)} disabled={oi === 0} style={btnSmSx}>▲</button>
               <button type="button" onClick={() => onMoveOption(q._id, o._id, 1)} disabled={oi === q.options.length - 1} style={btnSmSx}>▼</button>
               {q.options.length > 2 && (
-                <button type="button" onClick={() => onRemoveOption(q._id, o._id)} style={{ ...btnSmSx, color: '#f87171', borderColor: 'rgba(248,113,113,.3)' }}>✕</button>
+                <button type="button" onClick={() => onRemoveOption(q._id, o._id)} style={{ ...btnSmSx, color: 'var(--danger)', borderColor: 'rgba(248,113,113,.3)' }}>✕</button>
               )}
             </div>
           </div>
@@ -225,7 +225,7 @@ export default function QuizBuilder({ lessonId }) {
 
   return (
     <div style={{ marginTop: '8px', padding: '16px', background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '6px' }}>
-      <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', textTransform: 'uppercase', letterSpacing: '.1em', color: 'var(--accent)', marginBottom: '14px' }}>
+      <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', textTransform: 'uppercase', letterSpacing: '.1em', color: 'var(--accent-text)', marginBottom: '14px' }}>
         Quiz Builder — {questions.length} {questions.length === 1 ? 'questão' : 'questões'}
       </div>
 
@@ -255,7 +255,7 @@ export default function QuizBuilder({ lessonId }) {
       </button>
 
       {error && (
-        <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', margin: '10px 0 0' }}>{error}</p>
+        <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', margin: '10px 0 0' }}>{error}</p>
       )}
 
       <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -272,7 +272,7 @@ export default function QuizBuilder({ lessonId }) {
           {saving ? 'Salvando...' : 'Salvar Quiz'}
         </button>
         {saved && (
-          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: '#4ade80' }}>✓ Quiz salvo!</span>
+          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--success)' }}>✓ Quiz salvo!</span>
         )}
       </div>
     </div>

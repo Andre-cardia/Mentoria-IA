@@ -23,7 +23,7 @@ export default function AvisosPage() {
   return (
     <Layout>
       <div style={{ maxWidth: '780px' }}>
-        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
           Informações
         </div>
         <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '32px' }}>Quadro de Avisos</h1>
@@ -48,7 +48,7 @@ export default function AvisosPage() {
                     <span style={{
                       fontFamily: 'Space Mono, monospace', fontSize: '.65rem', fontWeight: 700,
                       textTransform: 'uppercase', letterSpacing: '.06em',
-                      background: 'var(--accent-soft)', color: 'var(--accent)',
+                      background: 'var(--accent-soft)', color: 'var(--accent-text)',
                       border: '1px solid rgba(255,106,0,.25)', borderRadius: '3px',
                       padding: '3px 10px',
                     }}>

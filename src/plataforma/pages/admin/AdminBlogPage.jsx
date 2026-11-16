@@ -5,7 +5,7 @@ import AdminLayout from '../../components/AdminLayout';
 import { toast } from 'sonner';
 
 const STATUS_LABELS = { draft: 'Rascunho', published: 'Publicado', scheduled: 'Agendado', archived: 'Arquivado' };
-const STATUS_COLORS = { draft: 'var(--muted)', published: '#22c55e', scheduled: '#f59e0b', archived: 'var(--muted)' };
+const STATUS_COLORS = { draft: 'var(--muted)', published: 'var(--success)', scheduled: 'var(--warning)', archived: 'var(--muted)' };
 const VISIBILITY_LABELS = { public: 'Público', private: 'Privado' };
 
 function fmtDate(d) {
@@ -225,8 +225,8 @@ export default function AdminBlogPage() {
                           onClick={() => handleDelete(post)}
                           disabled={deleting === post.id}
                           style={{
-                            background: 'transparent', border: '1px solid #ef4444',
-                            borderRadius: '4px', padding: '5px 10px', color: '#ef4444',
+                            background: 'transparent', border: '1px solid var(--danger)',
+                            borderRadius: '4px', padding: '5px 10px', color: 'var(--danger)',
                             fontFamily: 'Space Grotesk, sans-serif', fontSize: '.8rem', cursor: 'pointer',
                           }}
                         >
@@ -273,7 +273,7 @@ export default function AdminBlogPage() {
                         <button
                           onClick={() => handleApprove(c)}
                           style={{
-                            background: '#22c55e', color: '#000', border: 'none',
+                            background: 'var(--success)', color: '#000', border: 'none',
                             borderRadius: '4px', padding: '6px 14px',
                             fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', fontWeight: 600, cursor: 'pointer',
                           }}
@@ -283,8 +283,8 @@ export default function AdminBlogPage() {
                         <button
                           onClick={() => handleReject(c)}
                           style={{
-                            background: 'transparent', border: '1px solid #ef4444',
-                            borderRadius: '4px', padding: '6px 14px', color: '#ef4444',
+                            background: 'transparent', border: '1px solid var(--danger)',
+                            borderRadius: '4px', padding: '6px 14px', color: 'var(--danger)',
                             fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', cursor: 'pointer',
                           }}
                         >

@@ -44,7 +44,7 @@ export default function ConfirmModal({ isOpen, title, message, confirmLabel = 'E
             onClick={onConfirm}
             style={{
               padding: '8px 18px', background: 'transparent',
-              border: '1px solid rgba(248,113,113,.4)', borderRadius: '4px', color: '#f87171',
+              border: '1px solid rgba(248,113,113,.4)', borderRadius: '4px', color: 'var(--danger)',
               fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, fontSize: '.875rem', cursor: 'pointer',
             }}
           >

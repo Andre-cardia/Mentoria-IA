@@ -37,7 +37,7 @@ describe('Layout responsivo da plataforma', () => {
     }));
   });
 
-  it('inicia com a sidebar recolhida em viewport móvel', () => {
+  it('inicia recolhida em viewport móvel, só com os ícones do menu', () => {
     render(
       <MemoryRouter>
         <Layout><div>Conteúdo do dashboard</div></Layout>
@@ -45,7 +45,9 @@ describe('Layout responsivo da plataforma', () => {
     );
 
     expect(screen.getByTitle('Expandir menu')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Início' })).not.toBeInTheDocument();
+    // Recolhido, o item continua acessível pelo ícone, sem o rótulo visível.
+    expect(screen.getByRole('link', { name: 'Início' })).toBeInTheDocument();
+    expect(screen.queryByText('Início')).not.toBeInTheDocument();
     expect(screen.getByRole('main')).toHaveClass('mentoria-platform-main');
   });
 });

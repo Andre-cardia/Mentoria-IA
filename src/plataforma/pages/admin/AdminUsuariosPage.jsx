@@ -235,7 +235,7 @@ export default function AdminUsuariosPage() {
       <div style={{ maxWidth: '1120px' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '18px', flexWrap: 'wrap', marginBottom: '28px' }}>
           <div>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '6px' }}>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '6px' }}>
               Gestão / Acesso
             </div>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Usuários da Plataforma</h1>
@@ -259,7 +259,7 @@ export default function AdminUsuariosPage() {
             ['Comercial', users.filter((user) => user.role === 'comercial').length],
           ].map(([label, value]) => (
             <div key={label} style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '6px', padding: '16px' }}>
-              <div style={{ color: 'var(--accent)', fontSize: '1.6rem', fontWeight: 700, lineHeight: 1 }}>{value}</div>
+              <div style={{ color: 'var(--accent-text)', fontSize: '1.6rem', fontWeight: 700, lineHeight: 1 }}>{value}</div>
               <div style={{ marginTop: '8px', fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase' }}>{label}</div>
             </div>
           ))}
@@ -273,7 +273,7 @@ export default function AdminUsuariosPage() {
         />
 
         {loading && <p style={{ color: 'var(--muted)' }}>Carregando usuários...</p>}
-        {error && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
+        {error && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
 
         {!loading && !error && (
           <div style={{ border: '1px solid var(--line)', borderRadius: '6px', overflowX: 'auto' }}>
@@ -317,7 +317,7 @@ export default function AdminUsuariosPage() {
                     <div>
                       <div style={{ fontWeight: 600, fontSize: '.92rem' }}>{user.full_name}</div>
                       {isCurrentUser && (
-                        <div style={{ marginTop: '3px', fontFamily: 'Space Mono, monospace', color: 'var(--accent)', fontSize: '.62rem', letterSpacing: '.08em', textTransform: 'uppercase' }}>
+                        <div style={{ marginTop: '3px', fontFamily: 'Space Mono, monospace', color: 'var(--accent-text)', fontSize: '.62rem', letterSpacing: '.08em', textTransform: 'uppercase' }}>
                           Sua conta
                         </div>
                       )}
@@ -328,7 +328,7 @@ export default function AdminUsuariosPage() {
                         fontFamily: 'Space Mono, monospace',
                         fontSize: '.66rem',
                         fontWeight: 700,
-                        color: user.role === 'admin' ? 'var(--accent)' : '#38bdf8',
+                        color: user.role === 'admin' ? 'var(--accent-text)' : 'var(--info)',
                         background: user.role === 'admin' ? 'var(--accent-soft)' : 'rgba(56,189,248,.1)',
                         border: `1px solid ${user.role === 'admin' ? 'rgba(255,106,0,.25)' : 'rgba(56,189,248,.25)'}`,
                         borderRadius: '3px',
@@ -352,7 +352,7 @@ export default function AdminUsuariosPage() {
                         disabled={isCurrentUser}
                         title={isCurrentUser ? 'Você não pode excluir sua própria conta' : 'Excluir usuário'}
                         onClick={() => { setActionError(''); setModal({ type: 'delete', user }); }}
-                        style={{ padding: '7px 11px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: isCurrentUser ? 'rgba(248,113,113,.35)' : '#f87171', cursor: isCurrentUser ? 'not-allowed' : 'pointer' }}
+                        style={{ padding: '7px 11px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: isCurrentUser ? 'rgba(248,113,113,.35)' : 'var(--danger)', cursor: isCurrentUser ? 'not-allowed' : 'pointer' }}
                       >
                         Excluir
                       </button>
@@ -367,14 +367,14 @@ export default function AdminUsuariosPage() {
 
       {modal?.type === 'create' && (
         <Modal title="Novo usuário da plataforma" onClose={() => setModal(null)}>
-          {actionError && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
+          {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
           <UserForm onSave={createUser} onCancel={() => setModal(null)} loading={saving} />
         </Modal>
       )}
 
       {modal?.type === 'edit' && (
         <Modal title="Editar usuário" onClose={() => setModal(null)}>
-          {actionError && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
+          {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
           <UserForm initial={modal.user} onSave={updateUser} onCancel={() => setModal(null)} loading={saving} />
         </Modal>
       )}
@@ -386,16 +386,16 @@ export default function AdminUsuariosPage() {
           </p>
           <p style={{ fontWeight: 600, marginBottom: '4px' }}>{modal.user.full_name}</p>
           <p style={{ fontFamily: 'Space Mono, monospace', fontSize: '.8rem', color: 'var(--muted)', marginBottom: '20px' }}>{modal.user.email}</p>
-          <p style={{ color: '#f87171', fontSize: '.85rem', marginBottom: '20px' }}>
+          <p style={{ color: 'var(--danger)', fontSize: '.85rem', marginBottom: '20px' }}>
             Esta ação remove o usuário do Supabase Auth e não deve ser usada para alunos.
           </p>
-          {actionError && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
+          {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
           <div style={{ display: 'flex', gap: '10px' }}>
             <button
               type="button"
               onClick={deleteUser}
               disabled={saving}
-              style={{ flex: 1, padding: '10px', background: saving ? 'rgba(248,113,113,.4)' : '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer' }}
+              style={{ flex: 1, padding: '10px', background: saving ? 'rgba(248,113,113,.4)' : 'var(--danger)', color: '#fff', border: 'none', borderRadius: '4px', fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer' }}
             >
               {saving ? 'Excluindo...' : 'Excluir usuário'}
             </button>

@@ -92,7 +92,7 @@ export default function ForumPage() {
       <div style={{ maxWidth: '780px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
           <div>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
               Comunidade
             </div>
             <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>Fórum</h1>
@@ -166,7 +166,7 @@ export default function ForumPage() {
                     {formatDate(topic.created_at)}
                   </div>
                 </div>
-                <span style={{ color: 'var(--accent)', fontSize: '1rem', flexShrink: 0 }}>
+                <span style={{ color: 'var(--accent-text)', fontSize: '1rem', flexShrink: 0 }}>
                   {openTopic === topic.id ? '▲' : '▼'}
                 </span>
               </button>

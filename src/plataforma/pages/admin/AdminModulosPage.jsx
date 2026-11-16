@@ -46,7 +46,7 @@ const btnOutline = {
 
 const btnDanger = {
   padding: '6px 12px', background: 'transparent',
-  border: '1px solid rgba(248,113,113,.3)', borderRadius: '4px', color: '#f87171',
+  border: '1px solid rgba(248,113,113,.3)', borderRadius: '4px', color: 'var(--danger)',
   fontFamily: 'Space Mono, monospace', fontSize: '.7rem', cursor: 'pointer',
 };
 
@@ -485,7 +485,7 @@ export default function AdminModulosPage() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
           <div>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>Admin</div>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>Admin</div>
             <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>Cursos & Aulas</h1>
           </div>
           {editingModId !== 'new' && (
@@ -543,7 +543,7 @@ export default function AdminModulosPage() {
                                 {tracks.find((t) => t.id === mod.track_id).title}
                               </span>
                             )}
-                            <span style={{ marginLeft: '12px', color: 'var(--accent)', fontSize: '.85rem' }}>{openModule === mod.id ? '▲' : '▼'}</span>
+                            <span style={{ marginLeft: '12px', color: 'var(--accent-text)', fontSize: '.85rem' }}>{openModule === mod.id ? '▲' : '▼'}</span>
                           </button>
                           <div style={{ display: 'flex', gap: '8px' }}>
                             <button style={btnOutline} onClick={() => startEditMod(mod)}>Editar</button>
@@ -585,8 +585,8 @@ export default function AdminModulosPage() {
                                           </div>
                                         </div>
                                       ) : (
-                                        <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: '10px', background: 'rgba(255,255,255,.02)' }}>
-                                          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)', textTransform: 'uppercase' }}>Editando aula</div>
+                                        <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: '10px', background: 'var(--hover)' }}>
+                                          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent-text)', textTransform: 'uppercase' }}>Editando aula</div>
                                           <input style={inputSx} placeholder="Título da aula" value={lessonEditForm.title} onChange={(e) => setLessonEditForm((p) => ({ ...p, title: e.target.value }))} required />
                                           <select style={{ ...inputSx, cursor: 'pointer' }} value={lessonEditForm.lesson_type} onChange={(e) => setLessonEditForm((p) => ({ ...p, lesson_type: e.target.value }))}>
                                             {LESSON_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -621,7 +621,7 @@ export default function AdminModulosPage() {
 
                           {/* Form nova aula */}
                           {showLessonForm === mod.id ? (
-                            <form onSubmit={(e) => saveLesson(e, mod.id)} style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid var(--line)', background: 'rgba(255,255,255,.02)' }}>
+                            <form onSubmit={(e) => saveLesson(e, mod.id)} style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid var(--line)', background: 'var(--hover)' }}>
                               <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)', textTransform: 'uppercase' }}>Nova Aula</div>
                               <input style={inputSx} placeholder="Título da aula" value={lessonForm.title} onChange={(e) => setLessonForm((p) => ({ ...p, title: e.target.value }))} required />
                               <select style={{ ...inputSx, cursor: 'pointer' }} value={lessonForm.lesson_type} onChange={(e) => setLessonForm((p) => ({ ...p, lesson_type: e.target.value }))}>
@@ -688,7 +688,7 @@ function ModForm({ title, form, tracks = [], onChange, onSubmit, onCancel, savin
         display: 'flex', flexDirection: 'column', gap: '12px',
       }}
     >
-      <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '.1em' }}>
+      <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent-text)', textTransform: 'uppercase', letterSpacing: '.1em' }}>
         {title}
       </div>
       <input

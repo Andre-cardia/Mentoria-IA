@@ -19,7 +19,7 @@ function Avatar({ name }) {
       background: 'rgba(255,106,0,.15)', border: '1px solid rgba(255,106,0,.3)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontFamily: 'Space Mono, monospace', fontSize: '.75rem', fontWeight: 700,
-      color: 'var(--accent)', flexShrink: 0,
+      color: 'var(--accent-text)', flexShrink: 0,
     }}>
       {initial}
     </div>
@@ -86,7 +86,7 @@ function QAItem({ item, isAdmin, currentUserId, onDelete, onMarkOfficial, onRepl
           {item.is_official && (
             <span style={{
               fontFamily: 'Space Mono, monospace', fontSize: '.6rem', textTransform: 'uppercase',
-              letterSpacing: '.08em', color: '#4ade80', background: 'rgba(74,222,128,.1)',
+              letterSpacing: '.08em', color: 'var(--success)', background: 'rgba(74,222,128,.1)',
               border: '1px solid rgba(74,222,128,.25)', borderRadius: '3px', padding: '2px 6px',
             }}>
               ✓ Resposta Oficial
@@ -115,7 +115,7 @@ function QAItem({ item, isAdmin, currentUserId, onDelete, onMarkOfficial, onRepl
             <button onClick={() => onMarkOfficial(item.id, !item.is_official)} style={{
               background: 'none', border: 'none', padding: 0,
               fontFamily: 'Space Mono, monospace', fontSize: '.65rem', textTransform: 'uppercase',
-              letterSpacing: '.08em', color: item.is_official ? '#4ade80' : 'var(--muted)', cursor: 'pointer',
+              letterSpacing: '.08em', color: item.is_official ? 'var(--success)' : 'var(--muted)', cursor: 'pointer',
             }}>
               {item.is_official ? '✓ Oficial' : 'Marcar oficial'}
             </button>
@@ -124,7 +124,7 @@ function QAItem({ item, isAdmin, currentUserId, onDelete, onMarkOfficial, onRepl
             <button onClick={() => onDelete(item.id)} style={{
               background: 'none', border: 'none', padding: 0,
               fontFamily: 'Space Mono, monospace', fontSize: '.65rem', textTransform: 'uppercase',
-              letterSpacing: '.08em', color: '#f87171', cursor: 'pointer',
+              letterSpacing: '.08em', color: 'var(--danger)', cursor: 'pointer',
             }}>
               Excluir
             </button>

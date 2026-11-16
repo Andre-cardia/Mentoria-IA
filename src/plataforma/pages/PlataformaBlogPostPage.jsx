@@ -85,7 +85,7 @@ export default function PlataformaBlogPostPage() {
       <Layout>
         <div style={{ padding: '48px 24px' }}>
           <p style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--muted)', marginBottom: '12px' }}>Artigo não encontrado.</p>
-          <Link to="/blog" style={{ color: 'var(--accent)', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.9rem', textDecoration: 'none' }}>
+          <Link to="/blog" style={{ color: 'var(--accent-text)', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.9rem', textDecoration: 'none' }}>
             ← Voltar para o Blog
           </Link>
         </div>
@@ -110,7 +110,7 @@ export default function PlataformaBlogPostPage() {
 
           {/* Breadcrumb */}
           <nav style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', color: 'var(--muted)' }}>
-            <Link to="/blog" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Blog</Link>
+            <Link to="/blog" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>Blog</Link>
             <span style={{ margin: '0 8px' }}>›</span>
             <span>{post.title}</span>
           </nav>
@@ -120,7 +120,7 @@ export default function PlataformaBlogPostPage() {
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
               {post.post_tags.map((pt, i) => pt.tags && (
                 <span key={i} style={{
-                  fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--accent)',
+                  fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--accent-text)',
                   background: 'var(--accent-soft)', borderRadius: '3px', padding: '2px 8px',
                 }}>
                   {pt.tags.name}
