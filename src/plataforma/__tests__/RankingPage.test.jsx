@@ -12,9 +12,10 @@ vi.mock('../components/StarRace', () => ({
 vi.mock('../components/Layout', () => ({ default: ({ children }) => <div>{children}</div> }));
 
 const ME = { rank_pos: 2, participants: 14, points: 130, lessons: 10, access_days: 6, posts: 1, questions: 0, answers: 2 };
+// 4 aulas no básico → a galáxia pede 24 pontos; 12 pontos = metade do caminho.
 const RACE = [
-  { user_name: 'Bia Souza', is_current_user: false, points: 80, basico: 4, intermediario: 0, avancado: 0, certified: false },
-  { user_name: 'Aluno Teste', is_current_user: true, points: 50, basico: 2, intermediario: 0, avancado: 0, certified: false },
+  { user_name: 'Bia Souza', is_current_user: false, points: 20, certified: false },
+  { user_name: 'Aluno Teste', is_current_user: true, points: 12, certified: false },
 ];
 const TRACKS = [
   { level: 'basico', modules: [{ lessons: [{}, {}, {}, {}] }] },
@@ -54,11 +55,12 @@ describe('RankingPage', () => {
     expect(await screen.findByTestId('star-race')).toHaveTextContent('2 naves');
     expect(screen.getByText(/Na Galáxia Básica — 50% percorrida/)).toBeInTheDocument();
     expect(screen.getByRole('progressbar', { name: 'Galáxia Básica' })).toHaveAttribute('aria-valuenow', '50');
-    expect(screen.getByText(/conclua o Projeto de Certificação/)).toBeInTheDocument();
+    expect(screen.getByText('12 de 24 pts')).toBeInTheDocument();
+    expect(screen.getByText(/O ápice: conclua o Projeto de Certificação/)).toBeInTheDocument();
   });
 
   it('comemora quando o aluno chega ao ápice', async () => {
-    setup({ race: [{ ...RACE[1], basico: 4, intermediario: 2, avancado: 2, certified: true }] });
+    setup({ race: [{ ...RACE[1], certified: true }] });
     expect(await screen.findByText(/Chegou à Estrela da Certificação/)).toBeInTheDocument();
     expect(screen.getByText('Você chegou ao ápice da jornada!')).toBeInTheDocument();
   });

@@ -178,7 +178,7 @@ function RankingList({ period, onPeriodChange, rows, loading }) {
   );
 }
 
-function RaceSection({ racers, totals }) {
+function RaceSection({ racers }) {
   const mine = racers.find((racer) => racer.isCurrentUser);
   return (
     <section aria-labelledby="corrida" style={{ marginBottom: '32px' }}>
@@ -211,7 +211,7 @@ function RaceSection({ racers, totals }) {
                     <div style={{ height: '100%', width: `${pct}%`, background: galaxy.color }} />
                   </div>
                   <span style={{ ...mono, fontSize: '.75rem', color: 'var(--muted)' }}>
-                    {pct}% · {totals[galaxy.level]} aula{totals[galaxy.level] === 1 ? '' : 's'}
+                    {mine.position.earned[index]} de {mine.position.goals[index]} pts
                   </span>
                 </li>
               );
@@ -308,12 +308,12 @@ export default function RankingPage() {
           Corrida Estelar pela Certificação em AI Engineer
         </h1>
         <p style={{ color: 'var(--muted)', fontSize: '1rem', marginBottom: '24px' }}>
-          Cada trilha é uma galáxia. Conclua as aulas para levar sua nave até a {APEX_NAME}.
+          Cada trilha é uma galáxia. Ganhe pontos para atravessá-las e conclua o Projeto de Certificação para chegar à {APEX_NAME}.
         </p>
 
         {error && <p role="alert" style={{ color: 'var(--danger)', marginBottom: '20px' }}>{error}</p>}
 
-        {racers.length > 0 && <RaceSection racers={racers} totals={totals} />}
+        {racers.length > 0 && <RaceSection racers={racers} />}
         {me && <Summary me={me} />}
         {me && <BadgeGrid badges={computeBadges(me)} />}
         <RankingList period={period} onPeriodChange={changePeriod} rows={rows} loading={loadingRows} />

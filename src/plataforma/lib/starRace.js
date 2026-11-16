@@ -1,5 +1,5 @@
 // Corrida Estelar: cada trilha é uma galáxia e a nave do aluno avança
-// conforme ele conclui as aulas. O ápice é a Estrela da Certificação.
+// conforme ele ganha pontos. O ápice é a Estrela da Certificação.
 
 export const GALAXIES = [
   { level: 'basico',        name: 'Galáxia Básica',        color: '#38bdf8' },
@@ -37,21 +37,37 @@ export function levelTotals(tracks = []) {
   return totals;
 }
 
+// Pontos de uma aula concluída (ver lib/gamification.js) e a fatia deles que
+// cada galáxia pede. As aulas são transmitidas ao vivo, então ninguém precisa
+// assistir a todas as gravações: participar também move a nave.
+const LESSON_POINTS = 10;
+export const GALAXY_SHARE = 0.6;
+
+/** Pontos necessários para atravessar cada galáxia, na ordem de GALAXIES. */
+export function galaxyGoals(totals) {
+  return GALAXIES.map(({ level }) =>
+    Math.max(LESSON_POINTS, Math.round(toCount(totals?.[level]) * LESSON_POINTS * GALAXY_SHARE)));
+}
+
 /**
- * Onde a nave está. `fractions` é o avanço em cada galáxia (0 a 1),
+ * Onde a nave está. Os pontos preenchem as galáxias em sequência:
+ * `fractions` é o avanço em cada uma (0 a 1), `earned` os pontos gastos nela,
  * `u` a posição na rota e `galaxyIndex` a galáxia atual (3 = ápice).
  */
 export function racePosition(racer, totals) {
-  const fractions = GALAXIES.map(({ level }) => {
-    const total = toCount(totals?.[level]);
-    if (total === 0) return 0;
-    return Math.min(toCount(racer?.[level]) / total, 1);
+  const goals = galaxyGoals(totals);
+  let remaining = toCount(racer?.points);
+  const earned = goals.map((goal) => {
+    const used = Math.min(remaining, goal);
+    remaining -= used;
+    return used;
   });
+  const fractions = earned.map((used, index) => used / goals[index]);
   const traveled = fractions.reduce((sum, f) => sum + f, 0);
   const certified = Boolean(racer?.certified);
 
   if (certified) {
-    return { fractions, traveled, certified, u: APEX_U, galaxyIndex: GALAXIES.length, pct: 100 };
+    return { fractions, earned, goals, traveled, certified, u: APEX_U, galaxyIndex: GALAXIES.length, pct: 100 };
   }
 
   // Sem a certificação a nave para na borda da última galáxia.
@@ -59,7 +75,7 @@ export function racePosition(racer, totals) {
   const galaxyIndex = Math.min(Math.floor(traveled), GALAXIES.length - 1);
   // 99% no máximo: os 100% ficam reservados para quem chegou ao ápice.
   const pct = Math.min(Math.round((traveled / GALAXIES.length) * 100), 99);
-  return { fractions, traveled, certified, u, galaxyIndex, pct };
+  return { fractions, earned, goals, traveled, certified, u, galaxyIndex, pct };
 }
 
 export function positionLabel(position) {
