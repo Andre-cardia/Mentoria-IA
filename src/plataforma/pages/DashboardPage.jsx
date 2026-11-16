@@ -195,7 +195,7 @@ export default function DashboardPage() {
           .select('id, title, lesson_type, video_url, module_id, modules(title)')
           .order('created_at', { ascending: false })
           .limit(12),
-        supabase.rpc('get_weekly_ranking'),
+        supabase.rpc('get_gamification_ranking', { p_period: 'week', p_limit: 5 }),
         supabase.from('posts')
           .select('id, title, slug, cover_url, seo_description, published_at, author_name')
           .eq('status', 'published')
@@ -380,6 +380,9 @@ export default function DashboardPage() {
                     ))}
                   </div>
                 )}
+                <Link to="/ranking" style={{ display: 'inline-block', marginTop: '12px', fontSize: '.875rem', fontWeight: 600, color: 'var(--accent-text)' }}>
+                  Ver ranking e medalhas →
+                </Link>
               </section>
 
               {/* Comunidade WhatsApp */}

@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { to: '/inicio',       label: 'Início',      icon: 'home' },
   { to: '/cursos',       label: 'Trilhas',     icon: 'trilhas' },
   { to: '/formacoes',    label: 'Formações',   icon: 'formacoes', badge: 'Em breve' },
+  { to: '/ranking',      label: 'Ranking',     icon: 'ranking' },
   { to: '/forum',        label: 'Fórum',       icon: 'forum' },
   { to: '/materiais',    label: 'Materiais',   icon: 'materiais' },
   { to: '/avisos',       label: 'Avisos',      icon: 'avisos' },
@@ -75,6 +76,25 @@ export default function Layout({ children }) {
       .from('modules')
       .select('id, lessons(id)')
       .then(({ data }) => setModules(data ?? []));
+  }, [user]);
+
+  // Conta um acesso por dia (vale pontos no ranking). O banco ignora repetições;
+  // a marca local só evita chamadas desnecessárias a cada troca de página.
+  useEffect(() => {
+    if (!user || typeof supabase.rpc !== 'function') return;
+    const key = `neuralhub-acesso-${user.id}`;
+    const today = new Date().toDateString();
+    try {
+      if (window.localStorage.getItem(key) === today) return;
+    } catch {
+      // Sem armazenamento local: registra a cada carregamento, sem efeito colateral.
+    }
+    Promise.resolve(supabase.rpc('register_platform_access'))
+      .then((res) => {
+        if (res?.error) return;
+        try { window.localStorage.setItem(key, today); } catch { /* ignora */ }
+      })
+      .catch(() => { /* registro de acesso nunca deve quebrar a navegação */ });
   }, [user]);
 
   useEffect(() => {

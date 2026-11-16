@@ -16,6 +16,7 @@ export const DashboardPage    = lazy(() => import('./plataforma/pages/DashboardP
 export const CursosPage       = lazy(() => import('./plataforma/pages/CursosPage'));
 export const CursoPage        = lazy(() => import('./plataforma/pages/CursoPage'));
 export const FormacoesPage    = lazy(() => import('./plataforma/pages/FormacoesPage'));
+export const RankingPage       = lazy(() => import('./plataforma/pages/RankingPage'));
 export const ForumPage        = lazy(() => import('./plataforma/pages/ForumPage'));
 export const MateriaisPage    = lazy(() => import('./plataforma/pages/MateriaisPage'));
 export const AvisosPage       = lazy(() => import('./plataforma/pages/AvisosPage'));
@@ -69,6 +70,7 @@ createRoot(document.getElementById('root')).render(
             {/* Redirecionamentos de rotas legadas */}
             <Route path="/modulos" element={<Navigate to="/cursos" replace />} />
             <Route path="/modulos/:moduleId/aulas/:lessonId" element={<LegacyLessonRedirect />} />
+            <Route path="/ranking"   element={<ProtectedRoute><ProfileGuard><RankingPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/forum"     element={<ProtectedRoute><ProfileGuard><ForumPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/materiais" element={<ProtectedRoute><ProfileGuard><MateriaisPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/avisos"    element={<ProtectedRoute><ProfileGuard><AvisosPage /></ProfileGuard></ProtectedRoute>} />

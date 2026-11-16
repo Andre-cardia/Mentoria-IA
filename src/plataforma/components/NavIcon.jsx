@@ -3,6 +3,7 @@ const PATHS = {
   home: 'M3 10.5 12 3l9 7.5M5 9.5V20h5v-6h4v6h5V9.5',
   trilhas: 'M6 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM18 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM8 17h6a4 4 0 0 0 0-8h-4a4 4 0 0 1 0-8h1',
   formacoes: 'M2 9l10-5 10 5-10 5L2 9ZM6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5M22 9v6',
+  ranking: 'M8 4h8v5a4 4 0 0 1-8 0V4ZM8 6H4v1a4 4 0 0 0 4 4M16 6h4v1a4 4 0 0 1-4 4M12 13v4M8 20h8M10 17h4',
   forum: 'M4 5h16v11H9l-5 4V5Z',
   materiais: 'M3 6h6l2 2h10v11H3V6Z',
   avisos: 'M4 10v4h3l7 4V6l-7 4H4ZM18 9a4 4 0 0 1 0 6',
