@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../../lib/supabase';
 import AdminLayout from '../../components/AdminLayout';
+import { GRANTABLE_RANKS } from '../../lib/starRace';
 
 const STATUS_LABEL = { active: 'Ativo', suspended: 'Suspenso', cancelled: 'Cancelado' };
 const STATUS_COLOR = {
@@ -38,6 +39,48 @@ function Modal({ title, onClose, children }) {
         <button onClick={onClose} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: 'var(--muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
       </div>
     </div>
+  );
+}
+
+// ── Promoção por mérito (patente na Corrida Estelar) ─────────
+function RankForm({ initial = /** @type {{ rank?: string, note?: string }} */ ({}), onSave, onCancel, loading }) {
+  const [rank, setRank] = useState(initial.rank ?? '');
+  const [note, setNote] = useState(initial.note ?? '');
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); onSave({ rank, note }); }} style={{ display: 'grid', gap: '16px' }}>
+      <p style={{ color: 'var(--muted)', fontSize: '.875rem', lineHeight: 1.6, margin: 0 }}>
+        A patente normal vem do avanço do aluno na Corrida Estelar. Aqui você garante uma patente mínima por mérito.
+        Master só é alcançada concluindo o Projeto de Certificação.
+      </p>
+      <div style={{ display: 'grid', gap: '6px' }}>
+        <label htmlFor="rank-select" style={labelStyle}>Patente por mérito</label>
+        <select id="rank-select" value={rank} onChange={(e) => setRank(e.target.value)} style={inputStyle}>
+          <option value="">Sem promoção (segue o avanço na corrida)</option>
+          {GRANTABLE_RANKS.map((item) => (
+            <option key={item.id} value={item.id}>{'★'.repeat(item.stars)} {item.name}</option>
+          ))}
+        </select>
+      </div>
+      <div style={{ display: 'grid', gap: '6px' }}>
+        <label htmlFor="rank-note" style={labelStyle}>Motivo (opcional)</label>
+        <input id="rank-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={200} placeholder="Ex.: ajudou colegas no fórum" style={inputStyle} />
+      </div>
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <button type="submit" disabled={loading} style={{
+          flex: 1, padding: '10px', background: 'var(--accent)', color: '#261000', border: 'none', borderRadius: '4px',
+          fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1,
+        }}>
+          {loading ? 'Salvando...' : 'Salvar patente'}
+        </button>
+        <button type="button" onClick={onCancel} style={{
+          padding: '10px 20px', background: 'transparent', border: '1px solid var(--line)',
+          borderRadius: '4px', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'Space Grotesk, sans-serif',
+        }}>
+          Cancelar
+        </button>
+      </div>
+    </form>
   );
 }
 
@@ -205,6 +248,30 @@ export default function AdminAlunosPage() {
   const [modal, setModal] = useState(null); // null | { type: 'create' | 'edit' | 'delete', student? }
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [promotions, setPromotions] = useState(/** @type {Record<string, { rank: string, note?: string }>} */ ({}));
+
+  const loadPromotions = useCallback(async () => {
+    // As patentes são um complemento: se a leitura falhar, a lista de alunos segue normal.
+    try {
+      const { data } = await supabase.from('rank_promotions').select('user_id, rank, note');
+      setPromotions(Object.fromEntries((data ?? []).map((row) => [row.user_id, row])));
+    } catch (loadError) {
+      console.error('Error in loadPromotions:', loadError);
+    }
+  }, []);
+
+  useEffect(() => { void Promise.resolve().then(loadPromotions); }, [loadPromotions]);
+
+  async function handleRank({ rank, note }) {
+    setSaving(true); setActionError('');
+    const { error: rpcError } = await supabase.rpc('admin_set_rank_promotion', {
+      p_user_id: modal.student.user_id, p_rank: rank || null, p_note: note || null,
+    });
+    setSaving(false);
+    if (rpcError) { setActionError(rpcError.message || 'Não foi possível salvar a patente.'); return; }
+    setModal(null);
+    loadPromotions();
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -399,7 +466,14 @@ export default function AdminAlunosPage() {
                 onMouseOut={e => e.currentTarget.style.background = 'transparent'}
                 >
                   <div>
-                    <div style={{ fontWeight: 500, fontSize: '.9rem' }}>{s.full_name}</div>
+                    <div style={{ fontWeight: 500, fontSize: '.9rem' }}>
+                      {s.full_name}
+                      {promotions[s.user_id] && (
+                        <span title="Promovido por mérito" style={{ color: 'var(--accent-text)', marginLeft: '8px', fontSize: '.75rem', letterSpacing: '.1em' }}>
+                          {'★'.repeat(GRANTABLE_RANKS.find((item) => item.id === promotions[s.user_id].rank)?.stars ?? 0)}
+                        </span>
+                      )}
+                    </div>
                     <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)', marginTop: '2px' }}>
                       {new Date(s.created_at).toLocaleDateString('pt-BR')}
                     </div>
@@ -423,6 +497,12 @@ export default function AdminAlunosPage() {
                       title="Editar"
                       style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--muted)', cursor: 'pointer', fontSize: '.8rem' }}
                     >✏️</button>
+
+                    <button
+                      onClick={() => { setActionError(''); setModal({ type: 'rank', student: s }); }}
+                      title="Patente por mérito" aria-label={`Patente por mérito de ${s.full_name}`}
+                      style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--accent-text)', cursor: 'pointer', fontSize: '.8rem' }}
+                    >★</button>
 
                     {s.status === 'active' && (
                       <button onClick={() => quickStatus(s, 'suspended')} title="Suspender"
@@ -556,6 +636,14 @@ export default function AdminAlunosPage() {
         <Modal title="Editar aluno" onClose={() => setModal(null)}>
           {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
           <StudentForm initial={modal.student} onSave={handleEdit} onCancel={() => setModal(null)} loading={saving} />
+        </Modal>
+      )}
+
+      {/* Modal — Patente por mérito */}
+      {modal?.type === 'rank' && (
+        <Modal title={`Patente — ${modal.student.full_name}`} onClose={() => setModal(null)}>
+          {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
+          <RankForm initial={promotions[modal.student.user_id]} onSave={handleRank} onCancel={() => setModal(null)} loading={saving} />
         </Modal>
       )}
 

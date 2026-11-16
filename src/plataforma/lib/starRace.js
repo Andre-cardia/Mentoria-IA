@@ -87,6 +87,33 @@ export function positionLabel(position) {
   return `Na ${galaxy.name} — ${within}% percorrida`;
 }
 
+// Patentes: uma por galáxia, e Master para quem conclui a certificação.
+// `stars` é a insígnia; `shipClass` define o modelo da nave na corrida.
+export const RANKS = [
+  { id: 'aspirante',        name: 'Aspirante',        stars: 1, shipClass: 1, shipName: 'Lançador orbital' },
+  { id: 'primeiro_oficial', name: 'Primeiro Oficial', stars: 2, shipClass: 2, shipName: 'Lançador pesado' },
+  { id: 'comandante',       name: 'Comandante',       stars: 3, shipClass: 3, shipName: 'Nave interplanetária' },
+  { id: 'master',           name: 'Master',           stars: 4, shipClass: 4, shipName: 'Nave completa com propulsor' },
+];
+
+// Patentes que um admin pode conceder por mérito. Master só com a certificação.
+export const GRANTABLE_RANKS = RANKS.filter((rank) => rank.id === 'primeiro_oficial' || rank.id === 'comandante');
+
+/**
+ * Patente do aluno: a maior entre a conquistada na rota e a concedida por
+ * mérito. `promoted` indica que a promoção por mérito está valendo.
+ */
+export function rankFor(position, grantedRank = null) {
+  const earnedIndex = position?.certified
+    ? 3
+    : Math.min(Math.floor(toCount(position?.traveled)), 2);
+  const grantedIndex = GRANTABLE_RANKS.some((rank) => rank.id === grantedRank)
+    ? RANKS.findIndex((rank) => rank.id === grantedRank)
+    : -1;
+  const index = Math.max(earnedIndex, grantedIndex);
+  return { ...RANKS[index], promoted: grantedIndex > earnedIndex };
+}
+
 /** "Maria Clara Souza" → "Maria S." — cabe na etiqueta da nave. */
 export function shortName(fullName) {
   const parts = String(fullName ?? '').trim().split(/\s+/).filter(Boolean);
@@ -97,11 +124,16 @@ export function shortName(fullName) {
 
 /** Junta os dados do banco com a posição de cada nave. */
 export function buildRacers(rows = [], totals) {
-  return (rows ?? []).map((row, index) => ({
-    id: index,
-    name: shortName(row.user_name),
-    isCurrentUser: Boolean(row.is_current_user),
-    points: toCount(row.points),
-    position: racePosition(row, totals),
-  }));
+  return (rows ?? []).map((row, index) => {
+    const position = racePosition(row, totals);
+    return {
+      id: index,
+      name: shortName(row.user_name),
+      isCurrentUser: Boolean(row.is_current_user),
+      points: toCount(row.points),
+      modulesCompleted: Math.floor(toCount(row.modules_completed)),
+      position,
+      rank: rankFor(position, row.granted_rank),
+    };
+  });
 }

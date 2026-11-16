@@ -6,6 +6,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { APEX_NAME, APEX_U, GALAXIES, galaxyCenterU } from '../lib/starRace';
+import { unlockedUpgradeIds } from '../lib/shipUpgrades';
 
 const SPACE = 0x03040a;
 const MAX_LABELS = 8;
@@ -147,68 +148,216 @@ function buildApex(texture) {
   return group;
 }
 
-function buildShip(isCurrentUser, texture) {
+// ── Naves ────────────────────────────────────────────────────
+// Quatro classes, uma por patente. São modeladas "em pé" (nariz em +Y) e
+// deitadas no fim, para o nariz apontar para +Z (direção do voo).
+
+/** Corpo de foguete: cilindro com nariz em ogiva, torneado. */
+function rocketBody(radius, bottom, top, noseLength, material) {
+  const points = [new THREE.Vector2(0, bottom), new THREE.Vector2(radius, bottom), new THREE.Vector2(radius, top)];
+  const steps = 10;
+  for (let i = 1; i <= steps; i += 1) {
+    const k = i / steps;
+    points.push(new THREE.Vector2(radius * Math.cos(k * Math.PI / 2) ** 0.8, top + noseLength * Math.sin(k * Math.PI / 2)));
+  }
+  return new THREE.Mesh(new THREE.LatheGeometry(points, 32), material);
+}
+
+function band(radius, y, height, material) {
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius * 1.02, radius * 1.02, height, 32, 1, true), material);
+  mesh.position.y = y;
+  return mesh;
+}
+
+function engineBell(radius, y, material) {
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.55, radius, radius * 1.5, 20, 1, true), material);
+  mesh.position.y = y - radius * 0.75;
+  return mesh;
+}
+
+/** Aleta de aço (nave das classes 3 e 4), presa na lateral do casco. */
+function flap(width, height, x, y, material) {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, 0.04), material);
+  mesh.position.set(x, y, 0);
+  return mesh;
+}
+
+function buildShip(racer, texture) {
+  const isCurrentUser = Boolean(racer.isCurrentUser);
+  const shipClass = racer.rank?.shipClass ?? 1;
+  const upgrades = new Set(unlockedUpgradeIds(racer.modulesCompleted));
   const accent = isCurrentUser ? 0xff6a00 : 0x9aa3b5;
-  const hullMaterial = new THREE.MeshStandardMaterial({
-    color: 0xf2f4f8, metalness: 0.7, roughness: 0.3,
+
+  const white = new THREE.MeshStandardMaterial({ color: 0xf2f4f8, metalness: 0.35, roughness: 0.42 });
+  const steel = new THREE.MeshStandardMaterial({ color: 0xdfe3ea, metalness: 0.55, roughness: 0.32, emissive: 0x2a2f3a, emissiveIntensity: 0.35 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x14171d, metalness: 0.5, roughness: 0.6, side: THREE.DoubleSide });
+  const trim = new THREE.MeshStandardMaterial({
+    color: accent, metalness: 0.6, roughness: 0.35, emissive: accent, emissiveIntensity: isCurrentUser ? 0.55 : 0.05,
   });
-  const trimMaterial = new THREE.MeshStandardMaterial({
-    color: accent, metalness: 0.6, roughness: 0.35, emissive: accent, emissiveIntensity: isCurrentUser ? 0.5 : 0.05,
-  });
-  const glassMaterial = new THREE.MeshStandardMaterial({
-    color: 0x0c1830, metalness: 0.9, roughness: 0.08, emissive: 0x1d4f8f, emissiveIntensity: 0.5,
-  });
-  const group = new THREE.Group();
+  const gold = new THREE.MeshStandardMaterial({ color: 0xd9ae4f, metalness: 0.9, roughness: 0.25, emissive: 0x6b4a10, emissiveIntensity: 0.35 });
 
-  // Fuselagem: perfil torneado, com o nariz apontando para +Z (direção do voo).
-  const profile = [
-    [0, -1.5], [0.34, -1.42], [0.46, -0.9], [0.5, -0.1], [0.42, 0.7], [0.24, 1.35], [0, 1.9],
-  ].map(([x, y]) => new THREE.Vector2(x, y));
-  const hull = new THREE.Mesh(new THREE.LatheGeometry(profile, 28), hullMaterial);
-  hull.rotation.x = Math.PI / 2;
-  hull.scale.set(1, 1, 0.62); // achata a fuselagem na vertical
+  const rocket = new THREE.Group();
+  // Medidas que os acessórios usam para se encaixar em qualquer classe.
+  let spec;
 
-  const wingShape = new THREE.Shape();
-  wingShape.moveTo(0, 0.55);
-  wingShape.lineTo(1.9, -0.95);
-  wingShape.lineTo(1.9, -1.3);
-  wingShape.lineTo(0, -0.85);
-  wingShape.closePath();
-  const wingGeometry = new THREE.ExtrudeGeometry(wingShape, { depth: 0.07, bevelEnabled: false });
-  wingGeometry.rotateX(Math.PI / 2); // deita a asa no plano XZ
-  const wingRight = new THREE.Mesh(wingGeometry, trimMaterial);
-  wingRight.position.set(0.3, 0.02, -0.1);
-  const wingLeft = wingRight.clone();
-  wingLeft.scale.x = -1;
-  wingLeft.position.x = -0.3;
+  if (shipClass === 1 || shipClass === 2) {
+    const r = 0.24;
+    spec = { r, bottom: -1.6, top: 1.0, tip: 1.95, outer: r, finY: 0.55, engineYs: [[0, 0]] };
+    rocket.add(rocketBody(r, -1.6, 0.35, 0, white));          // primeiro estágio
+    rocket.add(band(r, 0.43, 0.2, dark));                      // interestágio
+    rocket.add(rocketBody(r, 0.5, 1.0, 0, white));             // segundo estágio
+    rocket.add(rocketBody(r * 1.22, 1.0, 1.35, 0.6, white));   // coifa
+    rocket.add(band(r, -0.6, 0.06, trim), band(r * 1.22, 1.1, 0.05, trim));
+    rocket.add(engineBell(r * 0.8, -1.6, dark));
+    if (shipClass === 2) {
+      // Dois propulsores laterais, com nariz próprio.
+      for (const side of [-1, 1]) {
+        const booster = new THREE.Group();
+        booster.add(rocketBody(r, -1.6, 0.1, 0.5, white), band(r, -0.6, 0.06, trim), engineBell(r * 0.8, -1.6, dark));
+        booster.position.x = side * r * 2.08;
+        rocket.add(booster);
+        const strut = new THREE.Mesh(new THREE.BoxGeometry(r * 0.4, 0.05, 0.05), dark);
+        strut.position.set(side * r * 1.04, -0.2, 0);
+        rocket.add(strut, strut.clone().translateY(-1.0));
+      }
+      spec.outer = r * 3.08;
+      spec.engineYs = [[0, 0], [-r * 2.08, 0], [r * 2.08, 0]];
+    }
+  } else {
+    const r = 0.34;
+    const hasBooster = shipClass === 4;
+    const shipBottom = hasBooster ? -0.35 : -1.5;
+    const top = hasBooster ? 1.45 : 0.85;
+    const bottom = hasBooster ? -2.5 : -1.5;
+    spec = { r, bottom, top, tip: top + 0.95, outer: r, finY: hasBooster ? -0.6 : top - 0.25, engineYs: [[0, 0]] };
+    rocket.add(rocketBody(r, shipBottom, top, 0.95, steel));
+    // Aletas: duas pequenas perto do nariz, duas grandes na base da nave.
+    for (const side of [-1, 1]) {
+      rocket.add(flap(0.3, 0.42, side * (r + 0.13), top + 0.12, dark));
+      rocket.add(flap(0.46, 0.7, side * (r + 0.21), shipBottom + 0.4, dark));
+    }
+    rocket.add(band(r, top - 0.1, 0.05, trim));
+    if (hasBooster) {
+      rocket.add(rocketBody(r, -2.5, -0.45, 0, steel));       // propulsor
+      rocket.add(band(r, -0.4, 0.14, dark));                   // anel de separação
+      rocket.add(band(r, -1.4, 0.05, trim), band(r, -2.3, 0.3, dark));
+    }
+    rocket.add(engineBell(r * 0.9, bottom, dark));
+    // Janelas da cabine, no dorso.
+    const glass = new THREE.MeshStandardMaterial({ color: 0x0c1830, metalness: 0.9, roughness: 0.1, emissive: 0x1d4f8f, emissiveIntensity: 0.6 });
+    const windowMesh = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 10), glass);
+    windowMesh.scale.set(1.6, 1, 0.5);
+    windowMesh.position.set(0, top + 0.3, -r * 0.82);
+    rocket.add(windowMesh);
+  }
 
-  const fin = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.75, 0.9), trimMaterial);
-  fin.position.set(0, 0.42, -1);
-  fin.rotation.x = -0.35;
+  // ── Acessórios (um a cada conjunto de módulos concluídos) ──
+  const { r, bottom, top, tip, outer, finY } = spec;
+  if (upgrades.has('antenna')) {
+    const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.4, 8), dark);
+    mast.rotation.x = Math.PI / 2;
+    mast.position.set(0, top - 0.35, -(r + 0.2));
+    const dish = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2.4), white);
+    dish.rotation.x = Math.PI / 2;
+    dish.position.set(0, top - 0.35, -(r + 0.3));
+    rocket.add(mast, dish);
+  }
+  if (upgrades.has('gridfins')) {
+    for (let i = 0; i < 4; i += 1) {
+      const fin = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.035, 0.2), dark);
+      const angle = Math.PI / 4 + i * Math.PI / 2;
+      fin.position.set(Math.cos(angle) * (r + 0.11), finY, Math.sin(angle) * (r + 0.11));
+      fin.rotation.y = -angle;
+      rocket.add(fin);
+    }
+  }
+  if (upgrades.has('legs')) {
+    for (let i = 0; i < 4; i += 1) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.07), dark);
+      const angle = Math.PI / 4 + i * Math.PI / 2;
+      leg.position.set(Math.cos(angle) * (r + 0.12), bottom + 0.2, Math.sin(angle) * (r + 0.12));
+      leg.rotation.y = -angle;
+      leg.rotation.z = -0.38;
+      rocket.add(leg);
+    }
+  }
+  if (upgrades.has('solar')) {
+    const cell = new THREE.MeshStandardMaterial({ color: 0x10244d, metalness: 0.8, roughness: 0.3, emissive: 0x16357a, emissiveIntensity: 0.5 });
+    const y = (bottom + top) / 2 + 0.2;
+    for (const side of [-1, 1]) {
+      const panel = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.34, 0.02), cell);
+      panel.position.set(side * (outer + 0.5), y, 0);
+      const strut = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.03, 0.03), dark);
+      strut.position.set(side * (outer + 0.07), y, 0);
+      rocket.add(panel, strut);
+    }
+  }
+  if (upgrades.has('shield')) {
+    // Meia-casca escura no ventre.
+    const shell = new THREE.Mesh(
+      new THREE.CylinderGeometry(r * 1.035, r * 1.035, top - bottom - 0.3, 24, 1, true, -Math.PI / 2, Math.PI), dark,
+    );
+    shell.position.y = (bottom + top) / 2 + 0.1;
+    rocket.add(shell);
+  }
+  if (upgrades.has('engines')) {
+    for (let i = 0; i < 3; i += 1) {
+      const angle = i * Math.PI * 2 / 3;
+      const bell = engineBell(r * 0.38, bottom, dark);
+      bell.position.x = Math.cos(angle) * r * 0.62;
+      bell.position.z = Math.sin(angle) * r * 0.62;
+      rocket.add(bell);
+    }
+  }
+  if (upgrades.has('lights')) {
+    const lights = [[0xff3b3b, -(outer + 0.03), 0], [0x3bff7a, outer + 0.03, 0]];
+    for (const [color, x] of lights) {
+      const light = glowSprite(texture, color, 0.5, 0.95);
+      light.position.set(x, bottom + 0.9, 0);
+      rocket.add(light);
+    }
+    const noseLight = glowSprite(texture, 0xffffff, 0.45, 0.9);
+    noseLight.position.y = tip + 0.02;
+    rocket.add(noseLight);
+  }
+  if (upgrades.has('command') || shipClass === 4) {
+    // Faixas douradas: acabamento de comando (e marca da patente Master).
+    rocket.add(band(r, top - 0.22, 0.07, gold), band(r, bottom + 0.55, 0.07, gold));
+  }
 
-  const cockpit = new THREE.Mesh(new THREE.SphereGeometry(0.3, 20, 14), glassMaterial);
-  cockpit.scale.set(0.9, 0.7, 1.9);
-  cockpit.position.set(0, 0.24, 0.45);
-
+  // Propulsão: um jato por motor principal.
   const engineColor = isCurrentUser ? 0xffb347 : 0xdfe9ff;
-  const trail = new THREE.Mesh(
-    new THREE.ConeGeometry(0.22, 4.5, 20, 1, true),
-    new THREE.MeshBasicMaterial({
-      color: engineColor, transparent: true, opacity: 0.32,
-      blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide,
-    }),
-  );
-  trail.rotation.x = -Math.PI / 2; // ponta para trás
-  trail.position.z = -3.7;
-  const engine = glowSprite(texture, engineColor, 1.8, 0.9);
-  engine.position.z = -1.6;
+  const boost = upgrades.has('engines') ? 1.35 : 1;
+  const engineSize = (shipClass >= 3 ? 2.2 : 1.7) * boost;
+  const trails = [];
+  const engines = [];
+  for (const [x] of spec.engineYs) {
+    const trail = new THREE.Mesh(
+      new THREE.ConeGeometry(r * 0.75 * boost, 4.5, 20, 1, true),
+      new THREE.MeshBasicMaterial({
+        color: engineColor, transparent: true, opacity: 0.3,
+        blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide,
+      }),
+    );
+    trail.rotation.z = Math.PI; // ponta para trás
+    trail.position.set(x, bottom - 2.5, 0);
+    const engine = glowSprite(texture, engineColor, engineSize, 0.9);
+    engine.position.set(x, bottom - 0.35, 0);
+    rocket.add(trail, engine);
+    trails.push(trail);
+    engines.push(engine);
+  }
 
-  group.add(hull, wingRight, wingLeft, fin, cockpit, trail, engine);
-  group.userData = { trail, engine };
+  rocket.rotation.x = Math.PI / 2; // deita: nariz para +Z
+  if (shipClass === 4) rocket.scale.setScalar(0.85);
+
+  const group = new THREE.Group();
+  group.add(rocket);
+  group.userData = { trails, engines, engineSize };
 
   if (isCurrentUser) {
     group.scale.setScalar(1.6);
-    group.add(glowSprite(texture, 0xff6a00, 5, 0.14));
+    group.add(glowSprite(texture, 0xff6a00, 5, 0.12));
   }
   return group;
 }
@@ -338,7 +487,7 @@ export default function StarRace({ racers = [] }) {
       const lift = new THREE.Vector3().crossVectors(side, tangent).normalize();
       const lane = racer.isCurrentUser ? 0 : 3.2 + (index % 5) * 1.8;
       const angle = index * 2.399963;
-      const ship = buildShip(racer.isCurrentUser, texture);
+      const ship = buildShip(racer, texture);
       ship.position.copy(center)
         .addScaledVector(side, Math.cos(angle) * lane)
         .addScaledVector(lift, Math.sin(angle) * lane * 0.6);
@@ -354,10 +503,10 @@ export default function StarRace({ racers = [] }) {
       if (racer.isCurrentUser) {
         myShip = ship;
         myU = u;
-        addLabel('VOCÊ', 'me', ship.position, 3.6);
+        addLabel(`VOCÊ ${'★'.repeat(racer.rank?.stars ?? 1)}`, 'me', ship.position, 4.2);
       } else if (labelCount < MAX_LABELS) {
         labelCount += 1;
-        addLabel(racer.name, 'racer', ship.position, 2.4);
+        addLabel(`${racer.name} ${'★'.repeat(racer.rank?.stars ?? 1)}`, 'racer', ship.position, 2.4);
       }
       return ship;
     });
@@ -456,11 +605,11 @@ export default function StarRace({ racers = [] }) {
         apex.userData.ringA.rotation.z = t * 0.35;
         apex.userData.ringB.rotation.z = -t * 0.22;
         ships.forEach((ship) => {
-          const { base, phase, trail, engine } = ship.userData;
+          const { base, phase, trails, engines, engineSize } = ship.userData;
           ship.position.y = base.y + Math.sin(t * 1.3 + phase) * 0.28;
           const pulse = 0.85 + Math.sin(t * 11 + phase) * 0.15;
-          trail.scale.set(1, pulse, 1);
-          engine.scale.setScalar(1.8 * pulse);
+          trails.forEach((trail) => trail.scale.set(1, pulse, 1));
+          engines.forEach((engine) => engine.scale.setScalar(engineSize * pulse));
         });
       }
       if (flight) {

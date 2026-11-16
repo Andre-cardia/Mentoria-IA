@@ -2,7 +2,8 @@ import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 import StellarGlyph from '../components/StellarGlyph';
-import { APEX_NAME, GALAXIES, buildRacers, levelTotals, positionLabel } from '../lib/starRace';
+import { APEX_NAME, GALAXIES, RANKS, buildRacers, levelTotals, positionLabel } from '../lib/starRace';
+import { nextUpgrade, upgradeStatus } from '../lib/shipUpgrades';
 import {
   POINT_RULES, RANKING_PERIODS,
   computeBadges, formatPoints, nextBadge, normalizeStats,
@@ -57,6 +58,75 @@ function Readout({ label, children }) {
   );
 }
 
+function Stars({ count, total = 4, size = 14 }) {
+  return (
+    <span role="img" aria-label={`${count} estrela${count === 1 ? '' : 's'}`} style={{ display: 'inline-flex', gap: '3px', verticalAlign: 'middle' }}>
+      {Array.from({ length: total }, (_, index) => (
+        <svg key={index} width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"
+          fill={index < count ? '#ffb347' : 'none'} stroke={index < count ? '#ffb347' : 'currentColor'} strokeWidth="1.5" opacity={index < count ? 1 : 0.35}>
+          <path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z" strokeLinejoin="round" />
+        </svg>
+      ))}
+    </span>
+  );
+}
+
+// Patente, nave e acessórios do aluno.
+function ShipBay({ racer }) {
+  const { rank, modulesCompleted } = racer;
+  const upgrades = upgradeStatus(modulesCompleted);
+  const upcoming = nextUpgrade(modulesCompleted);
+  const installed = upgrades.filter((upgrade) => upgrade.unlocked).length;
+
+  return (
+    <div style={{ borderTop: `1px solid ${panel.line}`, padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px 40px' }}>
+      <div>
+        <div style={{ ...eyebrow, color: panel.dim, marginBottom: '12px' }}>Carreira</div>
+        <ol style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+          {RANKS.map((item) => {
+            const current = item.id === rank.id;
+            const reached = item.stars <= rank.stars;
+            return (
+              <li key={item.id} aria-current={current ? 'step' : undefined}
+                style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 10px', borderLeft: `2px solid ${current ? '#ff6a00' : 'transparent'}`, background: current ? 'rgba(255,255,255,.05)' : 'transparent', color: reached ? panel.ink : panel.dim }}>
+                <span style={{ minWidth: '72px', color: panel.dim }}><Stars count={reached ? item.stars : 0} total={item.stars} size={12} /></span>
+                <span style={{ ...eyebrow, fontWeight: current ? 700 : 400, flex: 1 }}>{item.name}</span>
+                <span style={{ ...mono, fontSize: '.7rem', color: panel.dim, textAlign: 'right' }}>{item.shipName}</span>
+              </li>
+            );
+          })}
+        </ol>
+        {rank.promoted && (
+          <p style={{ ...mono, fontSize: '.72rem', color: '#ffb347', margin: '10px 0 0 10px' }}>Promoção por mérito concedida pela equipe.</p>
+        )}
+      </div>
+
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '12px' }}>
+          <span style={{ ...eyebrow, color: panel.dim }}>Acessórios da nave</span>
+          <span style={{ ...mono, fontSize: '.72rem', color: panel.dim }}>{pad(installed)} / {pad(upgrades.length)}</span>
+        </div>
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: '6px 20px' }}>
+          {upgrades.map((upgrade) => (
+            <li key={upgrade.id} title={upgrade.description} style={{ display: 'flex', alignItems: 'baseline', gap: '8px', fontSize: '.85rem', color: upgrade.unlocked ? panel.ink : panel.dim }}>
+              <span aria-hidden="true" style={{ ...mono, fontSize: '.7rem', color: upgrade.unlocked ? '#ffb347' : panel.dim }}>{upgrade.unlocked ? '■' : '□'}</span>
+              <span style={{ flex: 1 }}>{upgrade.name}</span>
+              <span style={{ ...mono, fontSize: '.68rem', color: panel.dim }}>
+                {upgrade.unlocked ? 'instalado' : `${upgrade.modules} mód.`}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p style={{ ...mono, fontSize: '.72rem', color: panel.dim, margin: '12px 0 0 0' }}>
+          {upcoming
+            ? `Próximo: ${upcoming.name} — falta${upcoming.remaining === 1 ? '' : 'm'} ${upcoming.remaining} módulo${upcoming.remaining === 1 ? '' : 's'} concluído${upcoming.remaining === 1 ? '' : 's'}.`
+            : 'Nave completa: todos os acessórios instalados.'}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function MissionPanel({ me, racers }) {
   const stats = normalizeStats(me);
   const rank = me?.rank_pos ? Number(me.rank_pos) : null;
@@ -81,6 +151,9 @@ function MissionPanel({ me, racers }) {
 
       {/* Telemetria */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', borderTop: `1px solid ${panel.line}`, marginLeft: '-1px' }}>
+        <Readout label={mine ? <>Patente <Stars count={mine.rank.stars} total={mine.rank.stars} size={11} /></> : 'Patente'}>
+          {mine ? mine.rank.name : '—'}
+        </Readout>
         <Readout label="Pontos">{formatPoints(stats.points)}</Readout>
         <Readout label="Posição">
           {rank ? <>{pad(rank)}<span style={{ color: panel.dim, fontSize: '1rem' }}> / {pad(participants)}</span></> : '—'}
@@ -127,6 +200,8 @@ function MissionPanel({ me, racers }) {
           </li>
         </ol>
       )}
+
+      {mine && <ShipBay racer={mine} />}
 
       {/* Situação e atividade */}
       <div style={{ padding: '18px 20px', borderTop: `1px solid ${panel.line}`, display: 'flex', flexWrap: 'wrap', gap: '14px 32px', alignItems: 'baseline', justifyContent: 'space-between' }}>
@@ -356,7 +431,7 @@ export default function RankingPage() {
           Corrida Estelar pela Certificação em AI Engineer
         </h1>
         <p style={{ color: 'var(--muted)', fontSize: '1rem', marginBottom: '24px', maxWidth: '70ch' }}>
-          Cada trilha é uma galáxia. Ganhe pontos para atravessá-las e conclua o Projeto de Certificação para chegar à {APEX_NAME}.
+          Cada trilha é uma galáxia e cada galáxia, uma patente e uma nave nova. Módulos concluídos rendem acessórios. Ganhe pontos para avançar e conclua o Projeto de Certificação para chegar à {APEX_NAME}.
         </p>
 
         {error && <p role="alert" style={{ color: 'var(--danger)', marginBottom: '20px' }}>{error}</p>}
