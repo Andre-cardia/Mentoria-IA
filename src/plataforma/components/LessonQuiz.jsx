@@ -73,39 +73,24 @@ export default function LessonQuiz({ lessonId }) {
       }
       if (!currentUser) setCurrentUser(user);
 
-      // Busca com is_correct apenas após submissão para calcular score
-      const { data: qWithCorrect, error: correctError } = await supabase
-        .from('quiz_questions')
-        .select('id, quiz_options(id, is_correct)')
-        .eq('lesson_id', lessonId);
+      // A correção acontece no servidor: é ele que confere as respostas,
+      // grava a tentativa e diz se ela rendeu pontos.
+      const { data, error: submitError } = await supabase.rpc('submit_quiz_attempt', {
+        p_lesson_id: lessonId,
+        p_answers: answers,
+      });
 
-      if (correctError) throw correctError;
+      if (submitError) throw submitError;
+      if (!data?.id) throw new Error('Tentativa não retornada pelo servidor.');
 
-      let correct = 0;
-      const correctMap = {};
-      if (qWithCorrect) {
-        for (const q of qWithCorrect) {
-          const correctOpt = (q.quiz_options || []).find((o) => o.is_correct);
-          if (correctOpt) {
-            correctMap[q.id] = correctOpt.id;
-            if (answers[q.id] === correctOpt.id) correct++;
-          }
-        }
-      }
-
-      const score = Math.round((correct / questions.length) * 100);
-
-      const { data: attempt, error: insertError } = await supabase
-        .from('quiz_attempts')
-        .insert({ lesson_id: lessonId, user_id: user.id, score, answers })
-        .select('id, score, completed_at')
-        .single();
-
-      if (insertError) throw insertError;
-      if (!attempt) throw new Error('Tentativa não retornada pelo servidor.');
-
-      setAttempts((p) => [attempt, ...p]);
-      setResult({ score, correct, total: questions.length, correctMap });
+      setAttempts((p) => [{ id: data.id, score: data.score, completed_at: data.completed_at }, ...p]);
+      setResult({
+        score: data.score,
+        correct: data.correct,
+        total: data.total,
+        correctMap: data.correct_map ?? {},
+        pointsEarned: Number(data.points_earned) || 0,
+      });
     } catch (err) {
       console.error('Erro ao salvar tentativa do quiz:', err);
       setError('Não foi possível salvar suas respostas no servidor. Revise sua conexão e tente novamente.');
@@ -148,6 +133,16 @@ export default function LessonQuiz({ lessonId }) {
             <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--muted)', marginTop: '4px' }}>
               {result.correct} de {result.total} {result.total === 1 ? 'correta' : 'corretas'}
             </div>
+            {result.pointsEarned > 0 && (
+              <div style={{ marginTop: '8px', fontWeight: 700, color: 'var(--accent-text)' }}>
+                🚀 +{result.pointsEarned} pontos na Corrida Estelar
+              </div>
+            )}
+            {result.score < 70 && (
+              <div style={{ marginTop: '8px', fontSize: '.875rem', color: 'var(--muted)' }}>
+                Acerte 70% ou mais para ganhar pontos na Corrida Estelar.
+              </div>
+            )}
           </div>
           <button onClick={retry} style={{
             padding: '8px 20px', background: 'transparent', border: '1px solid var(--line-strong)',

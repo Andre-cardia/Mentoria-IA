@@ -3,12 +3,11 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import LessonQuiz from '../components/LessonQuiz';
 
 const mockUser = { id: 'user-123' };
-const mockInsert = vi.fn();
+const mockRpc = vi.fn();
 
 let questionsResult;
-let correctQuestionsResult;
 let attemptsResult;
-let insertResult;
+let submitResult;
 let userResult;
 
 function eqReturning(value) {
@@ -20,12 +19,15 @@ vi.mock('../../lib/supabase', () => ({
     auth: {
       getUser: vi.fn(() => Promise.resolve(userResult)),
     },
+    rpc: vi.fn((name, params) => {
+      mockRpc(name, params);
+      return Promise.resolve(submitResult);
+    }),
     from: vi.fn((table) => {
       if (table === 'quiz_questions') {
         return {
-          select: vi.fn((columns) => ({
+          select: vi.fn(() => ({
             eq: vi.fn(() => {
-              if (columns.includes('is_correct')) return Promise.resolve(correctQuestionsResult);
               return {
                 order: vi.fn(() => Promise.resolve(questionsResult)),
               };
@@ -43,14 +45,6 @@ vi.mock('../../lib/supabase', () => ({
               })),
             })),
           })),
-          insert: vi.fn((payload) => {
-            mockInsert(payload);
-            return {
-              select: vi.fn(() => ({
-                single: vi.fn(() => Promise.resolve(insertResult)),
-              })),
-            };
-          }),
         };
       }
 
@@ -77,21 +71,13 @@ describe('LessonQuiz', () => {
       ],
       error: null,
     };
-    correctQuestionsResult = {
-      data: [
-        {
-          id: 'question-1',
-          quiz_options: [
-            { id: 'option-1', is_correct: true },
-            { id: 'option-2', is_correct: false },
-          ],
-        },
-      ],
-      error: null,
-    };
     attemptsResult = { data: [], error: null };
-    insertResult = {
-      data: { id: 'attempt-1', score: 100, completed_at: '2026-05-08T12:00:00Z' },
+    submitResult = {
+      data: {
+        id: 'attempt-1', score: 100, correct: 1, total: 1,
+        correct_map: { 'question-1': 'option-1' },
+        completed_at: '2026-05-08T12:00:00Z', points_earned: 20,
+      },
       error: null,
     };
   });
@@ -104,11 +90,9 @@ describe('LessonQuiz', () => {
     fireEvent.click(screen.getByRole('button', { name: /submeter prova/i }));
 
     await waitFor(() => {
-      expect(mockInsert).toHaveBeenCalledWith({
-        lesson_id: 'lesson-1',
-        user_id: 'user-123',
-        score: 100,
-        answers: { 'question-1': 'option-1' },
+      expect(mockRpc).toHaveBeenCalledWith('submit_quiz_attempt', {
+        p_lesson_id: 'lesson-1',
+        p_answers: { 'question-1': 'option-1' },
       });
     });
 
@@ -116,10 +100,26 @@ describe('LessonQuiz', () => {
       expect(screen.getAllByText('100%')).toHaveLength(2);
     });
     expect(screen.getByText(/1 de 1 correta/i)).toBeTruthy();
+    expect(screen.getByText(/\+20 pontos na Corrida Estelar/)).toBeTruthy();
+  });
+
+  it('não promete pontos quando a nota fica abaixo de 70%', async () => {
+    submitResult = {
+      data: { id: 'attempt-2', score: 0, correct: 0, total: 1, correct_map: { 'question-1': 'option-1' }, completed_at: '2026-05-08T12:00:00Z', points_earned: 0 },
+      error: null,
+    };
+    render(<LessonQuiz lessonId="lesson-1" />);
+
+    await screen.findByText('Qual resposta esta correta?');
+    fireEvent.click(screen.getByText('Resposta B'));
+    fireEvent.click(screen.getByRole('button', { name: /submeter prova/i }));
+
+    expect(await screen.findByText(/Acerte 70% ou mais/)).toBeTruthy();
+    expect(screen.queryByText(/pontos na Corrida Estelar$/)).toBeNull();
   });
 
   it('mostra erro e nao exibe resultado quando o Supabase rejeita o salvamento', async () => {
-    insertResult = { data: null, error: { message: 'RLS denied' } };
+    submitResult = { data: null, error: { message: 'denied' } };
 
     render(<LessonQuiz lessonId="lesson-1" />);
 

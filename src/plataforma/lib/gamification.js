@@ -1,7 +1,8 @@
 // Regras de pontuação. Espelham a função gamification_scores do banco
-// (supabase/migrations/20261116000033_gamification.sql): se mudar aqui, mude lá.
+// (supabase/migrations/20261116000035_quiz_points.sql): se mudar aqui, mude lá.
 export const POINT_RULES = [
   { metric: 'lessons',     label: 'Aula concluída',            points: 10 },
+  { metric: 'quizzes',     label: 'Quiz aprovado (70% ou mais)', points: 20, note: 'uma vez por quiz' },
   { metric: 'posts',       label: 'Post no fórum',             points: 5, dailyCap: 5 },
   { metric: 'questions',   label: 'Dúvida em uma aula',        points: 3, dailyCap: 5 },
   { metric: 'answers',     label: 'Resposta (fórum ou aula)',  points: 3, dailyCap: 5 },
@@ -14,7 +15,7 @@ export const RANKING_PERIODS = [
   { id: 'all',   label: 'Geral' },
 ];
 
-export const EMPTY_STATS = { lessons: 0, access_days: 0, posts: 0, questions: 0, answers: 0, points: 0 };
+export const EMPTY_STATS = { lessons: 0, access_days: 0, posts: 0, questions: 0, answers: 0, quizzes: 0, points: 0 };
 
 export const BADGES = [
   { id: 'aula-1',     icon: '🚀', title: 'Primeiro passo',   metric: 'lessons',     target: 1,   description: 'Conclua sua primeira aula' },
@@ -22,6 +23,9 @@ export const BADGES = [
   { id: 'aula-25',    icon: '🔥', title: 'Dedicação',        metric: 'lessons',     target: 25,  description: 'Conclua 25 aulas' },
   { id: 'aula-50',    icon: '🏅', title: 'Maratonista',      metric: 'lessons',     target: 50,  description: 'Conclua 50 aulas' },
   { id: 'aula-100',   icon: '🏆', title: 'Centurião',        metric: 'lessons',     target: 100, description: 'Conclua 100 aulas' },
+  { id: 'quiz-1',     icon: '🎯', title: 'Na mosca',         metric: 'quizzes',     target: 1,   description: 'Seja aprovado em um quiz' },
+  { id: 'quiz-5',     icon: '🧠', title: 'Mente afiada',     metric: 'quizzes',     target: 5,   description: 'Seja aprovado em 5 quizzes' },
+  { id: 'quiz-15',    icon: '🎓', title: 'Domínio total',    metric: 'quizzes',     target: 15,  description: 'Seja aprovado em 15 quizzes' },
   { id: 'acesso-7',   icon: '📅', title: 'Presença',         metric: 'access_days', target: 7,   description: 'Acesse a plataforma em 7 dias' },
   { id: 'acesso-30',  icon: '🗓️', title: 'Hábito formado',   metric: 'access_days', target: 30,  description: 'Acesse a plataforma em 30 dias' },
   { id: 'acesso-100', icon: '💎', title: 'Sempre por aqui',  metric: 'access_days', target: 100, description: 'Acesse a plataforma em 100 dias' },

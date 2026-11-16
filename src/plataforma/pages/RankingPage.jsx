@@ -15,6 +15,7 @@ const card = { background: 'var(--panel)', border: '1px solid var(--line)', bord
 
 const STAT_LABELS = [
   { metric: 'lessons',     label: 'Aulas concluídas' },
+  { metric: 'quizzes',     label: 'Quizzes aprovados' },
   { metric: 'access_days', label: 'Dias com acesso' },
   { metric: 'posts',       label: 'Posts no fórum' },
   { metric: 'questions',   label: 'Dúvidas' },
@@ -239,6 +240,7 @@ function Rules() {
             <span>
               {rule.label}
               {rule.dailyCap && <span style={{ color: 'var(--muted)', fontSize: '.85rem' }}> · até {rule.dailyCap} por dia</span>}
+              {rule.note && <span style={{ color: 'var(--muted)', fontSize: '.85rem' }}> · {rule.note}</span>}
             </span>
             <span style={{ ...mono, fontSize: '.8rem', fontWeight: 700, color: 'var(--accent-text)', whiteSpace: 'nowrap' }}>+{rule.points} pts</span>
           </li>

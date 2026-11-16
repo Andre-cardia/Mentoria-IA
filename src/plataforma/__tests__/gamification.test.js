@@ -4,7 +4,7 @@ import { BADGES, computeBadges, formatPoints, nextBadge, normalizeStats } from '
 describe('gamification', () => {
   it('normaliza números vindos do banco como texto e ignora lixo', () => {
     expect(normalizeStats({ lessons: '12', points: '140', posts: null, answers: -3, questions: 'x' }))
-      .toEqual({ lessons: 12, access_days: 0, posts: 0, questions: 0, answers: 0, points: 140 });
+      .toEqual({ lessons: 12, access_days: 0, posts: 0, questions: 0, answers: 0, quizzes: 0, points: 140 });
   });
 
   it('sem atividade nenhuma medalha é conquistada', () => {
@@ -22,7 +22,7 @@ describe('gamification', () => {
 
   it('aponta a medalha pendente mais próxima', () => {
     expect(nextBadge({ lessons: 9, access_days: 1 }).id).toBe('aula-10');
-    const tudo = { lessons: 100, access_days: 100, posts: 10, questions: 10, answers: 50 };
+    const tudo = { lessons: 100, access_days: 100, posts: 10, questions: 10, answers: 50, quizzes: 15 };
     expect(nextBadge(tudo)).toBeNull();
   });
 
