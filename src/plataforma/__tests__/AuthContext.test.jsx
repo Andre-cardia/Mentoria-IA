@@ -62,7 +62,7 @@ describe('AuthContext', () => {
 
   it('carrega usuário quando sessão existe', async () => {
     auth.getSession.mockResolvedValue({
-      data: { session: { user: { email: 'aluno@test.com', user_metadata: { role: 'aluno' } } } },
+      data: { session: { user: { email: 'aluno@test.com', app_metadata: { role: 'aluno' } } } },
     });
     renderWithAuth();
     await waitFor(() => expect(screen.getByTestId('user').textContent).toBe('aluno@test.com'));
@@ -70,9 +70,9 @@ describe('AuthContext', () => {
     expect(screen.getByTestId('hasCrmAccess').textContent).toBe('false');
   });
 
-  it('isAdmin=true quando role=admin no user_metadata', async () => {
+  it('isAdmin=true quando role=admin no app_metadata', async () => {
     auth.getSession.mockResolvedValue({
-      data: { session: { user: { email: 'admin@test.com', user_metadata: { role: 'admin' } } } },
+      data: { session: { user: { email: 'admin@test.com', app_metadata: { role: 'admin' } } } },
     });
     renderWithAuth();
     await waitFor(() => expect(screen.getByTestId('isAdmin').textContent).toBe('true'));
@@ -82,7 +82,7 @@ describe('AuthContext', () => {
 
   it('isCommercial=true e hasCrmAccess=true quando role=comercial', async () => {
     auth.getSession.mockResolvedValue({
-      data: { session: { user: { email: 'comercial@test.com', user_metadata: { role: 'comercial' } } } },
+      data: { session: { user: { email: 'comercial@test.com', app_metadata: { role: 'comercial' } } } },
     });
     renderWithAuth();
     await waitFor(() => expect(screen.getByTestId('isCommercial').textContent).toBe('true'));

@@ -178,7 +178,7 @@ export default function LessonQA({ lessonId }) {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         setCurrentUser(user);
-        setIsAdmin((user.user_metadata?.role) === 'admin');
+        setIsAdmin((user.app_metadata?.role) === 'admin');
         const name = user.user_metadata?.full_name
           || user.user_metadata?.name
           || user.email?.split('@')[0]

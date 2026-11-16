@@ -1,11 +1,10 @@
-import { StrictMode, lazy, Suspense } from 'react';
+import { StrictMode, lazy, Suspense, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
 import { AuthProvider } from './plataforma/context/AuthContext';
 import ProtectedRoute from './plataforma/components/ProtectedRoute';
-import AdminRoute from './plataforma/components/AdminRoute';
-import CrmRoute from './plataforma/components/CrmRoute';
 import ProfileGuard from './plataforma/components/ProfileGuard';
+import { GESTAO_BASE } from './lib/app-env';
 import LoginPage from './plataforma/pages/LoginPage';
 import RegisterPage from './plataforma/pages/RegisterPage';
 import CompletarPerfilPage from './plataforma/pages/CompletarPerfilPage';
@@ -16,29 +15,28 @@ import ResetPasswordPage from './plataforma/pages/ResetPasswordPage';
 export const DashboardPage    = lazy(() => import('./plataforma/pages/DashboardPage'));
 export const CursosPage       = lazy(() => import('./plataforma/pages/CursosPage'));
 export const CursoPage        = lazy(() => import('./plataforma/pages/CursoPage'));
+export const FormacoesPage    = lazy(() => import('./plataforma/pages/FormacoesPage'));
 export const ForumPage        = lazy(() => import('./plataforma/pages/ForumPage'));
 export const MateriaisPage    = lazy(() => import('./plataforma/pages/MateriaisPage'));
 export const AvisosPage       = lazy(() => import('./plataforma/pages/AvisosPage'));
-export const AdminAlunosPage    = lazy(() => import('./plataforma/pages/admin/AdminAlunosPage'));
-export const AdminUsuariosPage  = lazy(() => import('./plataforma/pages/admin/AdminUsuariosPage'));
-export const AdminLeadsPage     = lazy(() => import('./plataforma/pages/admin/AdminLeadsPage'));
-export const AdminModulosPage   = lazy(() => import('./plataforma/pages/admin/AdminModulosPage'));
-export const AdminAulasPage   = lazy(() => import('./plataforma/pages/admin/AdminAulasPage'));
-export const AdminMateriaisPage = lazy(() => import('./plataforma/pages/admin/AdminMateriaisPage'));
-export const AdminAvisosPage    = lazy(() => import('./plataforma/pages/admin/AdminAvisosPage'));
 export const LessonPage         = lazy(() => import('./plataforma/pages/LessonPage'));
-export const AdminProgressoPage     = lazy(() => import('./plataforma/pages/admin/AdminProgressoPage'));
 export const MinhaContaPage         = lazy(() => import('./plataforma/pages/MinhaContaPage'));
-export const AdminBlogPage          = lazy(() => import('./plataforma/pages/admin/AdminBlogPage'));
-export const AdminBlogEditorPage    = lazy(() => import('./plataforma/pages/admin/AdminBlogEditorPage'));
 export const PlataformaBlogPage     = lazy(() => import('./plataforma/pages/PlataformaBlogPage'));
 export const PlataformaBlogPostPage = lazy(() => import('./plataforma/pages/PlataformaBlogPostPage'));
-export const CrmReportsPage         = lazy(() => import('./plataforma/pages/admin/CrmReportsPage'));
-export const CrmClientesPage        = lazy(() => import('./plataforma/pages/admin/CrmClientesPage'));
 
 export function LegacyLessonRedirect() {
   const { moduleId, lessonId } = useParams();
   return <Navigate to={`/cursos/${moduleId}/aulas/${lessonId}`} replace />;
+}
+
+// Links antigos (/plataforma/admin/..., /plataforma/crm/...) saem deste app
+// e caem no ambiente de gestão, que tem login próprio.
+export function GestaoRedirect() {
+  const { pathname, search } = useLocation();
+  useEffect(() => {
+    window.location.replace(`${GESTAO_BASE}${pathname}${search}`);
+  }, [pathname, search]);
+  return <Fallback />;
 }
 
 export const Fallback = () => (
@@ -65,6 +63,7 @@ createRoot(document.getElementById('root')).render(
             {/* Área do Aluno (autenticado + perfil completo) */}
             <Route path="/inicio"    element={<ProtectedRoute><ProfileGuard><DashboardPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/cursos"    element={<ProtectedRoute><ProfileGuard><CursosPage /></ProfileGuard></ProtectedRoute>} />
+            <Route path="/formacoes" element={<ProtectedRoute><ProfileGuard><FormacoesPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/cursos/:moduleId" element={<ProtectedRoute><ProfileGuard><CursoPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/cursos/:moduleId/aulas/:lessonId" element={<ProtectedRoute><ProfileGuard><LessonPage /></ProfileGuard></ProtectedRoute>} />
             {/* Redirecionamentos de rotas legadas */}
@@ -75,23 +74,9 @@ createRoot(document.getElementById('root')).render(
             <Route path="/avisos"    element={<ProtectedRoute><ProfileGuard><AvisosPage /></ProfileGuard></ProtectedRoute>} />
             <Route path="/minha-conta" element={<ProtectedRoute><ProfileGuard><MinhaContaPage /></ProfileGuard></ProtectedRoute>} />
 
-            {/* Área de Admin */}
-            <Route path="/admin/alunos"     element={<AdminRoute><AdminAlunosPage /></AdminRoute>} />
-            <Route path="/admin/usuarios"   element={<AdminRoute><AdminUsuariosPage /></AdminRoute>} />
-            <Route path="/admin/leads"      element={<CrmRoute><Navigate to="/crm/leads" replace /></CrmRoute>} />
-            <Route path="/admin/modulos"    element={<AdminRoute><AdminModulosPage /></AdminRoute>} />
-            <Route path="/admin/aulas"      element={<AdminRoute><AdminAulasPage /></AdminRoute>} />
-            <Route path="/admin/materiais"  element={<AdminRoute><AdminMateriaisPage /></AdminRoute>} />
-            <Route path="/admin/avisos"     element={<AdminRoute><AdminAvisosPage /></AdminRoute>} />
-            <Route path="/admin/progresso"  element={<AdminRoute><AdminProgressoPage /></AdminRoute>} />
-            <Route path="/admin/blog"                  element={<AdminRoute><AdminBlogPage /></AdminRoute>} />
-            <Route path="/admin/blog/novo"             element={<AdminRoute><AdminBlogEditorPage /></AdminRoute>} />
-            <Route path="/admin/blog/:id/editar"       element={<AdminRoute><AdminBlogEditorPage /></AdminRoute>} />
-
-            {/* CRM Neural Hub */}
-            <Route path="/crm/leads"        element={<CrmRoute><AdminLeadsPage /></CrmRoute>} />
-            <Route path="/crm/clientes"     element={<CrmRoute><CrmClientesPage /></CrmRoute>} />
-            <Route path="/crm/relatorios"   element={<CrmRoute><CrmReportsPage /></CrmRoute>} />
+            {/* Admin e CRM mudaram para o ambiente de gestão (/gestao) */}
+            <Route path="/admin/*" element={<GestaoRedirect />} />
+            <Route path="/crm/*"   element={<GestaoRedirect />} />
 
             {/* Blog da plataforma (alunos autenticados) */}
             <Route path="/blog"       element={<ProtectedRoute><ProfileGuard><PlataformaBlogPage /></ProfileGuard></ProtectedRoute>} />

@@ -28,6 +28,8 @@
     { "source": "/governanca-ia/(.*)", "destination": "/index.html" },
     { "source": "/aulas/governanca-ia", "destination": "/index.html" },
     { "source": "/aulas/governanca-ia/(.*)", "destination": "/index.html" },
+    { "source": "/gestao", "destination": "/gestao.html" },
+    { "source": "/gestao/(.*)", "destination": "/gestao.html" },
     { "source": "/plataforma", "destination": "/plataforma.html" },
     { "source": "/plataforma/(.*)", "destination": "/plataforma.html" },
     { "source": "/blog", "destination": "/index.html" },

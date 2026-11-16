@@ -91,15 +91,15 @@ describe('CrmRoute', () => {
     expect(screen.queryByText('CRM')).not.toBeInTheDocument();
   });
 
-  it('redireciona para /inicio quando autenticado sem acesso CRM', () => {
+  it('manda para o login quem está autenticado sem acesso CRM', () => {
     renderWithAuth(
       <Routes>
         <Route path="/" element={<CrmRoute><div>CRM</div></CrmRoute>} />
-        <Route path="/inicio" element={<div>Início</div>} />
+        <Route path="/login" element={<div>Login</div>} />
       </Routes>,
       { user: { email: 'aluno@test.com' }, hasCrmAccess: false }
     );
-    expect(screen.getByText('Início')).toBeInTheDocument();
+    expect(screen.getByText('Login')).toBeInTheDocument();
     expect(screen.queryByText('CRM')).not.toBeInTheDocument();
   });
 
@@ -137,16 +137,29 @@ describe('AdminRoute', () => {
     expect(screen.queryByText('Painel Admin')).not.toBeInTheDocument();
   });
 
-  it('redireciona para /modulos quando autenticado mas sem role admin', () => {
+  it('manda para o login quem está autenticado mas não é da equipe', () => {
     renderWithAuth(
       <Routes>
         <Route path="/" element={<AdminRoute><div>Painel Admin</div></AdminRoute>} />
         <Route path="/login" element={<div>Login</div>} />
-        <Route path="/modulos" element={<div>Área do Aluno</div>} />
+        <Route path="/crm/leads" element={<div>CRM</div>} />
       </Routes>,
-      { user: { email: 'aluno@test.com' }, isAdmin: false }
+      { user: { email: 'aluno@test.com' }, isAdmin: false, hasCrmAccess: false }
     );
-    expect(screen.getByText('Área do Aluno')).toBeInTheDocument();
+    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(screen.queryByText('Painel Admin')).not.toBeInTheDocument();
+  });
+
+  it('manda o comercial para o CRM em vez do painel admin', () => {
+    renderWithAuth(
+      <Routes>
+        <Route path="/" element={<AdminRoute><div>Painel Admin</div></AdminRoute>} />
+        <Route path="/login" element={<div>Login</div>} />
+        <Route path="/crm/leads" element={<div>CRM</div>} />
+      </Routes>,
+      { user: { email: 'comercial@test.com' }, isAdmin: false, isCommercial: true, hasCrmAccess: true }
+    );
+    expect(screen.getByText('CRM')).toBeInTheDocument();
     expect(screen.queryByText('Painel Admin')).not.toBeInTheDocument();
   });
 

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestão — Neural Hub</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg:          #060606;
+        --bg-2:        #0b0b0b;
+        --panel:       #101010;
+        --panel-2:     #141414;
+        --line:        rgba(255,255,255,.08);
+        --line-strong: rgba(255,255,255,.16);
+        --text:        #f5f2ea;
+        --muted:       #8b867c;
+        --accent:        #ff6a00;
+        --accent-soft:   rgba(255,106,0,.14);
+        --green:         #84cc16;
+        --error:         #ef4444;
+        --error-soft:    rgba(239,68,68,.08);
+        --warning:       #f59e0b;
+        --warning-soft:  rgba(245,158,11,.08);
+      }
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Space Grotesk', sans-serif;
+        line-height: 1.6;
+      }
+      #root { min-height: 100vh; }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 2px;
+      }
+      :focus:not(:focus-visible) { outline: none; }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/gestao-main.jsx"></script>
+  </body>
+</html>

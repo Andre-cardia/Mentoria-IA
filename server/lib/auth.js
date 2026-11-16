@@ -58,7 +58,7 @@ export async function requireAuthenticatedUser(req, res, options = {}) {
     return null;
   }
 
-  if (requireAdmin && user.user_metadata?.role !== "admin") {
+  if (requireAdmin && user.app_metadata?.role !== "admin") {
     res.status(403).json({ error: "Forbidden" });
     return null;
   }

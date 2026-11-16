@@ -9,6 +9,8 @@ const devRewrites = {
     server.middlewares.use((req, _res, next) => {
       if (req.url === '/plataforma' || req.url.startsWith('/plataforma/')) {
         req.url = '/plataforma.html'
+      } else if (req.url === '/gestao' || req.url.startsWith('/gestao/')) {
+        req.url = '/gestao.html'
       } else if (req.url === '/lead') {
         req.url = '/lead.html'
       } else if (req.url === '/brand') {
@@ -71,6 +73,7 @@ export default defineConfig({
         privacidade: resolve(__dirname, 'privacidade.html'),
         termos:     resolve(__dirname, 'termos.html'),
         plataforma: resolve(__dirname, 'plataforma.html'),
+        gestao:     resolve(__dirname, 'gestao.html'),
         neuralhub:  resolve(__dirname, 'neuralhub.html'),
         auditoria:  resolve(__dirname, 'auditoria.html'),
       },

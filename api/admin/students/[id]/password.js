@@ -11,7 +11,7 @@ async function verifyAdmin(req, supabase) {
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (!token) return false;
   const { data: { user } } = await supabase.auth.getUser(token);
-  return user?.user_metadata?.role === "admin";
+  return user?.app_metadata?.role === "admin";
 }
 
 export default async function handler(req, res) {

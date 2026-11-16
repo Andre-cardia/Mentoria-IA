@@ -7,6 +7,7 @@ import { useLessonProgress } from '../hooks/useLessonProgress';
 const NAV_ITEMS = [
   { to: '/inicio',       label: 'Início' },
   { to: '/cursos',       label: 'Cursos & Aulas' },
+  { to: '/formacoes',    label: 'Formações', badge: 'Em breve' },
   { to: '/forum',        label: 'Fórum' },
   { to: '/materiais',    label: 'Materiais' },
   { to: '/avisos',       label: 'Avisos' },
@@ -178,9 +179,18 @@ export default function Layout({ children }) {
             <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)', letterSpacing: '.1em', textTransform: 'uppercase', padding: '0 14px', marginBottom: '8px' }}>
               Plataforma
             </div>
-            {NAV_ITEMS.map(({ to, label }) => (
+            {NAV_ITEMS.map(({ to, label, badge }) => (
               <NavLink key={to} to={to} style={({ isActive }) => linkStyle(isActive)}>
                 {label}
+                {badge && (
+                  <span style={{
+                    marginLeft: '8px', fontFamily: 'Space Mono, monospace', fontSize: '.6rem',
+                    color: 'var(--accent)', border: '1px solid rgba(255,106,0,.3)',
+                    borderRadius: '3px', padding: '1px 6px', whiteSpace: 'nowrap',
+                  }}>
+                    {badge}
+                  </span>
+                )}
               </NavLink>
             ))}
 
@@ -188,23 +198,12 @@ export default function Layout({ children }) {
               <>
                 <div style={{ borderTop: '1px solid var(--line)', margin: '16px 0 8px' }} />
                 <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)', letterSpacing: '.1em', textTransform: 'uppercase', padding: '0 14px', marginBottom: '8px' }}>
-                  Admin
+                  Equipe
                 </div>
-                {[
-                  { to: '/admin/alunos',    label: 'Alunos' },
-                  { to: '/admin/modulos',   label: 'Módulos & Aulas' },
-                  { to: '/admin/materiais', label: 'Materiais' },
-                  { to: '/admin/avisos',    label: 'Avisos' },
-                  { to: '/admin/progresso', label: 'Progresso' },
-                ].map(({ to, label }) => (
-                  <NavLink key={to} to={to} style={({ isActive }) => linkStyle(isActive)}>
-                    {label}
-                  </NavLink>
-                ))}
-                <div style={{ borderTop: '1px solid var(--line)', margin: '12px 0 8px' }} />
-                <NavLink to="/crm/leads" style={({ isActive }) => linkStyle(isActive)}>
-                  CRM Neural Hub
-                </NavLink>
+                {/* Admin e CRM vivem em outro ambiente, com login próprio. */}
+                <a href="/gestao" style={linkStyle(false)}>
+                  Abrir Gestão ↗
+                </a>
               </>
             )}
           </nav>

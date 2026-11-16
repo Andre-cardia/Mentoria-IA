@@ -17,8 +17,9 @@ const CRM_NAV = [
   { to: '/crm/leads', label: 'CRM Neural Hub' },
 ];
 
+// Ambiente separado, com login próprio: sai do app de gestão.
 const ALUNO_NAV = [
-  { to: '/modulos',   label: '← Área do Aluno' },
+  { href: '/plataforma/inicio', label: 'Área do Aluno ↗' },
 ];
 
 /** @returns {import('react').CSSProperties} */
@@ -114,8 +115,8 @@ export default function AdminLayout({ children }) {
           ))}
 
           <div style={{ borderTop: '1px solid var(--line)', margin: '16px 0 8px' }} />
-          {ALUNO_NAV.map(({ to, label }) => (
-            <NavLink key={to} to={to} title={label} style={() => linkStyle(false, collapsed)}>{collapsed ? '←' : label}</NavLink>
+          {ALUNO_NAV.map(({ href, label }) => (
+            <a key={href} href={href} title={label} style={linkStyle(false, collapsed)}>{collapsed ? '↗' : label}</a>
           ))}
         </nav>
 
