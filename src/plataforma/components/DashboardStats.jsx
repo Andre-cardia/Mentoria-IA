@@ -8,7 +8,7 @@ function getGreeting() {
 function StatCard({ label, value, accent = false }) {
   return (
     <div style={{
-      flex: 1, minWidth: '90px',
+      flex: 1, minWidth: '120px',
       background: 'var(--panel)', border: '1px solid var(--line)',
       borderRadius: '8px', padding: '16px 18px',
       display: 'flex', flexDirection: 'column', gap: '4px',

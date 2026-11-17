@@ -79,7 +79,7 @@ function ShipBay({ racer }) {
   const installed = upgrades.filter((upgrade) => upgrade.unlocked).length;
 
   return (
-    <div style={{ borderTop: `1px solid ${panel.line}`, padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px 40px' }}>
+    <div style={{ borderTop: `1px solid ${panel.line}`, padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '24px 40px' }}>
       <div>
         <div style={{ ...eyebrow, color: panel.dim, marginBottom: '12px' }}>Carreira</div>
         <ol style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -88,9 +88,9 @@ function ShipBay({ racer }) {
             const reached = item.stars <= rank.stars;
             return (
               <li key={item.id} aria-current={current ? 'step' : undefined}
-                style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 10px', borderLeft: `2px solid ${current ? '#ff6a00' : 'transparent'}`, background: current ? 'rgba(255,255,255,.05)' : 'transparent', color: reached ? panel.ink : panel.dim }}>
+                style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 12px', padding: '8px 10px', borderLeft: `2px solid ${current ? '#ff6a00' : 'transparent'}`, background: current ? 'rgba(255,255,255,.05)' : 'transparent', color: reached ? panel.ink : panel.dim }}>
                 <span style={{ minWidth: '72px', color: panel.dim }}><Stars count={reached ? item.stars : 0} total={item.stars} size={12} /></span>
-                <span style={{ ...eyebrow, fontWeight: current ? 700 : 400, flex: 1 }}>{item.name}</span>
+                <span style={{ ...eyebrow, fontWeight: current ? 700 : 400, flex: '1 1 120px' }}>{item.name}</span>
                 <span style={{ ...mono, fontSize: '.7rem', color: panel.dim, textAlign: 'right' }}>{item.shipName}</span>
               </li>
             );
@@ -109,7 +109,7 @@ function ShipBay({ racer }) {
           <span style={{ ...eyebrow, color: panel.dim }}>Acessórios da nave</span>
           <span style={{ ...mono, fontSize: '.72rem', color: panel.dim }}>{pad(installed)} / {pad(upgrades.length)}</span>
         </div>
-        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: '6px 20px' }}>
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 190px), 1fr))', gap: '6px 20px' }}>
           {upgrades.map((upgrade) => (
             <li key={upgrade.id} title={upgrade.description} style={{ display: 'flex', alignItems: 'baseline', gap: '8px', fontSize: '.85rem', color: upgrade.unlocked ? panel.ink : panel.dim }}>
               <span aria-hidden="true" style={{ ...mono, fontSize: '.7rem', color: upgrade.unlocked ? '#ffb347' : panel.dim }}>{upgrade.unlocked ? '■' : '□'}</span>
