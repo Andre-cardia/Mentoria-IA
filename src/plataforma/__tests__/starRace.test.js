@@ -43,16 +43,32 @@ describe('starRace', () => {
     expect(racePosition({ points: 75 }, TOTALS).galaxyIndex).toBe(1);
   });
 
-  it('só chega ao ápice com a certificação', () => {
-    const semCert = racePosition({ points: 5000 }, TOTALS);
-    expect(semCert).toMatchObject({ certified: false, pct: 99, galaxyIndex: 2 });
-    expect(semCert.earned).toEqual([60, 120, 60]);
-    expect(semCert.u).toBeLessThan(APEX_U);
-    expect(positionLabel(semCert)).toContain('falta o Projeto de Certificação');
+  it('para na fronteira da Galáxia Avançada sem o aval de um admin', () => {
+    const semAval = racePosition({ points: 5000 }, TOTALS);
+    expect(semAval).toMatchObject({ certified: false, advancedUnlocked: false, awaitingAdvanced: true, galaxyIndex: 1, traveled: 2 });
+    expect(semAval.earned).toEqual([60, 120, 0]);
+    expect(positionLabel(semAval)).toContain('aguardando o aval de um administrador para entrar na Avançada');
+    // Antes de completar a Intermediária ainda não há nada aguardando.
+    expect(racePosition({ points: 100 }, TOTALS).awaitingAdvanced).toBe(false);
+  });
 
-    const comCert = racePosition({ points: 40, certified: true }, TOTALS);
-    expect(comCert).toMatchObject({ certified: true, pct: 100, galaxyIndex: 3, u: APEX_U });
-    expect(positionLabel(comCert)).toBe('Chegou à Estrela da Certificação');
+  it('com o aval de Comandante os pontos entram na Galáxia Avançada', () => {
+    const comAval = racePosition({ points: 5000, granted_rank: 'comandante' }, TOTALS);
+    expect(comAval).toMatchObject({ certified: false, advancedUnlocked: true, awaitingAdvanced: false, pct: 99, galaxyIndex: 2 });
+    expect(comAval.earned).toEqual([60, 120, 60]);
+    expect(comAval.u).toBeLessThan(APEX_U);
+    expect(positionLabel(comAval)).toContain('falta o Projeto de Certificação');
+  });
+
+  it('só chega ao ápice com o aval de Master', () => {
+    // Concluir as aulas do projeto não basta: fica aguardando o aval.
+    const entregue = racePosition({ points: 5000, granted_rank: 'comandante', certified: true }, TOTALS);
+    expect(entregue).toMatchObject({ certified: false, awaitingMaster: true, projectDone: true });
+    expect(positionLabel(entregue)).toBe('Projeto de Certificação entregue — aguardando o aval de um administrador');
+
+    const master = racePosition({ points: 40, granted_rank: 'master' }, TOTALS);
+    expect(master).toMatchObject({ certified: true, pct: 100, galaxyIndex: 3, u: APEX_U });
+    expect(positionLabel(master)).toBe('Chegou à Estrela da Certificação');
   });
 
   it('abrevia nomes para a etiqueta da nave', () => {

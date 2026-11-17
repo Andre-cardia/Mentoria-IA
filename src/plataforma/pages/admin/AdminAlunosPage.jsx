@@ -42,7 +42,13 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-// ── Promoção por mérito (patente na Corrida Estelar) ─────────
+// ── Aval de patente (Corrida Estelar) ────────────────────────
+const RANK_EFFECT = {
+  primeiro_oficial: 'promoção por mérito',
+  comandante: 'libera a Galáxia Avançada',
+  master: 'certificação aprovada',
+};
+
 function RankForm({ initial = /** @type {{ rank?: string, note?: string }} */ ({}), onSave, onCancel, loading }) {
   const [rank, setRank] = useState(initial.rank ?? '');
   const [note, setNote] = useState(initial.note ?? '');
@@ -50,15 +56,15 @@ function RankForm({ initial = /** @type {{ rank?: string, note?: string }} */ ({
   return (
     <form onSubmit={(e) => { e.preventDefault(); onSave({ rank, note }); }} style={{ display: 'grid', gap: '16px' }}>
       <p style={{ color: 'var(--muted)', fontSize: '.875rem', lineHeight: 1.6, margin: 0 }}>
-        A patente normal vem do avanço do aluno na Corrida Estelar. Aqui você garante uma patente mínima por mérito.
-        Master só é alcançada concluindo o Projeto de Certificação.
+        Aspirante e Primeiro Oficial vêm dos pontos do aluno na Corrida Estelar. Comandante e Master só existem com o seu aval:
+        Comandante libera a Galáxia Avançada e Master leva o aluno à Estrela da Certificação.
       </p>
       <div style={{ display: 'grid', gap: '6px' }}>
-        <label htmlFor="rank-select" style={labelStyle}>Patente por mérito</label>
+        <label htmlFor="rank-select" style={labelStyle}>Patente concedida</label>
         <select id="rank-select" value={rank} onChange={(e) => setRank(e.target.value)} style={inputStyle}>
-          <option value="">Sem promoção (segue o avanço na corrida)</option>
+          <option value="">Sem aval (o aluno para antes da Galáxia Avançada)</option>
           {GRANTABLE_RANKS.map((item) => (
-            <option key={item.id} value={item.id}>{'★'.repeat(item.stars)} {item.name}</option>
+            <option key={item.id} value={item.id}>{'★'.repeat(item.stars)} {item.name} — {RANK_EFFECT[item.id]}</option>
           ))}
         </select>
       </div>
@@ -469,7 +475,7 @@ export default function AdminAlunosPage() {
                     <div style={{ fontWeight: 500, fontSize: '.9rem' }}>
                       {s.full_name}
                       {promotions[s.user_id] && (
-                        <span title="Promovido por mérito" style={{ color: 'var(--accent-text)', marginLeft: '8px', fontSize: '.75rem', letterSpacing: '.1em' }}>
+                        <span title="Patente concedida" style={{ color: 'var(--accent-text)', marginLeft: '8px', fontSize: '.75rem', letterSpacing: '.1em' }}>
                           {'★'.repeat(GRANTABLE_RANKS.find((item) => item.id === promotions[s.user_id].rank)?.stars ?? 0)}
                         </span>
                       )}
@@ -500,7 +506,7 @@ export default function AdminAlunosPage() {
 
                     <button
                       onClick={() => { setActionError(''); setModal({ type: 'rank', student: s }); }}
-                      title="Patente por mérito" aria-label={`Patente por mérito de ${s.full_name}`}
+                      title="Aval de patente" aria-label={`Aval de patente de ${s.full_name}`}
                       style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--accent-text)', cursor: 'pointer', fontSize: '.8rem' }}
                     >★</button>
 
@@ -639,7 +645,7 @@ export default function AdminAlunosPage() {
         </Modal>
       )}
 
-      {/* Modal — Patente por mérito */}
+      {/* Modal — Aval de patente */}
       {modal?.type === 'rank' && (
         <Modal title={`Patente — ${modal.student.full_name}`} onClose={() => setModal(null)}>
           {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}

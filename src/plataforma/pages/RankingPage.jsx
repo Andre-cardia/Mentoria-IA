@@ -96,6 +96,9 @@ function ShipBay({ racer }) {
             );
           })}
         </ol>
+        <p style={{ ...mono, fontSize: '.72rem', color: panel.dim, margin: '10px 0 0 10px' }}>
+          Comandante e Master dependem do aval de um administrador.
+        </p>
         {rank.promoted && (
           <p style={{ ...mono, fontSize: '.72rem', color: '#ffb347', margin: '10px 0 0 10px' }}>Promoção por mérito concedida pela equipe.</p>
         )}
@@ -182,8 +185,10 @@ function MissionPanel({ me, racers }) {
                 >
                   <div style={{ height: '100%', width: `${pct}%`, background: galaxy.color }} />
                 </div>
-                <span style={{ ...mono, fontSize: '.72rem', color: panel.dim }}>
-                  {position.earned[index]} de {position.goals[index]} pts
+                <span style={{ ...mono, fontSize: '.72rem', color: index === GALAXIES.length - 1 && position.awaitingAdvanced ? '#ffb347' : panel.dim }}>
+                  {index === GALAXIES.length - 1 && !position.advancedUnlocked
+                    ? (position.awaitingAdvanced ? 'Aguardando o aval de um administrador' : 'Liberada com o aval de um administrador')
+                    : `${position.earned[index]} de ${position.goals[index]} pts`}
                 </span>
               </li>
             );
@@ -194,8 +199,12 @@ function MissionPanel({ me, racers }) {
               <span style={{ ...eyebrow, color: panel.ink }}>{APEX_NAME}</span>
             </div>
             <div style={{ height: '2px', background: position.certified ? '#ffb347' : panel.line, marginBottom: '8px' }} />
-            <span style={{ ...mono, fontSize: '.72rem', color: panel.dim }}>
-              {position.certified ? 'Você chegou ao ápice da jornada!' : 'O ápice: conclua o Projeto de Certificação'}
+            <span style={{ ...mono, fontSize: '.72rem', color: position.awaitingMaster ? '#ffb347' : panel.dim }}>
+              {position.certified
+                ? 'Você chegou ao ápice da jornada!'
+                : position.awaitingMaster && position.projectDone
+                  ? 'Projeto entregue: aguardando o aval de um administrador'
+                  : 'O ápice: Projeto de Certificação aprovado por um administrador'}
             </span>
           </li>
         </ol>
@@ -431,7 +440,7 @@ export default function RankingPage() {
           Corrida Estelar pela Certificação em AI Engineer
         </h1>
         <p style={{ color: 'var(--muted)', fontSize: '1rem', marginBottom: '24px', maxWidth: '70ch' }}>
-          Cada trilha é uma galáxia e cada galáxia, uma patente e uma nave nova. Módulos concluídos rendem acessórios. Ganhe pontos para avançar e conclua o Projeto de Certificação para chegar à {APEX_NAME}.
+          Cada trilha é uma galáxia e cada galáxia, uma patente e uma nave nova. Módulos concluídos rendem acessórios. Ganhe pontos para avançar; a Galáxia Avançada e a {APEX_NAME} são liberadas com o aval de um administrador.
         </p>
 
         {error && <p role="alert" style={{ color: 'var(--danger)', marginBottom: '20px' }}>{error}</p>}

@@ -34,24 +34,25 @@ describe('patentes', () => {
     expect(RANKS.map((rank) => rank.name)).toEqual(['Aspirante', 'Primeiro Oficial', 'Comandante', 'Master']);
   });
 
-  it('segue a galáxia em que o aluno está', () => {
+  it('Aspirante e Primeiro Oficial vêm dos pontos', () => {
     expect(rankFor({ traveled: 0 }).id).toBe('aspirante');
     expect(rankFor({ traveled: 0.99 }).id).toBe('aspirante');
     expect(rankFor({ traveled: 1 }).id).toBe('primeiro_oficial');
-    expect(rankFor({ traveled: 2.4 }).id).toBe('comandante');
-    expect(rankFor({ traveled: 3 }).id).toBe('comandante');
   });
 
-  it('Master só com a certificação', () => {
-    expect(rankFor({ traveled: 0.5, certified: true }).id).toBe('master');
-    expect(GRANTABLE_RANKS.map((rank) => rank.id)).toEqual(['primeiro_oficial', 'comandante']);
-    expect(rankFor({ traveled: 0 }, 'master').id).toBe('aspirante');
+  it('Comandante e Master só com o aval de um admin', () => {
+    expect(rankFor({ traveled: 2 }).id).toBe('primeiro_oficial');
+    expect(rankFor({ traveled: 3 }).id).toBe('primeiro_oficial');
+    expect(rankFor({ traveled: 2.4 }, 'comandante')).toMatchObject({ id: 'comandante', promoted: false });
+    expect(rankFor({ traveled: 3 }, 'master')).toMatchObject({ id: 'master', promoted: false });
+    expect(GRANTABLE_RANKS.map((rank) => rank.id)).toEqual(['primeiro_oficial', 'comandante', 'master']);
   });
 
   it('promoção por mérito eleva a patente, nunca rebaixa', () => {
+    expect(rankFor({ traveled: 0.2 }, 'primeiro_oficial')).toMatchObject({ id: 'primeiro_oficial', promoted: true });
     expect(rankFor({ traveled: 0.2 }, 'comandante')).toMatchObject({ id: 'comandante', promoted: true });
-    expect(rankFor({ traveled: 2.5 }, 'primeiro_oficial')).toMatchObject({ id: 'comandante', promoted: false });
-    expect(rankFor({ traveled: 0.2 }, 'qualquer').promoted).toBe(false);
+    expect(rankFor({ traveled: 1.5 }, 'primeiro_oficial')).toMatchObject({ id: 'primeiro_oficial', promoted: false });
+    expect(rankFor({ traveled: 0.2 }, 'qualquer')).toMatchObject({ id: 'aspirante', promoted: false });
   });
 
   it('buildRacers traz patente e módulos concluídos', () => {

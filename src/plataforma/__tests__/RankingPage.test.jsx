@@ -56,13 +56,20 @@ describe('RankingPage', () => {
     expect(screen.getByText(/Na Galáxia Básica — 50% percorrida/)).toBeInTheDocument();
     expect(screen.getByRole('progressbar', { name: 'Galáxia Básica' })).toHaveAttribute('aria-valuenow', '50');
     expect(screen.getByText('12 de 24 pts')).toBeInTheDocument();
-    expect(screen.getByText(/O ápice: conclua o Projeto de Certificação/)).toBeInTheDocument();
+    expect(screen.getByText(/O ápice: Projeto de Certificação aprovado por um administrador/)).toBeInTheDocument();
+    expect(screen.getByText('Liberada com o aval de um administrador')).toBeInTheDocument();
   });
 
   it('comemora quando o aluno chega ao ápice', async () => {
-    setup({ race: [{ ...RACE[1], certified: true }] });
+    setup({ race: [{ ...RACE[1], certified: true, granted_rank: 'master' }] });
     expect(await screen.findByText(/Chegou à Estrela da Certificação/)).toBeInTheDocument();
     expect(screen.getByText('Você chegou ao ápice da jornada!')).toBeInTheDocument();
+  });
+
+  it('avisa quando o projeto foi entregue e falta o aval', async () => {
+    setup({ race: [{ ...RACE[1], certified: true }] });
+    expect(await screen.findByText('Projeto entregue: aguardando o aval de um administrador')).toBeInTheDocument();
+    expect(screen.queryByText('Você chegou ao ápice da jornada!')).not.toBeInTheDocument();
   });
 
   it('lista o ranking da semana e destaca o próprio aluno', async () => {

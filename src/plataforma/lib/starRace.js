@@ -49,41 +49,64 @@ export function galaxyGoals(totals) {
     Math.max(LESSON_POINTS, Math.round(toCount(totals?.[level]) * LESSON_POINTS * GALAXY_SHARE)));
 }
 
+// Patentes concedidas por um admin que liberam etapas da corrida.
+const ADVANCED_RANKS = ['comandante', 'master'];
+
 /**
  * Onde a nave está. Os pontos preenchem as galáxias em sequência:
  * `fractions` é o avanço em cada uma (0 a 1), `earned` os pontos gastos nela,
  * `u` a posição na rota e `galaxyIndex` a galáxia atual (3 = ápice).
+ *
+ * A Galáxia Avançada e o ápice dependem do aval de um admin (`granted_rank`):
+ * sem 'comandante' a nave para na fronteira da Avançada (`awaitingAdvanced`);
+ * só com 'master' ela chega à Estrela da Certificação (`certified`).
  */
 export function racePosition(racer, totals) {
   const goals = galaxyGoals(totals);
+  const granted = racer?.granted_rank ?? null;
+  const advancedUnlocked = ADVANCED_RANKS.includes(granted);
+  const certified = granted === 'master';
+  const projectDone = Boolean(racer?.certified);
+
   let remaining = toCount(racer?.points);
-  const earned = goals.map((goal) => {
+  const earned = goals.map((goal, index) => {
+    if (index === GALAXIES.length - 1 && !advancedUnlocked) return 0;
     const used = Math.min(remaining, goal);
     remaining -= used;
     return used;
   });
   const fractions = earned.map((used, index) => used / goals[index]);
   const traveled = fractions.reduce((sum, f) => sum + f, 0);
-  const certified = Boolean(racer?.certified);
+  const awaitingAdvanced = !advancedUnlocked && traveled >= GALAXIES.length - 1;
+  const awaitingMaster = !certified && (projectDone || traveled >= GALAXIES.length);
+  const flags = { advancedUnlocked, awaitingAdvanced, awaitingMaster, projectDone };
 
   if (certified) {
-    return { fractions, earned, goals, traveled, certified, u: APEX_U, galaxyIndex: GALAXIES.length, pct: 100 };
+    return { fractions, earned, goals, traveled, certified, ...flags, u: APEX_U, galaxyIndex: GALAXIES.length, pct: 100 };
   }
 
-  // Sem a certificação a nave para na borda da última galáxia.
+  // Sem o aval a nave para na borda: da Avançada (sem Comandante) ou da última galáxia (sem Master).
   const u = ROUTE_START + traveled * GALAXY_SPAN;
-  const galaxyIndex = Math.min(Math.floor(traveled), GALAXIES.length - 1);
+  const lastOpen = advancedUnlocked ? GALAXIES.length - 1 : GALAXIES.length - 2;
+  const galaxyIndex = Math.min(Math.floor(traveled), lastOpen);
   // 99% no máximo: os 100% ficam reservados para quem chegou ao ápice.
   const pct = Math.min(Math.round((traveled / GALAXIES.length) * 100), 99);
-  return { fractions, earned, goals, traveled, certified, u, galaxyIndex, pct };
+  return { fractions, earned, goals, traveled, certified, ...flags, u, galaxyIndex, pct };
 }
 
 export function positionLabel(position) {
   if (position.certified) return `Chegou à ${APEX_NAME}`;
+  if (position.awaitingAdvanced) {
+    return 'Concluiu a Galáxia Intermediária — aguardando o aval de um administrador para entrar na Avançada';
+  }
+  if (position.traveled >= GALAXIES.length) {
+    return position.projectDone
+      ? 'Projeto de Certificação entregue — aguardando o aval de um administrador'
+      : 'Atravessou as três galáxias — falta o Projeto de Certificação';
+  }
   const galaxy = GALAXIES[position.galaxyIndex];
   const within = Math.round(position.fractions[position.galaxyIndex] * 100);
   if (position.traveled === 0) return `Na largada, rumo à ${galaxy.name}`;
-  if (position.traveled >= GALAXIES.length) return `Atravessou as três galáxias — falta o Projeto de Certificação`;
   return `Na ${galaxy.name} — ${within}% percorrida`;
 }
 
@@ -96,22 +119,22 @@ export const RANKS = [
   { id: 'master',           name: 'Master',           stars: 4, shipClass: 4, shipName: 'Nave completa com propulsor' },
 ];
 
-// Patentes que um admin pode conceder por mérito. Master só com a certificação.
-export const GRANTABLE_RANKS = RANKS.filter((rank) => rank.id === 'primeiro_oficial' || rank.id === 'comandante');
+// Patentes que um admin concede. Comandante e Master só existem com esse aval.
+export const GRANTABLE_RANKS = RANKS.filter((rank) => rank.id !== 'aspirante');
 
 /**
- * Patente do aluno: a maior entre a conquistada na rota e a concedida por
- * mérito. `promoted` indica que a promoção por mérito está valendo.
+ * Patente do aluno. Aspirante e Primeiro Oficial vêm dos pontos; Comandante
+ * e Master, só do aval de um admin. `promoted` indica promoção por mérito:
+ * a patente concedida está acima do que os pontos dariam.
  */
 export function rankFor(position, grantedRank = null) {
-  const earnedIndex = position?.certified
-    ? 3
-    : Math.min(Math.floor(toCount(position?.traveled)), 2);
+  const earnedIndex = Math.min(Math.floor(toCount(position?.traveled)), 1);
   const grantedIndex = GRANTABLE_RANKS.some((rank) => rank.id === grantedRank)
     ? RANKS.findIndex((rank) => rank.id === grantedRank)
     : -1;
   const index = Math.max(earnedIndex, grantedIndex);
-  return { ...RANKS[index], promoted: grantedIndex > earnedIndex };
+  const promoted = grantedIndex > earnedIndex && grantedIndex < 3 && toCount(position?.traveled) < grantedIndex;
+  return { ...RANKS[index], promoted };
 }
 
 /** "Maria Clara Souza" → "Maria S." — cabe na etiqueta da nave. */

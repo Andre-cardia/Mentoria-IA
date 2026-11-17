@@ -206,7 +206,7 @@ describe('AdminAlunosPage — redefinição de senha', () => {
   });
 });
 
-describe('AdminAlunosPage — patente por mérito', () => {
+describe('AdminAlunosPage — aval de patente', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFetch.mockResolvedValue({
@@ -217,11 +217,11 @@ describe('AdminAlunosPage — patente por mérito', () => {
 
   it('promove o aluno pela função do servidor', async () => {
     renderPage();
-    const [firstBtn] = await screen.findAllByTitle('Patente por mérito');
+    const [firstBtn] = await screen.findAllByTitle('Aval de patente');
     await userEvent.click(firstBtn);
     expect(screen.getByText(/Patente — João Silva/i)).toBeTruthy();
 
-    await userEvent.selectOptions(screen.getByLabelText('Patente por mérito'), 'comandante');
+    await userEvent.selectOptions(screen.getByLabelText('Patente concedida'), 'comandante');
     await userEvent.type(screen.getByLabelText('Motivo (opcional)'), 'Ajudou colegas');
     await userEvent.click(screen.getByRole('button', { name: 'Salvar patente' }));
 
@@ -230,11 +230,11 @@ describe('AdminAlunosPage — patente por mérito', () => {
     });
   });
 
-  it('só oferece patentes até Comandante', async () => {
+  it('oferece as patentes que dependem de aval', async () => {
     renderPage();
-    const [firstBtn] = await screen.findAllByTitle('Patente por mérito');
+    const [firstBtn] = await screen.findAllByTitle('Aval de patente');
     await userEvent.click(firstBtn);
-    const options = [...screen.getByLabelText('Patente por mérito').querySelectorAll('option')].map((o) => o.value);
-    expect(options).toEqual(['', 'primeiro_oficial', 'comandante']);
+    const options = [...screen.getByLabelText('Patente concedida').querySelectorAll('option')].map((o) => o.value);
+    expect(options).toEqual(['', 'primeiro_oficial', 'comandante', 'master']);
   });
 });
