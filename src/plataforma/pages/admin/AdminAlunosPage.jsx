@@ -2,6 +2,10 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../../lib/supabase';
 import AdminLayout from '../../components/AdminLayout';
 import { GRANTABLE_RANKS } from '../../lib/starRace';
+import {
+  ANNIVERSARY_NOTICE_DAYS, INACTIVITY_ALERT_DAYS, filterByJoinDate, inactivityStatus,
+  sortStudents, studentsEmailCsv, upcomingAnniversaries, withOverview,
+} from '../../lib/students';
 
 const STATUS_LABEL = { active: 'Ativo', suspended: 'Suspenso', cancelled: 'Cancelado' };
 const STATUS_COLOR = {
@@ -243,6 +247,67 @@ function StudentForm({ initial = /** @type {{ full_name?: string, email?: string
   );
 }
 
+// ── Alerta de inatividade: desativar com observação ou reativar ──
+function InactivityForm({ initialNote = '', days, onSave, onCancel, loading }) {
+  const [note, setNote] = useState(initialNote);
+  const dismissed = Boolean(initialNote);
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); if (note.trim()) onSave(note.trim()); }} style={{ display: 'grid', gap: '16px' }}>
+      <p style={{ color: 'var(--muted)', fontSize: '.875rem', lineHeight: 1.6, margin: 0 }}>
+        Sem acesso há {days} dias. Registre uma observação para desativar o alerta deste aluno.
+        Se ele voltar a acessar a plataforma, o alerta some sozinho e a observação deixa de valer.
+      </p>
+      <div style={{ display: 'grid', gap: '6px' }}>
+        <label htmlFor="inactivity-note" style={labelStyle}>Observação</label>
+        <textarea id="inactivity-note" value={note} onChange={(e) => setNote(e.target.value)} required rows={3} maxLength={500}
+          placeholder="Ex.: avisou que está em viagem até o fim do mês" style={{ ...inputStyle, resize: 'vertical' }} />
+      </div>
+      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <button type="submit" disabled={loading || !note.trim()} style={{
+          flex: 1, padding: '10px', background: 'var(--accent)', color: '#261000', border: 'none', borderRadius: '4px',
+          fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading || !note.trim() ? 0.6 : 1,
+        }}>
+          {loading ? 'Salvando...' : dismissed ? 'Salvar observação' : 'Desativar alerta'}
+        </button>
+        {dismissed && (
+          <button type="button" onClick={() => onSave('')} disabled={loading} style={{
+            padding: '10px 16px', background: 'transparent', border: '1px solid var(--danger)',
+            borderRadius: '4px', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'Space Grotesk, sans-serif',
+          }}>
+            Reativar alerta
+          </button>
+        )}
+        <button type="button" onClick={onCancel} style={{
+          padding: '10px 20px', background: 'transparent', border: '1px solid var(--line)',
+          borderRadius: '4px', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'Space Grotesk, sans-serif',
+        }}>
+          Cancelar
+        </button>
+      </div>
+    </form>
+  );
+}
+
+// ── Cabeçalho de coluna ordenável ─────────────────────────────
+function SortHeader({ label, sortKey, sort, onSort }) {
+  const active = sort.key === sortKey;
+  const ascending = sort.direction === 'asc';
+  return (
+    <button
+      type="button" onClick={() => onSort(sortKey)}
+      aria-label={`Ordenar por ${label.toLowerCase()}${active ? (ascending ? ', crescente' : ', decrescente') : ''}`}
+      style={{
+        all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px',
+        color: active ? 'var(--text)' : 'inherit', fontWeight: active ? 700 : 400,
+      }}
+    >
+      {label}
+      <span aria-hidden="true">{active ? (ascending ? '↑' : '↓') : '↕'}</span>
+    </button>
+  );
+}
+
 // ── Página principal ──────────────────────────────────────────
 export default function AdminAlunosPage() {
   const [students, setStudents] = useState(/** @type {Student[]} */ ([]));
@@ -254,6 +319,34 @@ export default function AdminAlunosPage() {
   const [modal, setModal] = useState(null); // null | { type: 'create' | 'edit' | 'delete', student? }
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [sort, setSort] = useState({ key: 'created_at', direction: 'desc' });
+  const [overview, setOverview] = useState([]);
+
+  // Pontos e último acesso: complemento da lista; se falhar, a tela segue sem eles.
+  const loadOverview = useCallback(async () => {
+    try {
+      const { data, error: rpcError } = await supabase.rpc('admin_student_overview');
+      if (!rpcError) setOverview(data ?? []);
+    } catch (loadError) {
+      console.error('Error in loadOverview:', loadError);
+    }
+  }, []);
+
+  useEffect(() => { void Promise.resolve().then(loadOverview); }, [loadOverview]);
+
+  async function handleInactivity(note) {
+    setSaving(true); setActionError('');
+    const { error: rpcError } = await supabase.rpc('admin_set_inactivity_alert', {
+      p_user_id: modal.student.user_id, p_note: note || null,
+    });
+    setSaving(false);
+    if (rpcError) { setActionError(rpcError.message || 'Não foi possível salvar a observação.'); return; }
+    setModal(null);
+    loadOverview();
+  }
+
+  const [joinFrom, setJoinFrom] = useState('');
+  const [joinTo, setJoinTo] = useState('');
   const [promotions, setPromotions] = useState(/** @type {Record<string, { rank: string, note?: string }>} */ ({}));
 
   const loadPromotions = useCallback(async () => {
@@ -291,14 +384,38 @@ export default function AdminAlunosPage() {
 
   useEffect(() => { void Promise.resolve().then(load); }, [load]);
 
-  const filtered = tab === 'enrolled'
-    ? students.filter(s =>
+  const enriched = withOverview(students, overview);
+  const inactiveCount = enriched.filter((student) => inactivityStatus(student).alert).length;
+  const searched = tab === 'enrolled'
+    ? enriched.filter(s =>
         !search ||
         s.full_name?.toLowerCase().includes(search.toLowerCase()) ||
         s.email?.toLowerCase().includes(search.toLowerCase()) ||
         s.phone?.includes(search)
       )
-    : students;
+    : enriched;
+  const filtered = sortStudents(filterByJoinDate(searched, joinFrom, joinTo), sort.key, sort.direction);
+  const anniversaries = upcomingAnniversaries(students);
+
+  // Clicar no cabeçalho ordena por ele; clicar de novo inverte a ordem.
+  function toggleSort(key) {
+    setSort((current) => (current.key === key
+      ? { key, direction: current.direction === 'asc' ? 'desc' : 'asc' }
+      : { key, direction: key === 'name' ? 'asc' : 'desc' }));
+  }
+
+  // Exporta os e-mails da lista como está na tela (busca e filtro de data aplicados).
+  function exportEmails() {
+    const blob = new Blob(['\uFEFF' + studentsEmailCsv(filtered)], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `alunos-emails-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
 
   async function handleCreate({ full_name, email, password, phone, origin }) {
     setSaving(true); setActionError('');
@@ -398,6 +515,32 @@ export default function AdminAlunosPage() {
           </button>
         </div>
 
+        {/* Aviso automático: alunos perto de completar 1 ano de plataforma */}
+        {anniversaries.length > 0 && (
+          <section aria-labelledby="aviso-um-ano" style={{ border: '1px solid var(--accent)', background: 'var(--accent-soft)', borderRadius: '6px', padding: '16px 20px', marginBottom: '24px' }}>
+            <h2 id="aviso-um-ano" style={{ ...labelStyle, fontSize: '.7rem', fontWeight: 700, color: 'var(--accent-text)', margin: '0 0 10px' }}>
+              1 ano de plataforma nos próximos {ANNIVERSARY_NOTICE_DAYS} dias · {anniversaries.length} aluno{anniversaries.length === 1 ? '' : 's'}
+            </h2>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '6px' }}>
+              {anniversaries.map((student) => (
+                <li key={student.user_id} style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', alignItems: 'baseline', fontSize: '.9rem' }}>
+                  <strong style={{ fontWeight: 600 }}>{student.full_name}</strong>
+                  <span style={{ color: 'var(--muted)' }}>{student.email}</span>
+                  <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginLeft: 'auto' }}>
+                    {student.anniversary.toLocaleDateString('pt-BR')} · {student.daysLeft === 0 ? 'hoje' : `em ${student.daysLeft} dia${student.daysLeft === 1 ? '' : 's'}`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {inactiveCount > 0 && (
+          <p role="status" style={{ color: 'var(--danger)', fontSize: '.875rem', fontWeight: 600, margin: '0 0 20px' }}>
+            {inactiveCount} aluno{inactiveCount === 1 ? '' : 's'} sem acessar a plataforma há mais de {INACTIVITY_ALERT_DAYS} dias (em vermelho na lista).
+          </p>
+        )}
+
         {/* Tabs */}
         <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', borderBottom: '1px solid var(--line)', paddingBottom: '0' }}>
           {[
@@ -431,11 +574,39 @@ export default function AdminAlunosPage() {
         </div>
 
         {/* Search */}
-        <input
-          value={search} onChange={e => setSearch(e.target.value)}
-          placeholder={tab === 'enrolled' ? 'Buscar por nome, e-mail ou telefone...' : 'Buscar por e-mail...'}
-          style={{ ...inputStyle, marginBottom: '20px', maxWidth: '400px' }}
-        />
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px 16px', alignItems: 'flex-end', marginBottom: '20px' }}>
+          <input
+            value={search} onChange={e => setSearch(e.target.value)}
+            aria-label="Buscar"
+            placeholder={tab === 'enrolled' ? 'Buscar por nome, e-mail ou telefone...' : 'Buscar por e-mail...'}
+            style={{ ...inputStyle, flex: '1 1 260px', maxWidth: '400px' }}
+          />
+          {tab === 'enrolled' && (
+            <>
+              <div style={{ display: 'grid', gap: '4px' }}>
+                <label htmlFor="join-from" style={labelStyle}>Ingresso de</label>
+                <input id="join-from" type="date" value={joinFrom} max={joinTo || undefined} onChange={e => setJoinFrom(e.target.value)} style={{ ...inputStyle, width: 'auto' }} />
+              </div>
+              <div style={{ display: 'grid', gap: '4px' }}>
+                <label htmlFor="join-to" style={labelStyle}>até</label>
+                <input id="join-to" type="date" value={joinTo} min={joinFrom || undefined} onChange={e => setJoinTo(e.target.value)} style={{ ...inputStyle, width: 'auto' }} />
+              </div>
+              {(joinFrom || joinTo) && (
+                <button type="button" onClick={() => { setJoinFrom(''); setJoinTo(''); }} style={{ padding: '10px 14px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem' }}>
+                  Limpar datas
+                </button>
+              )}
+              <button type="button" onClick={exportEmails} disabled={filtered.length === 0} style={{ marginLeft: 'auto', padding: '10px 16px', background: 'transparent', border: '1px solid var(--line-strong)', borderRadius: '4px', color: 'var(--text)', cursor: filtered.length === 0 ? 'not-allowed' : 'pointer', opacity: filtered.length === 0 ? 0.5 : 1, fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, fontSize: '.85rem' }}>
+                Exportar e-mails (.csv)
+              </button>
+            </>
+          )}
+        </div>
+        {tab === 'enrolled' && (search || joinFrom || joinTo) && !loading && (
+          <p style={{ color: 'var(--muted)', fontSize: '.8rem', margin: '-8px 0 14px' }}>
+            Mostrando {filtered.length} de {students.length} aluno{students.length === 1 ? '' : 's'}.
+          </p>
+        )}
 
         {loading && <p style={{ color: 'var(--muted)' }}>Carregando...</p>}
         {error && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
@@ -444,35 +615,44 @@ export default function AdminAlunosPage() {
         {!loading && tab === 'enrolled' && (
           <div style={{ border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden' }}>
             <div style={{
-              display: 'grid', gridTemplateColumns: '1fr 1fr .8fr .8fr auto',
+              display: 'grid', gridTemplateColumns: 'minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,.8fr) minmax(0,.6fr) minmax(0,.45fr) minmax(0,.6fr) auto',
               padding: '10px 20px', background: 'var(--bg-2)',
               borderBottom: '1px solid var(--line)',
               fontFamily: 'Space Mono, monospace', fontSize: '.65rem',
               color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.08em', gap: '12px',
             }}>
-              <span>Nome</span><span>E-mail</span><span>WhatsApp</span><span>Status</span><span>Ações</span>
+              <SortHeader label="Nome" sortKey="name" sort={sort} onSort={toggleSort} />
+              <span>E-mail</span><span>WhatsApp</span>
+              <SortHeader label="Ingresso" sortKey="created_at" sort={sort} onSort={toggleSort} />
+              <SortHeader label="Pontos" sortKey="points" sort={sort} onSort={toggleSort} />
+              <span>Status</span><span>Ações</span>
             </div>
 
             {filtered.length === 0 && (
               <p style={{ padding: '24px 20px', color: 'var(--muted)', fontSize: '.875rem' }}>
-                {search ? 'Nenhum aluno encontrado.' : 'Nenhum aluno cadastrado.'}
+                {search || joinFrom || joinTo ? 'Nenhum aluno encontrado.' : 'Nenhum aluno cadastrado.'}
               </p>
             )}
 
             {filtered.map((s, i) => {
               const sc = STATUS_COLOR[s.status] ?? STATUS_COLOR.active;
+              const inactivity = inactivityStatus(s);
+              const rowBg = inactivity.alert ? 'rgba(248,113,113,.08)' : 'transparent';
               return (
                 <div key={s.user_id} style={{
-                  display: 'grid', gridTemplateColumns: '1fr 1fr .8fr .8fr auto',
+                  display: 'grid', gridTemplateColumns: 'minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,.8fr) minmax(0,.6fr) minmax(0,.45fr) minmax(0,.6fr) auto',
                   padding: '14px 20px', gap: '12px', alignItems: 'center',
                   borderBottom: i < filtered.length - 1 ? '1px solid var(--line)' : 'none',
                   transition: 'background .15s',
+                  background: rowBg,
+                  boxShadow: inactivity.alert ? 'inset 3px 0 0 var(--danger)' : 'none',
                 }}
+                data-inactive={inactivity.alert ? 'true' : undefined}
                 onMouseOver={e => e.currentTarget.style.background = 'var(--hover)'}
-                onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+                onMouseOut={e => e.currentTarget.style.background = rowBg}
                 >
                   <div>
-                    <div style={{ fontWeight: 500, fontSize: '.9rem' }}>
+                    <div style={{ fontWeight: inactivity.alert ? 700 : 500, fontSize: '.9rem', color: inactivity.alert ? 'var(--danger)' : 'inherit' }}>
                       {s.full_name}
                       {promotions[s.user_id] && (
                         <span title="Patente concedida" style={{ color: 'var(--accent-text)', marginLeft: '8px', fontSize: '.75rem', letterSpacing: '.1em' }}>
@@ -480,14 +660,35 @@ export default function AdminAlunosPage() {
                         </span>
                       )}
                     </div>
-                    <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)', marginTop: '2px' }}>
-                      {new Date(s.created_at).toLocaleDateString('pt-BR')}
-                    </div>
+                    {inactivity.alert && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 10px', alignItems: 'baseline', marginTop: '4px', fontSize: '.75rem', color: 'var(--danger)' }}>
+                        <span>Sem acesso há {inactivity.days} dias</span>
+                        <button type="button" onClick={() => { setActionError(''); setModal({ type: 'inactivity', student: s }); }}
+                          style={{ all: 'unset', cursor: 'pointer', textDecoration: 'underline', color: 'var(--danger)' }}>
+                          Desativar alerta
+                        </button>
+                      </div>
+                    )}
+                    {inactivity.dismissed && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 10px', alignItems: 'baseline', marginTop: '4px', fontSize: '.75rem', color: 'var(--muted)' }}>
+                        <span>Alerta de inatividade desativado: {inactivity.note}</span>
+                        <button type="button" onClick={() => { setActionError(''); setModal({ type: 'inactivity', student: s }); }}
+                          style={{ all: 'unset', cursor: 'pointer', textDecoration: 'underline' }}>
+                          Rever
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div style={{ fontSize: '.875rem', color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {s.email ?? '—'}
                   </div>
                   <div style={{ fontSize: '.875rem', color: 'var(--muted)' }}>{s.phone ?? '—'}</div>
+                  <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--muted)' }}>
+                    {s.created_at ? new Date(s.created_at).toLocaleDateString('pt-BR') : '—'}
+                  </div>
+                  <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.8rem', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                    {s.points}
+                  </div>
                   <div>
                     <span style={{
                       fontFamily: 'Space Mono, monospace', fontSize: '.65rem', fontWeight: 700,
@@ -642,6 +843,18 @@ export default function AdminAlunosPage() {
         <Modal title="Editar aluno" onClose={() => setModal(null)}>
           {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
           <StudentForm initial={modal.student} onSave={handleEdit} onCancel={() => setModal(null)} loading={saving} />
+        </Modal>
+      )}
+
+      {/* Modal — Alerta de inatividade */}
+      {modal?.type === 'inactivity' && (
+        <Modal title={`Inatividade — ${modal.student.full_name}`} onClose={() => setModal(null)}>
+          {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
+          <InactivityForm
+            initialNote={modal.student.alert_note ?? ''}
+            days={inactivityStatus(modal.student).days}
+            onSave={handleInactivity} onCancel={() => setModal(null)} loading={saving}
+          />
         </Modal>
       )}
 
