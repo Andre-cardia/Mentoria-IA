@@ -3,7 +3,7 @@ import { supabase } from '../../../lib/supabase';
 import { toast } from 'sonner';
 
 const STATUSES = [
-  { id: 'new', label: 'Novo', color: 'var(--accent)' },
+  { id: 'new', label: 'Novo', color: 'var(--accent-text)' },
   { id: 'contacted', label: 'Contato', color: '#38bdf8' },
   { id: 'qualified', label: 'Qualificado', color: '#a855f7' },
   { id: 'proposal', label: 'Proposta', color: '#f59e0b' },
@@ -507,7 +507,7 @@ export default function ClientePanoramaDrawer({
                       alignItems: 'flex-start',
                       justifyContent: 'space-between',
                       gap: '12px',
-                      background: item.completed ? 'rgba(255,255,255,.02)' : isOverdue ? 'rgba(239,68,68,.08)' : 'var(--bg-2)',
+                      background: item.completed ? 'var(--hover)' : isOverdue ? 'rgba(239,68,68,.08)' : 'var(--bg-2)',
                       border: `1px solid ${item.completed ? 'var(--line)' : isOverdue ? 'rgba(239,68,68,.4)' : 'var(--line-strong)'}`,
                       borderRadius: '6px',
                       padding: '12px 14px',
@@ -537,7 +537,7 @@ export default function ClientePanoramaDrawer({
                             style={{
                               fontFamily: 'Space Mono, monospace',
                               fontSize: '.68rem',
-                              color: item.completed ? 'var(--muted)' : isOverdue ? '#f87171' : 'var(--accent)',
+                              color: item.completed ? 'var(--muted)' : isOverdue ? '#f87171' : 'var(--accent-text)',
                               fontWeight: isOverdue ? 700 : 400,
                             }}
                           >

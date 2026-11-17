@@ -118,7 +118,7 @@ describe('DashboardPage — Últimos Lançamentos', () => {
     expect(screen.getAllByText('Vídeo')).toHaveLength(12);
     expect(screen.getByRole('link', { name: /Aula recente 1\b(?!\d)/i })).toHaveAttribute(
       'href',
-      '/modulos/module-1/aulas/lesson-1',
+      '/cursos/module-1/aulas/lesson-1',
     );
   });
 

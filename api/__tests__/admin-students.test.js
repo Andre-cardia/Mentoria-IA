@@ -56,14 +56,14 @@ describe('api/admin/students handler', () => {
     mockSupabase.not.mockReturnValue(mockSupabase);
     mockSupabase.update.mockReturnValue(mockSupabase);
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: 'admin-user', user_metadata: { role: 'admin' } } },
+      data: { user: { id: 'admin-user', app_metadata: { role: 'admin' } } },
       error: null,
     });
   });
 
   it('retorna 403 quando usuário não é admin', async () => {
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: 'student-user', user_metadata: { role: 'student' } } },
+      data: { user: { id: 'student-user', app_metadata: { role: 'student' } } },
       error: null,
     });
 
@@ -172,7 +172,7 @@ describe('api/admin/students/[id] handler', () => {
     mockSupabase.eq.mockReturnValue(mockSupabase);
     mockSupabase.update.mockReturnValue(mockSupabase);
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: 'admin-user', user_metadata: { role: 'admin' } } },
+      data: { user: { id: 'admin-user', app_metadata: { role: 'admin' } } },
       error: null,
     });
   });
@@ -231,7 +231,7 @@ describe('api/admin/platform-users handler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: 'admin-user', user_metadata: { role: 'admin' } } },
+      data: { user: { id: 'admin-user', app_metadata: { role: 'admin' } } },
       error: null,
     });
   });
@@ -240,9 +240,9 @@ describe('api/admin/platform-users handler', () => {
     mockSupabase.auth.admin.listUsers.mockResolvedValue({
       data: {
         users: [
-          { id: 'admin-1', email: 'admin@test.com', user_metadata: { role: 'admin', full_name: 'Admin' }, created_at: '2026-04-27' },
-          { id: 'sales-1', email: 'comercial@test.com', user_metadata: { role: 'comercial', full_name: 'Comercial' }, created_at: '2026-04-27' },
-          { id: 'student-1', email: 'aluno@test.com', user_metadata: { role: 'aluno', full_name: 'Aluno' }, created_at: '2026-04-27' },
+          { id: 'admin-1', email: 'admin@test.com', app_metadata: { role: 'admin' }, user_metadata: { full_name: 'Admin' }, created_at: '2026-04-27' },
+          { id: 'sales-1', email: 'comercial@test.com', app_metadata: { role: 'comercial' }, user_metadata: { full_name: 'Comercial' }, created_at: '2026-04-27' },
+          { id: 'student-1', email: 'aluno@test.com', app_metadata: { role: 'aluno' }, user_metadata: { full_name: 'Aluno' }, created_at: '2026-04-27' },
         ],
       },
       error: null,
@@ -261,7 +261,7 @@ describe('api/admin/platform-users handler', () => {
 
   it('cria usuário comercial com metadata de role', async () => {
     mockSupabase.auth.admin.createUser.mockResolvedValue({
-      data: { user: { id: 'sales-1', email: 'sales@test.com', user_metadata: { role: 'comercial', full_name: 'Sales' } } },
+      data: { user: { id: 'sales-1', email: 'sales@test.com', app_metadata: { role: 'comercial' }, user_metadata: { full_name: 'Sales' } } },
       error: null,
     });
 
@@ -284,7 +284,8 @@ describe('api/admin/platform-users handler', () => {
       email: 'sales@test.com',
       password: '123456',
       email_confirm: true,
-      user_metadata: { full_name: 'Sales', role: 'comercial' },
+      user_metadata: { full_name: 'Sales' },
+      app_metadata: { role: 'comercial' },
     });
   });
 
@@ -311,7 +312,7 @@ describe('api/admin/platform-users/[id] handler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: 'admin-user', user_metadata: { role: 'admin' } } },
+      data: { user: { id: 'admin-user', app_metadata: { role: 'admin' } } },
       error: null,
     });
   });
@@ -333,7 +334,7 @@ describe('api/admin/platform-users/[id] handler', () => {
 
   it('atualiza metadata preservando campos existentes', async () => {
     mockSupabase.auth.admin.getUserById.mockResolvedValue({
-      data: { user: { id: 'sales-1', user_metadata: { role: 'comercial', theme: 'dark' } } },
+      data: { user: { id: 'sales-1', app_metadata: { role: 'comercial' }, user_metadata: { theme: 'dark' } } },
       error: null,
     });
     mockSupabase.auth.admin.updateUserById.mockResolvedValue({ error: null });
@@ -350,7 +351,8 @@ describe('api/admin/platform-users/[id] handler', () => {
 
     expect(res.statusCode).toBe(200);
     expect(mockSupabase.auth.admin.updateUserById).toHaveBeenCalledWith('sales-1', {
-      user_metadata: { role: 'admin', theme: 'dark', full_name: 'Comercial Novo' },
+      user_metadata: { theme: 'dark', full_name: 'Comercial Novo' },
+      app_metadata: { role: 'admin' },
     });
   });
 

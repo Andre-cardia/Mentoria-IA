@@ -23,7 +23,7 @@ router.post("/image-upload", async (req, res) => {
     const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
     if (authErr || !user) return res.status(401).json({ error: "Token inválido" });
 
-    const role = user.user_metadata?.role;
+    const role = user.app_metadata?.role;
     if (role !== "admin") return res.status(403).json({ error: "Forbidden" });
 
     const { fileName, contentType, type } = req.body;

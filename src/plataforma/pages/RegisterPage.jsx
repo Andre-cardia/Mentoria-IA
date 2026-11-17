@@ -72,7 +72,7 @@ export default function RegisterPage() {
         </div>
 
         <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '6px', padding: '32px' }}>
-          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
             Criar Conta
           </div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '8px', lineHeight: 1.2 }}>
@@ -121,7 +121,7 @@ export default function RegisterPage() {
               </div>
 
               {error && (
-                <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', lineHeight: 1.5 }}>
+                <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', lineHeight: 1.5 }}>
                   {error}
                 </p>
               )}
@@ -142,7 +142,7 @@ export default function RegisterPage() {
 
           <p style={{ marginTop: '20px', fontSize: '.875rem', color: 'var(--muted)', textAlign: 'center' }}>
             Já tem conta?{' '}
-            <Link to="/login" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Entrar</Link>
+            <Link to="/login" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>Entrar</Link>
           </p>
         </div>
       </div>

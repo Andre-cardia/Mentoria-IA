@@ -11,7 +11,7 @@ function getStrength(password) {
   return 'forte';
 }
 
-const COLORS = { fraca: '#f87171', média: '#fbbf24', forte: '#4ade80' };
+const COLORS = { fraca: 'var(--danger)', média: 'var(--warning)', forte: 'var(--success)' };
 const WIDTHS = { fraca: '33%', média: '66%', forte: '100%' };
 
 export default function PasswordStrengthIndicator({ password }) {

@@ -75,8 +75,8 @@ export default function AdminAulasPage() {
 
   return (
     <AdminLayout>
-      <div style={{ maxWidth: '820px' }}>
-        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>Admin</div>
+      <div style={{ maxWidth: '100%' }}>
+        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>Admin</div>
         <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '28px' }}>Aulas</h1>
 
         {/* Seletor de módulo */}
@@ -174,13 +174,13 @@ export default function AdminAulasPage() {
                 <div key={lesson.id} style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '6px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)', minWidth: '28px' }}>#{lesson.order}</span>
                   <span style={{ flex: 1, fontWeight: 500, color: 'var(--text)' }}>{lesson.title}</span>
-                  <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.6rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--accent)', background: 'rgba(255,106,0,.08)', border: '1px solid rgba(255,106,0,.2)', borderRadius: '3px', padding: '2px 7px' }}>
+                  <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.6rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--accent-text)', background: 'rgba(255,106,0,.08)', border: '1px solid rgba(255,106,0,.2)', borderRadius: '3px', padding: '2px 7px' }}>
                     {lesson.lesson_type ?? 'video'}
                   </span>
                   {lesson.duration && <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)' }}>{Math.floor(lesson.duration / 60)}:{String(lesson.duration % 60).padStart(2, '0')}</span>}
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button onClick={() => startEdit(lesson)} style={{ padding: '6px 14px', background: 'transparent', border: '1px solid var(--line-strong)', borderRadius: '4px', color: 'var(--muted)', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.8rem', cursor: 'pointer' }}>Editar</button>
-                    <button onClick={() => remove(lesson.id)} style={{ padding: '6px 12px', background: 'transparent', border: '1px solid rgba(248,113,113,.3)', borderRadius: '4px', color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.7rem', cursor: 'pointer' }}>Excluir</button>
+                    <button onClick={() => remove(lesson.id)} style={{ padding: '6px 12px', background: 'transparent', border: '1px solid rgba(248,113,113,.3)', borderRadius: '4px', color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.7rem', cursor: 'pointer' }}>Excluir</button>
                   </div>
                 </div>
               ))}

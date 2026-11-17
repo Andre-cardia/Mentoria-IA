@@ -168,7 +168,7 @@ export default function FollowUpAlertNotifier() {
                 fontSize: '.72rem',
                 letterSpacing: '.14em',
                 textTransform: 'uppercase',
-                color: isOverdue ? '#f87171' : 'var(--accent)',
+                color: isOverdue ? 'var(--danger)' : 'var(--accent-text)',
                 fontWeight: 700,
               }}
             >
@@ -202,7 +202,7 @@ export default function FollowUpAlertNotifier() {
           {activeAlert.title}
         </div>
         {lead && (
-          <div style={{ fontSize: '.85rem', color: 'var(--accent)', fontWeight: 600 }}>
+          <div style={{ fontSize: '.85rem', color: 'var(--accent-text)', fontWeight: 600 }}>
             {lead.name} • <span style={{ color: 'var(--muted)' }}>{lead.company}</span>
           </div>
         )}

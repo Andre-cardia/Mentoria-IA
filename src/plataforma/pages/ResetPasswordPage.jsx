@@ -131,7 +131,7 @@ export default function ResetPasswordPage() {
           borderRadius: '6px',
           padding: '32px',
         }}>
-          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
             Nova Senha
           </div>
 
@@ -196,14 +196,14 @@ export default function ResetPasswordPage() {
                     onBlur={(e) => e.target.style.borderColor = 'var(--line-strong)'}
                   />
                   {matchError && (
-                    <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.72rem', margin: 0 }}>
+                    <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.72rem', margin: 0 }}>
                       {matchError}
                     </p>
                   )}
                 </div>
 
                 {error && (
-                  <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem' }}>
+                  <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem' }}>
                     {error}
                   </p>
                 )}

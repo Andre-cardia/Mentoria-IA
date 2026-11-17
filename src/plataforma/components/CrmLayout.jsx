@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useAuth } from '../context/useAuth';
+import ThemeToggle from './ThemeToggle';
 import FollowUpAlertNotifier from './crm/FollowUpAlertNotifier';
 
 const CRM_NAV = [
@@ -23,7 +24,7 @@ const linkStyle = (isActive, collapsed = false) => ({
   fontFamily: 'Space Grotesk, sans-serif',
   fontSize: collapsed ? '.7rem' : '.9rem',
   fontWeight: isActive ? 600 : 400,
-  color: isActive ? 'var(--accent)' : 'var(--muted)',
+  color: isActive ? 'var(--accent-text)' : 'var(--muted)',
   background: isActive ? 'var(--accent-soft)' : 'transparent',
   textAlign: collapsed ? 'center' : 'left',
   transition: 'color .15s, background .15s',
@@ -41,7 +42,7 @@ export default function CrmLayout({ children }) {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)' }}>
-      <aside style={{
+      <aside className="app-sidebar" style={{
         width: collapsed ? '76px' : '240px',
         flexShrink: 0,
         background: 'var(--bg-2)',
@@ -87,7 +88,7 @@ export default function CrmLayout({ children }) {
             textTransform: 'uppercase',
             letterSpacing: '.06em',
             background: 'var(--accent-soft)',
-            color: 'var(--accent)',
+            color: 'var(--accent-text)',
             border: '1px solid rgba(255,106,0,.25)',
             borderRadius: '3px',
             padding: '2px 8px',
@@ -145,6 +146,7 @@ export default function CrmLayout({ children }) {
               {user?.email}
             </div>
           )}
+          <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center' }}><ThemeToggle collapsed={collapsed} /></div>
           <button
             onClick={handleSignOut}
             style={{

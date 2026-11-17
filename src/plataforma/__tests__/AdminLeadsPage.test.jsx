@@ -47,7 +47,7 @@ vi.mock('../../lib/supabase', () => ({
 
 vi.mock('../context/useAuth', () => ({
   useAuth: () => ({
-    user: { id: 'admin-user-1', email: 'admin@neuralhub.ia.br', user_metadata: { role: 'admin' } },
+    user: { id: 'admin-user-1', email: 'admin@neuralhub.ia.br', app_metadata: { role: 'admin' } },
     isAdmin: true,
     isCommercial: false,
     hasCrmAccess: true,

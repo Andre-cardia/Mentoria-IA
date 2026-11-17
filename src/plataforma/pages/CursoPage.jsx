@@ -81,23 +81,24 @@ export default function CursoPage() {
   }
 
   const lessons = mod?.lessons ?? [];
-  const firstLesson = lessons[0] ?? null;
+  // Retoma na primeira aula ainda não concluída; curso completo volta ao início.
+  const firstLesson = lessons.find((l) => !isComplete(l.id)) ?? lessons[0] ?? null;
   const mp = mod ? getModuleProgress(mod.id, lessons) : { completed: 0, total: 0 };
   const hasProgress = mp.completed > 0;
 
   return (
     <Layout>
-      <div style={{ maxWidth: '800px' }}>
+      <div style={{ maxWidth: '100%' }}>
         {/* Breadcrumb */}
         <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '.85rem', color: 'var(--muted)' }}>
-          <Link to="/cursos" style={{ color: 'var(--muted)', textDecoration: 'none' }}>Cursos</Link>
+          <Link to="/cursos" style={{ color: 'var(--muted)', textDecoration: 'none' }}>Trilhas</Link>
           <span>›</span>
           <span style={{ color: 'var(--text)' }}>{mod?.title ?? '...'}</span>
         </div>
 
         {loading && <p style={{ color: 'var(--muted)' }}>Carregando curso...</p>}
         {notFound && (
-          <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>
+          <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>
             Curso não encontrado.
           </p>
         )}
@@ -106,7 +107,7 @@ export default function CursoPage() {
           <>
             {/* Cabeçalho */}
             <div style={{ marginBottom: '36px' }}>
-              <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+              <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
                 Curso
               </div>
               <h1 style={{ fontSize: '2rem', fontWeight: 700, margin: '0 0 8px 0' }}>{mod.title}</h1>
@@ -167,7 +168,7 @@ export default function CursoPage() {
                           cursor: 'pointer',
                           transition: 'background .15s',
                         }}
-                        onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.02)'; }}
+                        onMouseOver={(e) => { e.currentTarget.style.background = 'var(--hover)'; }}
                         onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; }}
                       >
                         <div style={{
@@ -176,7 +177,7 @@ export default function CursoPage() {
                           border: done ? '1px solid rgba(34,197,94,.3)' : '1px solid rgba(255,106,0,.3)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
-                          color: done ? '#4ade80' : 'var(--accent)', flexShrink: 0,
+                          color: done ? 'var(--success)' : 'var(--accent-text)', flexShrink: 0,
                         }}>
                           {done ? '✓' : idx + 1}
                         </div>
@@ -188,7 +189,7 @@ export default function CursoPage() {
                             <span style={{
                               marginLeft: '8px',
                               fontFamily: 'Space Mono, monospace', fontSize: '.65rem',
-                              color: '#4ade80', background: 'rgba(34,197,94,.1)',
+                              color: 'var(--success)', background: 'rgba(34,197,94,.1)',
                               border: '1px solid rgba(34,197,94,.25)', borderRadius: '3px',
                               padding: '1px 6px',
                             }}>
@@ -231,7 +232,7 @@ export default function CursoPage() {
                         width: '36px', height: '36px', flexShrink: 0,
                         background: 'var(--accent-soft)', border: '1px solid rgba(255,106,0,.25)',
                         borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)',
+                        fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent-text)',
                       }}>
                         FILE
                       </div>

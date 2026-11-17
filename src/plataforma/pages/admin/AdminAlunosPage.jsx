@@ -1,12 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../../lib/supabase';
 import AdminLayout from '../../components/AdminLayout';
+import { GRANTABLE_RANKS } from '../../lib/starRace';
 
 const STATUS_LABEL = { active: 'Ativo', suspended: 'Suspenso', cancelled: 'Cancelado' };
 const STATUS_COLOR = {
-  active:    { color: '#4ade80', bg: 'rgba(34,197,94,.1)',  border: 'rgba(34,197,94,.25)' },
-  suspended: { color: '#fbbf24', bg: 'rgba(251,191,36,.1)', border: 'rgba(251,191,36,.25)' },
-  cancelled: { color: '#f87171', bg: 'rgba(248,113,113,.1)', border: 'rgba(248,113,113,.25)' },
+  active:    { color: 'var(--success)', bg: 'rgba(34,197,94,.1)',  border: 'rgba(34,197,94,.25)' },
+  suspended: { color: 'var(--warning)', bg: 'rgba(251,191,36,.1)', border: 'rgba(251,191,36,.25)' },
+  cancelled: { color: 'var(--danger)', bg: 'rgba(248,113,113,.1)', border: 'rgba(248,113,113,.25)' },
 };
 
 /** @typedef {{ user_id: string, full_name?: string, email?: string, phone?: string, origin?: string, status?: keyof typeof STATUS_COLOR, created_at?: string }} Student */
@@ -38,6 +39,54 @@ function Modal({ title, onClose, children }) {
         <button onClick={onClose} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: 'var(--muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
       </div>
     </div>
+  );
+}
+
+// ── Aval de patente (Corrida Estelar) ────────────────────────
+const RANK_EFFECT = {
+  primeiro_oficial: 'promoção por mérito',
+  comandante: 'libera a Galáxia Avançada',
+  master: 'certificação aprovada',
+};
+
+function RankForm({ initial = /** @type {{ rank?: string, note?: string }} */ ({}), onSave, onCancel, loading }) {
+  const [rank, setRank] = useState(initial.rank ?? '');
+  const [note, setNote] = useState(initial.note ?? '');
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); onSave({ rank, note }); }} style={{ display: 'grid', gap: '16px' }}>
+      <p style={{ color: 'var(--muted)', fontSize: '.875rem', lineHeight: 1.6, margin: 0 }}>
+        Aspirante e Primeiro Oficial vêm dos pontos do aluno na Corrida Estelar. Comandante e Master só existem com o seu aval:
+        Comandante libera a Galáxia Avançada e Master leva o aluno à Estrela da Certificação.
+      </p>
+      <div style={{ display: 'grid', gap: '6px' }}>
+        <label htmlFor="rank-select" style={labelStyle}>Patente concedida</label>
+        <select id="rank-select" value={rank} onChange={(e) => setRank(e.target.value)} style={inputStyle}>
+          <option value="">Sem aval (o aluno para antes da Galáxia Avançada)</option>
+          {GRANTABLE_RANKS.map((item) => (
+            <option key={item.id} value={item.id}>{'★'.repeat(item.stars)} {item.name} — {RANK_EFFECT[item.id]}</option>
+          ))}
+        </select>
+      </div>
+      <div style={{ display: 'grid', gap: '6px' }}>
+        <label htmlFor="rank-note" style={labelStyle}>Motivo (opcional)</label>
+        <input id="rank-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={200} placeholder="Ex.: ajudou colegas no fórum" style={inputStyle} />
+      </div>
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <button type="submit" disabled={loading} style={{
+          flex: 1, padding: '10px', background: 'var(--accent)', color: '#261000', border: 'none', borderRadius: '4px',
+          fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1,
+        }}>
+          {loading ? 'Salvando...' : 'Salvar patente'}
+        </button>
+        <button type="button" onClick={onCancel} style={{
+          padding: '10px 20px', background: 'transparent', border: '1px solid var(--line)',
+          borderRadius: '4px', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'Space Grotesk, sans-serif',
+        }}>
+          Cancelar
+        </button>
+      </div>
+    </form>
   );
 }
 
@@ -86,7 +135,7 @@ function ChangePasswordForm({ onSave, onCancel, loading }) {
         />
       </div>
       {localError && (
-        <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', margin: 0 }}>
+        <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', margin: 0 }}>
           {localError}
         </p>
       )}
@@ -205,6 +254,30 @@ export default function AdminAlunosPage() {
   const [modal, setModal] = useState(null); // null | { type: 'create' | 'edit' | 'delete', student? }
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [promotions, setPromotions] = useState(/** @type {Record<string, { rank: string, note?: string }>} */ ({}));
+
+  const loadPromotions = useCallback(async () => {
+    // As patentes são um complemento: se a leitura falhar, a lista de alunos segue normal.
+    try {
+      const { data } = await supabase.from('rank_promotions').select('user_id, rank, note');
+      setPromotions(Object.fromEntries((data ?? []).map((row) => [row.user_id, row])));
+    } catch (loadError) {
+      console.error('Error in loadPromotions:', loadError);
+    }
+  }, []);
+
+  useEffect(() => { void Promise.resolve().then(loadPromotions); }, [loadPromotions]);
+
+  async function handleRank({ rank, note }) {
+    setSaving(true); setActionError('');
+    const { error: rpcError } = await supabase.rpc('admin_set_rank_promotion', {
+      p_user_id: modal.student.user_id, p_rank: rank || null, p_note: note || null,
+    });
+    setSaving(false);
+    if (rpcError) { setActionError(rpcError.message || 'Não foi possível salvar a patente.'); return; }
+    setModal(null);
+    loadPromotions();
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -294,11 +367,11 @@ export default function AdminAlunosPage() {
 
   return (
     <AdminLayout>
-      <div style={{ maxWidth: '960px' }}>
+      <div style={{ maxWidth: '100%' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '32px', gap: '16px', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '6px' }}>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '6px' }}>
               Gestão
             </div>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Alunos</h1>
@@ -306,7 +379,7 @@ export default function AdminAlunosPage() {
               {students.length} aluno{students.length !== 1 ? 's' : ''} cadastrado{students.length !== 1 ? 's' : ''}
               {pendingRegistration.length > 0 && (
                 <span style={{ marginLeft: '10px', fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
-                  color: '#fbbf24', background: 'rgba(251,191,36,.1)', border: '1px solid rgba(251,191,36,.25)',
+                  color: 'var(--warning)', background: 'rgba(251,191,36,.1)', border: '1px solid rgba(251,191,36,.25)',
                   borderRadius: '3px', padding: '1px 7px' }}>
                   {pendingRegistration.length} aguardando cadastro
                 </span>
@@ -348,7 +421,7 @@ export default function AdminAlunosPage() {
                 <span style={{
                   marginLeft: '7px', fontFamily: 'Space Mono, monospace', fontSize: '.65rem',
                   background: tab === key ? 'var(--accent-soft)' : 'var(--bg-2)',
-                  color: tab === key ? 'var(--accent)' : 'var(--muted)',
+                  color: tab === key ? 'var(--accent-text)' : 'var(--muted)',
                   border: `1px solid ${tab === key ? 'rgba(255,106,0,.25)' : 'var(--line)'}`,
                   borderRadius: '3px', padding: '1px 6px',
                 }}>{count}</span>
@@ -365,7 +438,7 @@ export default function AdminAlunosPage() {
         />
 
         {loading && <p style={{ color: 'var(--muted)' }}>Carregando...</p>}
-        {error && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
+        {error && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
 
         {/* Tabela — Matriculados */}
         {!loading && tab === 'enrolled' && (
@@ -395,11 +468,18 @@ export default function AdminAlunosPage() {
                   borderBottom: i < filtered.length - 1 ? '1px solid var(--line)' : 'none',
                   transition: 'background .15s',
                 }}
-                onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,.02)'}
+                onMouseOver={e => e.currentTarget.style.background = 'var(--hover)'}
                 onMouseOut={e => e.currentTarget.style.background = 'transparent'}
                 >
                   <div>
-                    <div style={{ fontWeight: 500, fontSize: '.9rem' }}>{s.full_name}</div>
+                    <div style={{ fontWeight: 500, fontSize: '.9rem' }}>
+                      {s.full_name}
+                      {promotions[s.user_id] && (
+                        <span title="Patente concedida" style={{ color: 'var(--accent-text)', marginLeft: '8px', fontSize: '.75rem', letterSpacing: '.1em' }}>
+                          {'★'.repeat(GRANTABLE_RANKS.find((item) => item.id === promotions[s.user_id].rank)?.stars ?? 0)}
+                        </span>
+                      )}
+                    </div>
                     <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)', marginTop: '2px' }}>
                       {new Date(s.created_at).toLocaleDateString('pt-BR')}
                     </div>
@@ -424,27 +504,33 @@ export default function AdminAlunosPage() {
                       style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--muted)', cursor: 'pointer', fontSize: '.8rem' }}
                     >✏️</button>
 
+                    <button
+                      onClick={() => { setActionError(''); setModal({ type: 'rank', student: s }); }}
+                      title="Aval de patente" aria-label={`Aval de patente de ${s.full_name}`}
+                      style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--accent-text)', cursor: 'pointer', fontSize: '.8rem' }}
+                    >★</button>
+
                     {s.status === 'active' && (
                       <button onClick={() => quickStatus(s, 'suspended')} title="Suspender"
-                        style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: '#fbbf24', cursor: 'pointer', fontSize: '.8rem' }}>
+                        style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--warning)', cursor: 'pointer', fontSize: '.8rem' }}>
                         ⏸
                       </button>
                     )}
                     {s.status === 'suspended' && (
                       <button onClick={() => quickStatus(s, 'active')} title="Reativar"
-                        style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: '#4ade80', cursor: 'pointer', fontSize: '.8rem' }}>
+                        style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--success)', cursor: 'pointer', fontSize: '.8rem' }}>
                         ▶
                       </button>
                     )}
                     {s.status !== 'cancelled' && (
                       <button onClick={() => quickStatus(s, 'cancelled')} title="Cancelar matrícula"
-                        style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: '#f87171', cursor: 'pointer', fontSize: '.8rem' }}>
+                        style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--danger)', cursor: 'pointer', fontSize: '.8rem' }}>
                         ✕
                       </button>
                     )}
                     {s.status === 'cancelled' && (
                       <button onClick={() => quickStatus(s, 'active')} title="Reativar"
-                        style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: '#4ade80', cursor: 'pointer', fontSize: '.8rem' }}>
+                        style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--success)', cursor: 'pointer', fontSize: '.8rem' }}>
                         ↩
                       </button>
                     )}
@@ -458,7 +544,7 @@ export default function AdminAlunosPage() {
                     <button
                       onClick={() => { setActionError(''); setModal({ type: 'delete', student: s }); }}
                       title="Excluir permanentemente"
-                      style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: '#f87171', cursor: 'pointer', fontSize: '.8rem' }}>
+                      style={{ padding: '6px 10px', background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--danger)', cursor: 'pointer', fontSize: '.8rem' }}>
                       🗑
                     </button>
                   </div>
@@ -498,7 +584,7 @@ export default function AdminAlunosPage() {
                   borderBottom: i < filteredPending.length - 1 ? '1px solid var(--line)' : 'none',
                   transition: 'background .15s',
                 }}
-                onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,.02)'}
+                onMouseOver={e => e.currentTarget.style.background = 'var(--hover)'}
                 onMouseOut={e => e.currentTarget.style.background = 'transparent'}
                 >
                   <div style={{ fontSize: '.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -524,7 +610,7 @@ export default function AdminAlunosPage() {
                     style={{
                       padding: '6px 12px', background: 'var(--accent-soft)',
                       border: '1px solid rgba(255,106,0,.25)', borderRadius: '4px',
-                      color: 'var(--accent)', cursor: 'pointer',
+                      color: 'var(--accent-text)', cursor: 'pointer',
                       fontFamily: 'Space Grotesk, sans-serif', fontSize: '.8rem', fontWeight: 600,
                       whiteSpace: 'nowrap',
                     }}
@@ -541,7 +627,7 @@ export default function AdminAlunosPage() {
       {/* Modal — Criar */}
       {modal?.type === 'create' && (
         <Modal title="Novo aluno" onClose={() => setModal(null)}>
-          {actionError && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
+          {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
           <StudentForm
             initial={modal.prefillEmail ? { email: modal.prefillEmail } : {}}
             onSave={handleCreate}
@@ -554,15 +640,23 @@ export default function AdminAlunosPage() {
       {/* Modal — Editar */}
       {modal?.type === 'edit' && (
         <Modal title="Editar aluno" onClose={() => setModal(null)}>
-          {actionError && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
+          {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
           <StudentForm initial={modal.student} onSave={handleEdit} onCancel={() => setModal(null)} loading={saving} />
+        </Modal>
+      )}
+
+      {/* Modal — Aval de patente */}
+      {modal?.type === 'rank' && (
+        <Modal title={`Patente — ${modal.student.full_name}`} onClose={() => setModal(null)}>
+          {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
+          <RankForm initial={promotions[modal.student.user_id]} onSave={handleRank} onCancel={() => setModal(null)} loading={saving} />
         </Modal>
       )}
 
       {/* Modal — Redefinir senha */}
       {modal?.type === 'change-password' && (
         <Modal title={`Redefinir senha — ${modal.student.full_name}`} onClose={() => setModal(null)}>
-          {actionError && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
+          {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
           <ChangePasswordForm onSave={handleChangePassword} onCancel={() => setModal(null)} loading={saving} />
         </Modal>
       )}
@@ -575,13 +669,13 @@ export default function AdminAlunosPage() {
           </p>
           <p style={{ fontWeight: 600, marginBottom: '4px' }}>{modal.student.full_name}</p>
           <p style={{ fontFamily: 'Space Mono, monospace', fontSize: '.8rem', color: 'var(--muted)', marginBottom: '24px' }}>{modal.student.email}</p>
-          <p style={{ color: '#f87171', fontSize: '.85rem', marginBottom: '20px' }}>
+          <p style={{ color: 'var(--danger)', fontSize: '.85rem', marginBottom: '20px' }}>
             ⚠️ Esta ação é irreversível. Todo o histórico de progresso também será removido.
           </p>
-          {actionError && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
+          {actionError && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '12px' }}>{actionError}</p>}
           <div style={{ display: 'flex', gap: '10px' }}>
             <button onClick={handleDelete} disabled={saving} style={{
-              flex: 1, padding: '10px', background: saving ? 'rgba(248,113,113,.4)' : '#ef4444',
+              flex: 1, padding: '10px', background: saving ? 'rgba(248,113,113,.4)' : 'var(--danger)',
               color: '#fff', border: 'none', borderRadius: '4px',
               fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer',
             }}>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { appBasePath } from '../../lib/app-env';
 import { AuthContext } from './auth-context';
 
 export function AuthProvider({ children }) {
@@ -63,14 +64,15 @@ export function AuthProvider({ children }) {
   const signOut = () => supabase.auth.signOut();
 
   const resetPassword = (email) => {
-    const redirectTo = `${window.location.origin}/plataforma/redefinir-senha`;
+    const redirectTo = `${window.location.origin}${appBasePath()}/redefinir-senha`;
     return supabase.auth.resetPasswordForEmail(email, { redirectTo });
   };
 
   const updatePassword = (newPassword) =>
     supabase.auth.updateUser({ password: newPassword });
 
-  const role = user?.user_metadata?.role ?? null;
+  // app_metadata só é alterável pelo servidor; user_metadata o próprio usuário edita.
+  const role = user?.app_metadata?.role ?? null;
   const isAdmin = role === 'admin';
   const isCommercial = role === 'comercial';
   const hasCrmAccess = isAdmin || isCommercial;

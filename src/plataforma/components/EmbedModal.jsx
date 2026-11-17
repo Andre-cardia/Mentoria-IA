@@ -33,7 +33,7 @@ const tabBtnSx = (active) => ({
   background: active ? 'var(--accent-soft)' : 'transparent',
   border: 'none',
   borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent',
-  color: active ? 'var(--accent)' : 'var(--muted)',
+  color: active ? 'var(--accent-text)' : 'var(--muted)',
   fontFamily: 'Space Grotesk, sans-serif',
   fontSize: '.9rem',
   cursor: 'pointer',
@@ -200,7 +200,7 @@ export default function EmbedModal({ onClose, onInsert }) {
           {/* Dicas */}
           <div
             style={{
-              background: 'rgba(255,255,255,.03)',
+              background: 'var(--hover)',
               border: '1px solid var(--line)',
               borderRadius: '4px',
               padding: '12px',

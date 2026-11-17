@@ -10,11 +10,11 @@ const inputSx = {
 };
 
 const TYPE_OPTIONS = [
-  { value: 'info', label: 'ℹ️ Informação', color: '#3b82f6' },
-  { value: 'warning', label: '⚠️ Aviso', color: '#f59e0b' },
-  { value: 'success', label: '✅ Sucesso', color: '#22c55e' },
-  { value: 'error', label: '❌ Erro', color: '#ef4444' },
-  { value: 'update', label: '🚀 Atualização', color: '#a855f7' },
+  { value: 'info', label: 'ℹ️ Informação', color: 'var(--info)' },
+  { value: 'warning', label: '⚠️ Aviso', color: 'var(--warning)' },
+  { value: 'success', label: '✅ Sucesso', color: 'var(--success)' },
+  { value: 'error', label: '❌ Erro', color: 'var(--danger)' },
+  { value: 'update', label: '🚀 Atualização', color: 'var(--purple)' },
 ];
 
 export default function AdminAvisosPage() {
@@ -75,10 +75,10 @@ export default function AdminAvisosPage() {
 
   return (
     <AdminLayout>
-      <div style={{ maxWidth: '820px' }}>
+      <div style={{ maxWidth: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
           <div>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>Admin</div>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>Admin</div>
             <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>Avisos</h1>
           </div>
           <button onClick={() => { setEditing(null); setForm({ title: '', body: '', published_at: '', type: 'info', featured: false }); setShowForm(true); }}
@@ -108,7 +108,7 @@ export default function AdminAvisosPage() {
             <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '10px', background: 'rgba(255,106,0,.05)', border: '1px solid rgba(255,106,0,.2)', borderRadius: '4px' }}>
               <input type="checkbox" checked={form.featured} onChange={(e) => setForm((p) => ({ ...p, featured: e.target.checked }))} style={{ cursor: 'pointer', width: '18px', height: '18px' }} />
               <div>
-                <div style={{ fontWeight: 600, fontSize: '.9rem', color: 'var(--accent)', marginBottom: '2px' }}>⭐ Destacar na página inicial</div>
+                <div style={{ fontWeight: 600, fontSize: '.9rem', color: 'var(--accent-text)', marginBottom: '2px' }}>⭐ Destacar na página inicial</div>
                 <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)' }}>Aparece acima de "Continue Assistindo"</div>
               </div>
             </label>
@@ -135,7 +135,7 @@ export default function AdminAvisosPage() {
             return (
               <div key={a.id} style={{ background: 'var(--panel)', border: `1px solid ${a.featured ? 'rgba(255,106,0,.3)' : 'var(--line)'}`, borderRadius: '6px', padding: '20px 24px', position: 'relative' }}>
                 {a.featured && (
-                  <div style={{ position: 'absolute', top: '12px', right: '12px', fontFamily: 'Space Mono, monospace', fontSize: '.65rem', background: 'var(--accent-soft)', color: 'var(--accent)', border: '1px solid rgba(255,106,0,.3)', borderRadius: '3px', padding: '3px 8px', fontWeight: 600 }}>
+                  <div style={{ position: 'absolute', top: '12px', right: '12px', fontFamily: 'Space Mono, monospace', fontSize: '.65rem', background: 'var(--accent-soft)', color: 'var(--accent-text)', border: '1px solid rgba(255,106,0,.3)', borderRadius: '3px', padding: '3px 8px', fontWeight: 600 }}>
                     ⭐ DESTAQUE
                   </div>
                 )}
@@ -149,7 +149,7 @@ export default function AdminAvisosPage() {
                   </div>
                   <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
                     <button onClick={() => startEdit(a)} style={{ padding: '6px 14px', background: 'transparent', border: '1px solid var(--line-strong)', borderRadius: '4px', color: 'var(--muted)', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.8rem', cursor: 'pointer' }}>Editar</button>
-                    <button onClick={() => remove(a.id)} style={{ padding: '6px 12px', background: 'transparent', border: '1px solid rgba(248,113,113,.3)', borderRadius: '4px', color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.7rem', cursor: 'pointer' }}>Excluir</button>
+                    <button onClick={() => remove(a.id)} style={{ padding: '6px 12px', background: 'transparent', border: '1px solid rgba(248,113,113,.3)', borderRadius: '4px', color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.7rem', cursor: 'pointer' }}>Excluir</button>
                   </div>
                 </div>
                 <p style={{ color: 'var(--muted)', fontSize: '.9rem', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{a.body}</p>

@@ -6,6 +6,7 @@ import { useLessonProgress } from '../hooks/useLessonProgress';
 import Layout from '../components/Layout';
 import DashboardStats from '../components/DashboardStats';
 import AdminAnnouncements from '../components/AdminAnnouncements';
+import StellarGlyph from '../components/StellarGlyph';
 
 const WHATSAPP_URL = 'https://chat.whatsapp.com/CzkXZ1ol61YC1zw5dUjy7v?mode=gi_t';
 
@@ -31,7 +32,7 @@ function LessonTypeTag({ type }) {
     <span style={{
       fontFamily: 'Space Mono, monospace', fontSize: '.58rem',
       textTransform: 'uppercase', letterSpacing: '.08em',
-      color: 'var(--accent)', background: 'rgba(255,106,0,.08)',
+      color: 'var(--accent-text)', background: 'rgba(255,106,0,.08)',
       border: '1px solid rgba(255,106,0,.2)', borderRadius: '3px',
       padding: '2px 6px',
     }}>
@@ -45,7 +46,7 @@ function LessonCard({ lesson }) {
   const thumb = getVideoThumbnail(lesson.video_url);
   const type  = lesson.lesson_type ?? 'video';
   return (
-    <Link to={`/modulos/${lesson.module_id}/aulas/${lesson.id}`} style={{ textDecoration: 'none' }}>
+    <Link to={`/cursos/${lesson.module_id}/aulas/${lesson.id}`} style={{ textDecoration: 'none' }}>
       <div
         style={{
           background: 'var(--panel)', border: '1px solid var(--line)',
@@ -91,7 +92,7 @@ function LessonCard({ lesson }) {
 /* ── Card "Continue Assistindo" ─────────────────────────────────── */
 function NextLessonCard({ lesson }) {
   return (
-    <Link to={`/modulos/${lesson.module_id}/aulas/${lesson.id}`} style={{ textDecoration: 'none' }}>
+    <Link to={`/cursos/${lesson.module_id}/aulas/${lesson.id}`} style={{ textDecoration: 'none' }}>
       <div
         style={{
           background: 'var(--panel)', border: '1px solid var(--line)',
@@ -110,7 +111,7 @@ function NextLessonCard({ lesson }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <LessonTypeTag type={lesson.lesson_type ?? 'video'} />
-          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)' }}>
+          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent-text)' }}>
             → Continuar
           </span>
         </div>
@@ -182,12 +183,13 @@ export default function DashboardPage() {
   const [modules, setModules]             = useState([]);
   const [latestLessons, setLatestLessons] = useState([]);
   const [ranking, setRanking]             = useState([]);
+  const [mission, setMission]             = useState(null);
   const [blogPosts, setBlogPosts]         = useState([]);
 
   useEffect(() => {
     if (!user) return;
     async function load() {
-      const [profileRes, progressRes, modulesRes, latestRes, rankingRes, blogRes] = await Promise.all([
+      const [profileRes, progressRes, modulesRes, latestRes, rankingRes, blogRes, missionRes] = await Promise.all([
         supabase.from('profiles').select('full_name').eq('user_id', user.id).single(),
         supabase.from('lesson_progress').select('completed_at').eq('user_id', user.id),
         supabase.from('modules').select('id, title, order, lessons(id, title, lesson_type, order, module_id)').order('order'),
@@ -195,13 +197,14 @@ export default function DashboardPage() {
           .select('id, title, lesson_type, video_url, module_id, modules(title)')
           .order('created_at', { ascending: false })
           .limit(12),
-        supabase.rpc('get_weekly_ranking'),
+        supabase.rpc('get_gamification_ranking', { p_period: 'week', p_limit: 5 }),
         supabase.from('posts')
           .select('id, title, slug, cover_url, seo_description, published_at, author_name')
           .eq('status', 'published')
           .lte('published_at', new Date().toISOString())
           .order('published_at', { ascending: false })
           .limit(3),
+        supabase.rpc('get_my_gamification', { p_period: 'all' }),
       ]);
 
       const name = profileRes.data?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Aluno';
@@ -214,6 +217,7 @@ export default function DashboardPage() {
       if (modulesRes.data) setModules(modulesRes.data);
       if (latestRes.data)  setLatestLessons(latestRes.data);
       if (rankingRes.data) setRanking(rankingRes.data);
+      if (missionRes?.data?.[0]) setMission(missionRes.data[0]);
       if (blogRes.data)    setBlogPosts(blogRes.data);
 
       setLoading(false);
@@ -237,7 +241,7 @@ export default function DashboardPage() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: '960px' }}>
+      <div style={{ maxWidth: '100%' }}>
         {loading ? (
           <p style={{ color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>Carregando...</p>
         ) : (
@@ -250,29 +254,92 @@ export default function DashboardPage() {
               diasEstudando={diasEstudando}
             />
 
-            {/* ── Avisos do Administrador ───────────────────────── */}
-            <AdminAnnouncements />
+            {/* ── Status da missão (Corrida Estelar) ─────────────── */}
+            {mission && (
+              <Link
+                to="/ranking"
+                aria-label="Abrir a Corrida Estelar"
+                style={{
+                  display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '14px 28px',
+                  background: '#05070d', color: '#f2f4f8', borderRadius: '8px',
+                  padding: '16px 20px', margin: '0 0 28px', textDecoration: 'none',
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#ff8a3d' }}>
+                  <StellarGlyph name="orbit" size={22} />
+                  <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', letterSpacing: '.18em', textTransform: 'uppercase', color: '#f2f4f8', fontWeight: 700 }}>
+                    Corrida Estelar
+                  </span>
+                </span>
+                {[
+                  ['Pontos', Number(mission.points) || 0],
+                  ['Posição', mission.rank_pos ? `${String(mission.rank_pos).padStart(2, '0')} / ${String(mission.participants).padStart(2, '0')}` : '—'],
+                ].map(([label, value]) => (
+                  <span key={label} style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
+                    <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', letterSpacing: '.18em', textTransform: 'uppercase', color: '#8b93a7' }}>{label}</span>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{value}</span>
+                  </span>
+                ))}
+                <span style={{ marginLeft: 'auto', fontFamily: 'Space Mono, monospace', fontSize: '.68rem', letterSpacing: '.18em', textTransform: 'uppercase', color: '#8b93a7' }}>
+                  Abrir painel →
+                </span>
+              </Link>
+            )}
 
-            {/* ── Continue Assistindo ───────────────────────────── */}
-            <section style={{ marginBottom: '44px' }}>
-              <SectionTitle label="Continue Assistindo" />
+            {/* ── Continue de onde parou: a ação principal da tela ── */}
+            <section style={{ marginBottom: '32px' }}>
               {nextLessons.length === 0 ? (
                 <div style={{
-                  background: 'rgba(74,222,128,.06)', border: '1px solid rgba(74,222,128,.2)',
-                  borderRadius: '8px', padding: '24px', textAlign: 'center',
+                  background: 'rgba(21,128,61,.08)', border: '1px solid rgba(21,128,61,.3)',
+                  borderRadius: '12px', padding: '24px', textAlign: 'center',
                 }}>
-                  <div style={{ fontSize: '1.5rem', marginBottom: '8px' }}>🎉</div>
-                  <div style={{ fontWeight: 600, fontSize: '.9rem', color: '#4ade80', marginBottom: '4px' }}>Parabéns!</div>
-                  <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)' }}>
+                  <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--success)', marginBottom: '4px' }}>Parabéns!</div>
+                  <div style={{ fontSize: '.9rem', color: 'var(--muted)' }}>
                     Você concluiu todas as aulas disponíveis.
                   </div>
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
-                  {nextLessons.map((lesson) => <NextLessonCard key={lesson.id} lesson={lesson} />)}
-                </div>
+                <>
+                  <Link to={`/cursos/${nextLessons[0].module_id}/aulas/${nextLessons[0].id}`} style={{ textDecoration: 'none' }}>
+                    <div style={{
+                      background: 'var(--panel)', border: '1px solid var(--line)', borderLeft: '6px solid var(--accent)',
+                      borderRadius: '12px', padding: '22px 24px',
+                      display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap',
+                    }}>
+                      <div style={{ flex: '1 1 260px', minWidth: 0 }}>
+                        <div style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--accent-text)', marginBottom: '4px' }}>
+                          {progress.completed > 0 ? 'Continue de onde parou' : 'Comece por aqui'}
+                        </div>
+                        <div style={{ fontWeight: 700, fontSize: '1.25rem', color: 'var(--text)', lineHeight: 1.3 }}>
+                          {nextLessons[0].title}
+                        </div>
+                        <div style={{ fontSize: '.9rem', color: 'var(--muted)', marginTop: '2px' }}>
+                          {nextLessons[0].moduleTitle} · {TYPE_LABEL[nextLessons[0].lesson_type ?? 'video']}
+                        </div>
+                      </div>
+                      <span style={{
+                        padding: '12px 24px', background: 'var(--accent)', color: '#261000',
+                        borderRadius: '8px', fontWeight: 700, fontSize: '.95rem', whiteSpace: 'nowrap',
+                      }}>
+                        {progress.completed > 0 ? 'Continuar →' : 'Começar →'}
+                      </span>
+                    </div>
+                  </Link>
+
+                  {nextLessons.length > 1 && (
+                    <div style={{ marginTop: '20px' }}>
+                      <SectionTitle label="A seguir" />
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
+                        {nextLessons.slice(1).map((lesson) => <NextLessonCard key={lesson.id} lesson={lesson} />)}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </section>
+
+            {/* ── Avisos do Administrador ───────────────────────── */}
+            <AdminAnnouncements />
 
             {/* ── Últimos Lançamentos ───────────────────────────── */}
             <section style={{ marginBottom: '44px' }}>
@@ -297,7 +364,7 @@ export default function DashboardPage() {
                     to="/blog"
                     style={{
                       fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
-                      color: 'var(--accent)', textDecoration: 'none', letterSpacing: '.04em',
+                      color: 'var(--accent-text)', textDecoration: 'none', letterSpacing: '.04em',
                     }}
                   >
                     Ver todos →
@@ -331,24 +398,27 @@ export default function DashboardPage() {
                       }}>
                         <span style={{
                           fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
-                          color: i < 3 ? 'var(--accent)' : 'var(--muted)',
+                          color: i < 3 ? 'var(--accent-text)' : 'var(--muted)',
                           fontWeight: i < 3 ? 700 : 400, minWidth: '20px',
                         }}>
-                          {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
+                          {String(i + 1).padStart(2, '0')}
                         </span>
                         <span style={{ flex: 1, fontSize: '.875rem', fontWeight: entry.is_current_user ? 600 : 400, color: 'var(--text)' }}>
                           {entry.user_name}
                           {entry.is_current_user && (
-                            <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.6rem', color: 'var(--accent)', marginLeft: '6px' }}>(você)</span>
+                            <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.6rem', color: 'var(--accent-text)', marginLeft: '6px' }}>(você)</span>
                           )}
                         </span>
-                        <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--accent)', fontWeight: 700 }}>
+                        <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--accent-text)', fontWeight: 700 }}>
                           {entry.points} pt{entry.points !== 1 ? 's' : ''}
                         </span>
                       </div>
                     ))}
                   </div>
                 )}
+                <Link to="/ranking" style={{ display: 'inline-block', marginTop: '12px', fontSize: '.875rem', fontWeight: 600, color: 'var(--accent-text)' }}>
+                  Abrir a Corrida Estelar →
+                </Link>
               </section>
 
               {/* Comunidade WhatsApp */}

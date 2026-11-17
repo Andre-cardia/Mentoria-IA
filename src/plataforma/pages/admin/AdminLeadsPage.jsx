@@ -5,12 +5,12 @@ import { useAuth } from '../../context/useAuth';
 import { toast } from 'sonner';
 
 const STATUSES = [
-  { id: 'new', label: 'Novo', hint: 'Entrada do formulário', color: 'var(--accent)' },
-  { id: 'contacted', label: 'Contato', hint: 'Primeira conversa', color: '#38bdf8' },
-  { id: 'qualified', label: 'Qualificado', hint: 'Fit validado', color: '#a855f7' },
-  { id: 'proposal', label: 'Proposta', hint: 'Proposta enviada', color: '#f59e0b' },
+  { id: 'new', label: 'Novo', hint: 'Entrada do formulário', color: 'var(--accent-text)' },
+  { id: 'contacted', label: 'Contato', hint: 'Primeira conversa', color: 'var(--info)' },
+  { id: 'qualified', label: 'Qualificado', hint: 'Fit validado', color: 'var(--purple)' },
+  { id: 'proposal', label: 'Proposta', hint: 'Proposta enviada', color: 'var(--warning)' },
   { id: 'won', label: 'Ganho', hint: 'Fechado', color: '#84cc16' },
-  { id: 'lost', label: 'Perdido', hint: 'Sem avanço', color: '#ef4444' },
+  { id: 'lost', label: 'Perdido', hint: 'Sem avanço', color: 'var(--danger)' },
 ];
 
 const STATUS_BY_ID = Object.fromEntries(STATUSES.map((status) => [status.id, status]));
@@ -348,7 +348,7 @@ export default function AdminLeadsPage() {
       <div className="admin-leads-focus" style={{ width: '100%', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px', marginBottom: '28px', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
               CRM / Neural Hub
             </div>
             <h1 style={{ margin: 0, fontSize: '2rem', lineHeight: 1, letterSpacing: '-.04em' }}>Leads de Proposta</h1>
@@ -363,7 +363,7 @@ export default function AdminLeadsPage() {
             style={{
               ...inputSx,
               cursor: loading ? 'not-allowed' : 'pointer',
-              color: 'var(--accent)',
+              color: 'var(--accent-text)',
               fontFamily: 'Space Mono, monospace',
               fontSize: '.72rem',
               letterSpacing: '.12em',
@@ -399,7 +399,7 @@ export default function AdminLeadsPage() {
             ['Ganhos', won],
           ].map(([label, value]) => (
             <div key={label} style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '6px', padding: '16px' }}>
-              <div style={{ color: 'var(--accent)', fontSize: '1.7rem', fontWeight: 700, lineHeight: 1 }}>{value}</div>
+              <div style={{ color: 'var(--accent-text)', fontSize: '1.7rem', fontWeight: 700, lineHeight: 1 }}>{value}</div>
               <div style={{ marginTop: '8px', fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase' }}>
                 {label}
               </div>
@@ -558,7 +558,7 @@ function CreateLeadModal({ form, errors, saving, onChange, onClose, onSubmit }) 
       >
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '24px' }}>
           <div>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
               CRM / Cadastro manual
             </div>
             <h2 id="create-lead-title" style={{ margin: 0, fontSize: '1.8rem', lineHeight: 1.05, letterSpacing: '-.04em' }}>Novo lead</h2>
@@ -621,7 +621,7 @@ function LeadInput({ label, field, type = 'text', value, error, onChange }) {
     <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase' }}>{label}</span>
       <input type={type} value={value} onChange={(event) => onChange(field, event.target.value)} style={{ ...inputSx, width: '100%' }} />
-      {error && <span style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.68rem' }}>{error}</span>}
+      {error && <span style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.68rem' }}>{error}</span>}
     </label>
   );
 }
@@ -636,7 +636,7 @@ function LeadSelect({ label, field, value, error, onChange, options, values = un
           <option key={values?.[index] ?? option} value={values?.[index] ?? option}>{option}</option>
         ))}
       </select>
-      {error && <span style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.68rem' }}>{error}</span>}
+      {error && <span style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.68rem' }}>{error}</span>}
     </label>
   );
 }
@@ -646,7 +646,7 @@ function LeadTextarea({ label, field, value, error, onChange }) {
     <label style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: '6px' }}>
       <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase' }}>{label}</span>
       <textarea value={value} onChange={(event) => onChange(field, event.target.value)} rows={4} style={{ ...inputSx, width: '100%', resize: 'vertical', lineHeight: 1.55 }} />
-      {error && <span style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.68rem' }}>{error}</span>}
+      {error && <span style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.68rem' }}>{error}</span>}
     </label>
   );
 }
@@ -671,7 +671,7 @@ function LeadCard({ lead, isAdmin, onOpen, onDelete, onDragStart, onDragEnd, onS
             <div style={{ color: 'var(--text)', fontWeight: 700, fontSize: '.95rem', lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {lead.name}
             </div>
-            <div style={{ color: 'var(--accent)', fontFamily: 'Space Mono, monospace', fontSize: '.68rem', marginTop: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ color: 'var(--accent-text)', fontFamily: 'Space Mono, monospace', fontSize: '.68rem', marginTop: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {lead.company}
             </div>
           </div>
@@ -714,7 +714,7 @@ function LeadCard({ lead, isAdmin, onOpen, onDelete, onDragStart, onDragEnd, onS
             background: 'rgba(239,68,68,.08)',
             border: '1px solid rgba(239,68,68,.35)',
             borderRadius: '4px',
-            color: '#f87171',
+            color: 'var(--danger)',
             cursor: 'pointer',
             fontFamily: 'Space Mono, monospace',
             fontSize: '.68rem',
@@ -838,7 +838,7 @@ function LeadDrawer({ lead, notes, setNotes, savingNotes, ownerOptions, isAdmin,
 
         {isAdmin && (
           <div style={{ marginTop: '24px', borderTop: '1px solid rgba(239,68,68,.28)', paddingTop: '18px' }}>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: '#f87171', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.68rem', color: 'var(--danger)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
               Zona administrativa
             </div>
             <button
@@ -849,7 +849,7 @@ function LeadDrawer({ lead, notes, setNotes, savingNotes, ownerOptions, isAdmin,
                 background: 'rgba(239,68,68,.08)',
                 border: '1px solid rgba(239,68,68,.45)',
                 borderRadius: '4px',
-                color: '#f87171',
+                color: 'var(--danger)',
                 cursor: 'pointer',
                 fontFamily: 'Space Mono, monospace',
                 fontSize: '.72rem',

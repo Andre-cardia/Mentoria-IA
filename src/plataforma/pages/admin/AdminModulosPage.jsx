@@ -18,6 +18,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { supabase } from '../../../lib/supabase';
 import AdminLayout from '../../components/AdminLayout';
 import ConfirmModal from '../../components/ConfirmModal';
+import { TRACK_LEVEL_LABEL } from '../../lib/tracks';
 import RichTextEditor from '../../components/RichTextEditor';
 
 // ─── Estilos base ────────────────────────────────────────────────────────────
@@ -45,11 +46,11 @@ const btnOutline = {
 
 const btnDanger = {
   padding: '6px 12px', background: 'transparent',
-  border: '1px solid rgba(248,113,113,.3)', borderRadius: '4px', color: '#f87171',
+  border: '1px solid rgba(248,113,113,.3)', borderRadius: '4px', color: 'var(--danger)',
   fontFamily: 'Space Mono, monospace', fontSize: '.7rem', cursor: 'pointer',
 };
 
-const EMPTY_MOD = { title: '', subtitle: '', description: '' };
+const EMPTY_MOD = { title: '', subtitle: '', description: '', track_id: '' };
 const EMPTY_LESSON = { title: '', lesson_type: 'video', video_url: '', content: '', duration: '' };
 
 const LESSON_TYPES = [
@@ -165,6 +166,7 @@ function SortableLessonItem({ lesson, children }) {
 
 export default function AdminModulosPage() {
   const [modules, setModules] = useState([]);
+  const [tracks, setTracks] = useState([]);
   const [openModule, setOpenModule] = useState(null);
   const [lessons, setLessons] = useState({});
   const [loading, setLoading] = useState(true);
@@ -196,7 +198,7 @@ export default function AdminModulosPage() {
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
 
-  useEffect(() => { loadModules(); }, []);
+  useEffect(() => { loadModules(); loadTracks(); }, []);
 
   // ── Módulos ──────────────────────────────────────────────────────────────
 
@@ -204,6 +206,16 @@ export default function AdminModulosPage() {
     const { data } = await supabase.from('modules').select('*').order('order');
     setModules(data ?? []);
     setLoading(false);
+  }
+
+  // Sem a tabela de trilhas (migração pendente) o seletor simplesmente não aparece.
+  async function loadTracks() {
+    const { data, error } = await supabase.from('tracks').select('id, title, level, order').order('order');
+    setTracks(error ? [] : (data ?? []));
+  }
+
+  function trackPayload() {
+    return tracks.length > 0 ? { track_id: modForm.track_id || null } : {};
   }
 
   async function toggleModule(id) {
@@ -223,7 +235,7 @@ export default function AdminModulosPage() {
   }
 
   function startEditMod(mod) {
-    setModForm({ title: mod.title, subtitle: mod.subtitle ?? '', description: mod.description ?? '' });
+    setModForm({ title: mod.title, subtitle: mod.subtitle ?? '', description: mod.description ?? '', track_id: mod.track_id ?? '' });
     setEditingModId(mod.id);
     if (openModule !== mod.id) toggleModule(mod.id);
   }
@@ -242,6 +254,7 @@ export default function AdminModulosPage() {
           title: modForm.title,
           subtitle: modForm.subtitle || null,
           description: modForm.description || null,
+          ...trackPayload(),
           order: modules.length,
         });
         if (error) throw error;
@@ -251,6 +264,7 @@ export default function AdminModulosPage() {
           title: modForm.title,
           subtitle: modForm.subtitle || null,
           description: modForm.description || null,
+          ...trackPayload(),
         }).eq('id', editingModId);
         if (error) throw error;
         toast.success('Curso atualizado');
@@ -466,12 +480,12 @@ export default function AdminModulosPage() {
 
   return (
     <AdminLayout>
-      <div style={{ maxWidth: '820px' }}>
+      <div style={{ maxWidth: '100%' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
           <div>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>Admin</div>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>Admin</div>
             <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>Cursos & Aulas</h1>
           </div>
           {editingModId !== 'new' && (
@@ -484,6 +498,7 @@ export default function AdminModulosPage() {
           <ModForm
             title="Novo Curso"
             form={modForm}
+            tracks={tracks}
             onChange={setModForm}
             onSubmit={saveMod}
             onCancel={cancelModForm}
@@ -507,6 +522,7 @@ export default function AdminModulosPage() {
                           <ModForm
                             title="Editar Curso"
                             form={modForm}
+                            tracks={tracks}
                             onChange={setModForm}
                             onSubmit={saveMod}
                             onCancel={cancelModForm}
@@ -522,7 +538,12 @@ export default function AdminModulosPage() {
                           >
                             <span style={{ color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginRight: '10px' }}>#{mod.order}</span>
                             {mod.title}
-                            <span style={{ marginLeft: '12px', color: 'var(--accent)', fontSize: '.85rem' }}>{openModule === mod.id ? '▲' : '▼'}</span>
+                            {tracks.find((t) => t.id === mod.track_id) && (
+                              <span style={{ marginLeft: '10px', color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.7rem', fontWeight: 400 }}>
+                                {tracks.find((t) => t.id === mod.track_id).title}
+                              </span>
+                            )}
+                            <span style={{ marginLeft: '12px', color: 'var(--accent-text)', fontSize: '.85rem' }}>{openModule === mod.id ? '▲' : '▼'}</span>
                           </button>
                           <div style={{ display: 'flex', gap: '8px' }}>
                             <button style={btnOutline} onClick={() => startEditMod(mod)}>Editar</button>
@@ -564,8 +585,8 @@ export default function AdminModulosPage() {
                                           </div>
                                         </div>
                                       ) : (
-                                        <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: '10px', background: 'rgba(255,255,255,.02)' }}>
-                                          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)', textTransform: 'uppercase' }}>Editando aula</div>
+                                        <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: '10px', background: 'var(--hover)' }}>
+                                          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent-text)', textTransform: 'uppercase' }}>Editando aula</div>
                                           <input style={inputSx} placeholder="Título da aula" value={lessonEditForm.title} onChange={(e) => setLessonEditForm((p) => ({ ...p, title: e.target.value }))} required />
                                           <select style={{ ...inputSx, cursor: 'pointer' }} value={lessonEditForm.lesson_type} onChange={(e) => setLessonEditForm((p) => ({ ...p, lesson_type: e.target.value }))}>
                                             {LESSON_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -600,7 +621,7 @@ export default function AdminModulosPage() {
 
                           {/* Form nova aula */}
                           {showLessonForm === mod.id ? (
-                            <form onSubmit={(e) => saveLesson(e, mod.id)} style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid var(--line)', background: 'rgba(255,255,255,.02)' }}>
+                            <form onSubmit={(e) => saveLesson(e, mod.id)} style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid var(--line)', background: 'var(--hover)' }}>
                               <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)', textTransform: 'uppercase' }}>Nova Aula</div>
                               <input style={inputSx} placeholder="Título da aula" value={lessonForm.title} onChange={(e) => setLessonForm((p) => ({ ...p, title: e.target.value }))} required />
                               <select style={{ ...inputSx, cursor: 'pointer' }} value={lessonForm.lesson_type} onChange={(e) => setLessonForm((p) => ({ ...p, lesson_type: e.target.value }))}>
@@ -657,7 +678,7 @@ export default function AdminModulosPage() {
 
 // ─── Subcomponente: form de módulo ───────────────────────────────────────────
 
-function ModForm({ title, form, onChange, onSubmit, onCancel, saving }) {
+function ModForm({ title, form, tracks = [], onChange, onSubmit, onCancel, saving }) {
   return (
     <form
       onSubmit={onSubmit}
@@ -667,7 +688,7 @@ function ModForm({ title, form, onChange, onSubmit, onCancel, saving }) {
         display: 'flex', flexDirection: 'column', gap: '12px',
       }}
     >
-      <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '.1em' }}>
+      <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--accent-text)', textTransform: 'uppercase', letterSpacing: '.1em' }}>
         {title}
       </div>
       <input
@@ -684,6 +705,21 @@ function ModForm({ title, form, onChange, onSubmit, onCancel, saving }) {
         value={form.subtitle}
         onChange={(e) => onChange((p) => ({ ...p, subtitle: e.target.value }))}
       />
+      {tracks.length > 0 && (
+        <select
+          aria-label="Trilha do curso"
+          style={{ ...inputSx, cursor: 'pointer' }}
+          value={form.track_id}
+          onChange={(e) => onChange((p) => ({ ...p, track_id: e.target.value }))}
+        >
+          <option value="">Sem trilha</option>
+          {tracks.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.title}{TRACK_LEVEL_LABEL[t.level] ? ` — ${TRACK_LEVEL_LABEL[t.level]}` : ''}
+            </option>
+          ))}
+        </select>
+      )}
       <div>
         <label style={{
           display: 'block',

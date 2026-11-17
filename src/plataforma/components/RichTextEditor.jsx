@@ -12,7 +12,7 @@ const toolbarBtnSx = (active = false) => ({
   borderRadius: '3px',
   padding: '6px 10px',
   cursor: 'pointer',
-  color: active ? 'var(--accent)' : 'var(--text)',
+  color: active ? 'var(--accent-text)' : 'var(--text)',
   fontFamily: 'Space Mono, monospace',
   fontSize: '.75rem',
   minWidth: '32px',

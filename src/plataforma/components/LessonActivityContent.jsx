@@ -18,7 +18,7 @@ export default function LessonActivityContent({ content }) {
               fontSize: '.65rem',
               letterSpacing: '.12em',
               textTransform: 'uppercase',
-              color: 'var(--accent)',
+              color: 'var(--accent-text)',
               marginBottom: '12px',
             }}
           >

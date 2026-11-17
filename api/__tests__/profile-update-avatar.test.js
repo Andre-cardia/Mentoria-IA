@@ -76,7 +76,8 @@ describe('api/profile/update-avatar handler', () => {
       error: null,
     });
     mockSupabase.update.mockReturnValue(mockSupabase);
-    mockSupabase.eq.mockResolvedValue({ error: null });
+    // 1ª chamada: select().eq() segue a cadeia; 2ª: update().eq() resolve o resultado.
+    mockSupabase.eq.mockReturnValueOnce(mockSupabase).mockResolvedValueOnce({ error: null });
 
     const req = {
       method: 'POST',

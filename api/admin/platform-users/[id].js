@@ -13,7 +13,7 @@ async function getAdminUser(req, supabase) {
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (!token) return null;
   const { data: { user } } = await supabase.auth.getUser(token);
-  return user?.user_metadata?.role === "admin" ? user : null;
+  return user?.app_metadata?.role === "admin" ? user : null;
 }
 
 function normalizeRole(role) {
@@ -34,6 +34,7 @@ export default async function handler(req, res) {
     const { full_name, role } = req.body;
     const updates = {};
     const metadataUpdates = {};
+    let nextRole;
 
     if (full_name !== undefined) {
       const nextName = String(full_name ?? "").trim();
@@ -42,17 +43,16 @@ export default async function handler(req, res) {
     }
 
     if (role !== undefined) {
-      const nextRole = normalizeRole(role);
+      nextRole = normalizeRole(role);
       if (!ALLOWED_ROLES.includes(nextRole)) {
         return res.status(400).json({ error: "Role inválido" });
       }
       if (id === adminUser.id && nextRole !== "admin") {
         return res.status(400).json({ error: "Você não pode remover seu próprio acesso admin" });
       }
-      metadataUpdates.role = nextRole;
     }
 
-    if (Object.keys(metadataUpdates).length === 0) {
+    if (Object.keys(metadataUpdates).length === 0 && nextRole === undefined) {
       return res.status(400).json({ error: "Nenhum campo para atualizar" });
     }
 
@@ -61,10 +61,19 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: "Usuário não encontrado" });
     }
 
-    updates.user_metadata = {
-      ...(currentData.user.user_metadata ?? {}),
-      ...metadataUpdates,
-    };
+    if (Object.keys(metadataUpdates).length > 0) {
+      updates.user_metadata = {
+        ...(currentData.user.user_metadata ?? {}),
+        ...metadataUpdates,
+      };
+    }
+    if (nextRole !== undefined) {
+      // O papel vive em app_metadata: só o servidor altera, o usuário não.
+      updates.app_metadata = {
+        ...(currentData.user.app_metadata ?? {}),
+        role: nextRole,
+      };
+    }
 
     const { error } = await supabase.auth.admin.updateUserById(id, updates);
     if (error) {
@@ -84,7 +93,7 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: "Usuário não encontrado" });
     }
 
-    if (!ALLOWED_ROLES.includes(currentData.user.user_metadata?.role)) {
+    if (!ALLOWED_ROLES.includes(currentData.user.app_metadata?.role)) {
       return res.status(400).json({ error: "Este endpoint remove apenas usuários admin ou comercial" });
     }
 

@@ -13,7 +13,7 @@ async function getAdminUser(req, supabase) {
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (!token) return null;
   const { data: { user } } = await supabase.auth.getUser(token);
-  return user?.user_metadata?.role === "admin" ? user : null;
+  return user?.app_metadata?.role === "admin" ? user : null;
 }
 
 function sanitizeUser(user) {
@@ -21,7 +21,7 @@ function sanitizeUser(user) {
   return {
     id: user.id,
     email: user.email,
-    role: metadata.role ?? null,
+    role: user.app_metadata?.role ?? null,
     full_name: metadata.full_name || metadata.name || user.email,
     created_at: user.created_at,
     last_sign_in_at: user.last_sign_in_at,
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
     if (error) return res.status(500).json({ error: "Erro ao listar usuários" });
 
     const users = (data?.users ?? [])
-      .filter((user) => ALLOWED_ROLES.includes(user.user_metadata?.role))
+      .filter((user) => ALLOWED_ROLES.includes(user.app_metadata?.role))
       .map(sanitizeUser)
       .sort((a, b) => String(a.full_name).localeCompare(String(b.full_name), "pt-BR"));
 
@@ -70,10 +70,9 @@ export default async function handler(req, res) {
       email: email.toLowerCase().trim(),
       password,
       email_confirm: true,
-      user_metadata: {
-        full_name: full_name.trim(),
-        role: nextRole,
-      },
+      user_metadata: { full_name: full_name.trim() },
+      // O papel vive em app_metadata: só o servidor altera, o usuário não.
+      app_metadata: { role: nextRole },
     });
 
     if (error) {

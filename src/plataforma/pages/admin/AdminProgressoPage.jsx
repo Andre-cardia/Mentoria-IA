@@ -61,7 +61,7 @@ export default function AdminProgressoPage() {
   return (
     <AdminLayout>
       <div>
-        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
           Admin
         </div>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '24px' }}>Progresso dos Alunos</h1>
@@ -86,7 +86,7 @@ export default function AdminProgressoPage() {
         </div>
 
         {loading && <p style={{ color: 'var(--muted)' }}>Carregando...</p>}
-        {error && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
+        {error && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
 
         {!loading && !error && (
           <>

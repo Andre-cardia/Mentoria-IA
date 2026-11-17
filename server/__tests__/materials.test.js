@@ -51,7 +51,7 @@ describe('POST /api/materials/upload', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: 'admin-user', user_metadata: { role: 'admin' } } },
+      data: { user: { id: 'admin-user', app_metadata: { role: 'admin' } } },
       error: null,
     });
   });
@@ -79,7 +79,7 @@ describe('POST /api/materials/upload', () => {
 
   it('retorna 403 para usuário sem role admin', async () => {
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: 'student-user', user_metadata: { role: 'student' } } },
+      data: { user: { id: 'student-user', app_metadata: { role: 'student' } } },
       error: null,
     });
 
@@ -139,7 +139,7 @@ describe('GET /api/materials/:id/download', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: 'student-user', user_metadata: { role: 'student' } } },
+      data: { user: { id: 'student-user', app_metadata: { role: 'student' } } },
       error: null,
     });
   });

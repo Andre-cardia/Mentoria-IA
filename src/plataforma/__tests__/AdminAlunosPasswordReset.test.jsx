@@ -4,13 +4,17 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { AuthContext } from '../context/useAuth';
 
-vi.mock('../../../lib/supabase', () => ({
+vi.mock('../../lib/supabase', () => ({
   supabase: {
     auth: {
       getSession: vi.fn().mockResolvedValue({
         data: { session: { access_token: 'fake-token' } },
       }),
+      onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
     },
+    // Promoções por mérito: nenhuma, nestes testes.
+    from: vi.fn(() => ({ select: vi.fn().mockResolvedValue({ data: [], error: null }) })),
+    rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
   },
 }));
 
@@ -20,6 +24,7 @@ globalThis.fetch = vi.fn();
 const mockFetch = /** @type {typeof mockFetch} */ (/** @type {unknown} */ (globalThis.fetch));
 
 import AdminAlunosPage from '../pages/admin/AdminAlunosPage';
+import { supabase } from '../../lib/supabase';
 
 const fakeAuthValue = {
   user: { id: 'admin-id', email: 'admin@test.com' },
@@ -198,5 +203,38 @@ describe('AdminAlunosPage — redefinição de senha', () => {
       expect(screen.getByText('Erro ao redefinir senha')).toBeTruthy();
       expect(screen.getByText(/Redefinir senha — João Silva/i)).toBeTruthy();
     });
+  });
+});
+
+describe('AdminAlunosPage — aval de patente', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ students: mockStudents, pendingRegistration: [] }),
+    });
+  });
+
+  it('promove o aluno pela função do servidor', async () => {
+    renderPage();
+    const [firstBtn] = await screen.findAllByTitle('Aval de patente');
+    await userEvent.click(firstBtn);
+    expect(screen.getByText(/Patente — João Silva/i)).toBeTruthy();
+
+    await userEvent.selectOptions(screen.getByLabelText('Patente concedida'), 'comandante');
+    await userEvent.type(screen.getByLabelText('Motivo (opcional)'), 'Ajudou colegas');
+    await userEvent.click(screen.getByRole('button', { name: 'Salvar patente' }));
+
+    expect(supabase.rpc).toHaveBeenCalledWith('admin_set_rank_promotion', {
+      p_user_id: 'uuid-1', p_rank: 'comandante', p_note: 'Ajudou colegas',
+    });
+  });
+
+  it('oferece as patentes que dependem de aval', async () => {
+    renderPage();
+    const [firstBtn] = await screen.findAllByTitle('Aval de patente');
+    await userEvent.click(firstBtn);
+    const options = [...screen.getByLabelText('Patente concedida').querySelectorAll('option')].map((o) => o.value);
+    expect(options).toEqual(['', 'primeiro_oficial', 'comandante', 'master']);
   });
 });

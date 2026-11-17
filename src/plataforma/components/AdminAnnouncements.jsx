@@ -6,31 +6,31 @@ const TYPE_CONFIG = {
     bg: 'rgba(59, 130, 246, 0.08)',
     border: 'rgba(59, 130, 246, 0.3)',
     icon: 'ℹ️',
-    color: '#3b82f6',
+    color: 'var(--info)',
   },
   warning: {
     bg: 'rgba(245, 158, 11, 0.08)',
     border: 'rgba(245, 158, 11, 0.3)',
     icon: '⚠️',
-    color: '#f59e0b',
+    color: 'var(--warning)',
   },
   success: {
     bg: 'rgba(34, 197, 94, 0.08)',
     border: 'rgba(34, 197, 94, 0.3)',
     icon: '✅',
-    color: '#22c55e',
+    color: 'var(--success)',
   },
   error: {
     bg: 'rgba(239, 68, 68, 0.08)',
     border: 'rgba(239, 68, 68, 0.3)',
     icon: '❌',
-    color: '#ef4444',
+    color: 'var(--danger)',
   },
   update: {
     bg: 'rgba(168, 85, 247, 0.08)',
     border: 'rgba(168, 85, 247, 0.3)',
     icon: '🚀',
-    color: '#a855f7',
+    color: 'var(--purple)',
   },
 };
 

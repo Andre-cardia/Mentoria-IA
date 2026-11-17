@@ -33,7 +33,7 @@ const toolbarBtnSx = (active = false) => ({
   background: active ? 'var(--accent-soft)' : 'transparent',
   border: active ? '1px solid var(--accent)' : '1px solid var(--line)',
   borderRadius: '3px', padding: '4px 8px', cursor: 'pointer',
-  color: active ? 'var(--accent)' : 'var(--text)',
+  color: active ? 'var(--accent-text)' : 'var(--text)',
   fontFamily: 'Space Mono, monospace', fontSize: '.8rem',
   minWidth: '30px',
 });
@@ -92,7 +92,7 @@ function ImageModal({ onClose, onInsert, getToken }) {
   const tabBtnSx = (active) => ({
     padding: '6px 14px', background: active ? 'var(--accent-soft)' : 'transparent',
     border: 'none', borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent',
-    color: active ? 'var(--accent)' : 'var(--muted)',
+    color: active ? 'var(--accent-text)' : 'var(--muted)',
     fontFamily: 'Space Grotesk, sans-serif', fontSize: '.9rem', cursor: 'pointer',
   });
 
@@ -379,7 +379,7 @@ export default function AdminBlogEditorPage() {
         />
       )}
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: '100%', margin: '0 auto', padding: '32px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <h1 style={{ margin: 0, fontFamily: 'Space Grotesk, sans-serif', fontSize: '1.5rem', color: 'var(--text)' }}>
             {isEdit ? 'Editar post' : 'Novo post'}
@@ -595,7 +595,7 @@ export default function AdminBlogEditorPage() {
               .tiptap ul, .tiptap ol { padding-left: 1.5em; margin: .5em 0; }
               .tiptap blockquote { border-left: 3px solid var(--accent); padding-left: 1em; color: var(--muted); margin: 1em 0; }
               .tiptap img { max-width: 100%; border-radius: 4px; margin: .5em 0; }
-              .tiptap a { color: var(--accent); }
+              .tiptap a { color: var(--accent-text); }
             `}</style>
             <EditorContent editor={editor} />
           </div>

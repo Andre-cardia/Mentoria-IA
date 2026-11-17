@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
           borderRadius: '6px',
           padding: '32px',
         }}>
-          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
             Recuperar Acesso
           </div>
 
@@ -92,7 +92,7 @@ export default function ForgotPasswordPage() {
                 display: 'inline-block',
                 fontFamily: 'Space Mono, monospace',
                 fontSize: '.75rem',
-                color: 'var(--accent)',
+                color: 'var(--accent-text)',
                 textDecoration: 'none',
                 letterSpacing: '.04em',
               }}>
@@ -126,7 +126,7 @@ export default function ForgotPasswordPage() {
                 </div>
 
                 {error && (
-                  <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem' }}>
+                  <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem' }}>
                     {error}
                   </p>
                 )}
@@ -149,7 +149,7 @@ export default function ForgotPasswordPage() {
               </form>
 
               <p style={{ marginTop: '20px', fontSize: '.875rem', color: 'var(--muted)', textAlign: 'center' }}>
-                <Link to="/login" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+                <Link to="/login" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>
                   ← Voltar ao login
                 </Link>
               </p>

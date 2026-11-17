@@ -242,7 +242,7 @@ export default function MinhaContaPage() {
       <div style={{ maxWidth: '560px' }}>
         {/* Cabeçalho */}
         <div style={{ marginBottom: '32px' }}>
-          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '6px' }}>
+          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '6px' }}>
             Conta
           </div>
           <h1 style={{ fontSize: '1.6rem', fontWeight: 700, lineHeight: 1.2, margin: 0 }}>
@@ -271,7 +271,7 @@ export default function MinhaContaPage() {
               {currentAvatar ? (
                 <img src={currentAvatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <span style={{ fontFamily: 'Space Mono, monospace', fontWeight: 700, fontSize: '1.1rem', color: 'var(--accent)' }}>
+                <span style={{ fontFamily: 'Space Mono, monospace', fontWeight: 700, fontSize: '1.1rem', color: 'var(--accent-text)' }}>
                   {initials}
                 </span>
               )}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useAuth } from '../context/useAuth';
+import ThemeToggle from './ThemeToggle';
 
 const ADMIN_NAV = [
   { to: '/admin/alunos',     label: 'Alunos' },
@@ -17,8 +18,9 @@ const CRM_NAV = [
   { to: '/crm/leads', label: 'CRM Neural Hub' },
 ];
 
+// Ambiente separado, com login próprio: sai do app de gestão.
 const ALUNO_NAV = [
-  { to: '/modulos',   label: '← Área do Aluno' },
+  { href: '/plataforma/inicio', label: 'Área do Aluno ↗' },
 ];
 
 /** @returns {import('react').CSSProperties} */
@@ -26,7 +28,7 @@ const linkStyle = (isActive, collapsed = false) => ({
   display: 'block', padding: collapsed ? '10px 8px' : '10px 14px', borderRadius: '4px',
   textDecoration: 'none', fontFamily: 'Space Grotesk, sans-serif',
   fontSize: collapsed ? '.7rem' : '.9rem', fontWeight: isActive ? 600 : 400,
-  color: isActive ? 'var(--accent)' : 'var(--muted)',
+  color: isActive ? 'var(--accent-text)' : 'var(--muted)',
   background: isActive ? 'var(--accent-soft)' : 'transparent',
   textAlign: collapsed ? 'center' : 'left',
   transition: 'color .15s, background .15s',
@@ -45,7 +47,7 @@ export default function AdminLayout({ children }) {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)' }}>
       {/* Sidebar */}
-      <aside style={{
+      <aside className="app-sidebar" style={{
         width: collapsed ? '76px' : '240px', flexShrink: 0,
         background: 'var(--bg-2)', borderRight: '1px solid var(--line)',
         display: 'flex', flexDirection: 'column',
@@ -71,7 +73,7 @@ export default function AdminLayout({ children }) {
           <span style={{
             fontFamily: 'Space Mono, monospace', fontSize: '.65rem', fontWeight: 700,
             textTransform: 'uppercase', letterSpacing: '.06em',
-            background: 'var(--accent-soft)', color: 'var(--accent)',
+            background: 'var(--accent-soft)', color: 'var(--accent-text)',
             border: '1px solid rgba(255,106,0,.25)', borderRadius: '3px', padding: '2px 8px',
           }}>{collapsed ? 'A' : 'Admin'}</span>
         </div>
@@ -114,8 +116,8 @@ export default function AdminLayout({ children }) {
           ))}
 
           <div style={{ borderTop: '1px solid var(--line)', margin: '16px 0 8px' }} />
-          {ALUNO_NAV.map(({ to, label }) => (
-            <NavLink key={to} to={to} title={label} style={() => linkStyle(false, collapsed)}>{collapsed ? '←' : label}</NavLink>
+          {ALUNO_NAV.map(({ href, label }) => (
+            <a key={href} href={href} title={label} style={linkStyle(false, collapsed)}>{collapsed ? '↗' : label}</a>
           ))}
         </nav>
 
@@ -124,6 +126,7 @@ export default function AdminLayout({ children }) {
           {!collapsed && <div style={{ fontSize: '.8rem', color: 'var(--muted)', marginBottom: '10px', paddingLeft: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {user?.email}
           </div>}
+          <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center' }}><ThemeToggle collapsed={collapsed} /></div>
           <button onClick={handleSignOut} style={{
             width: '100%', padding: '8px 14px', background: 'transparent',
             border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--muted)',

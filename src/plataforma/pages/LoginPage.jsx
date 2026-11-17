@@ -2,9 +2,15 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { isSupabaseConfigured } from '../../lib/supabase';
+import { isStaffRole } from '../../lib/app-env';
 
-export default function LoginPage() {
-  const { signIn } = useAuth();
+/**
+ * @param {{ area?: 'ensino' | 'gestao' }} props
+ * `ensino` é o login dos alunos; `gestao` é o da equipe (admin e comercial).
+ */
+export default function LoginPage({ area = 'ensino' }) {
+  const isGestao = area === 'gestao';
+  const { signIn, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -29,8 +35,25 @@ export default function LoginPage() {
       setError('Email ou senha inválidos.');
       return;
     }
-    const role = data?.user?.user_metadata?.role;
-    navigate(role === 'comercial' ? '/crm/leads' : '/inicio', { replace: true });
+    const role = data?.user?.app_metadata?.role;
+
+    if (isGestao) {
+      if (!isStaffRole(role)) {
+        await signOut();
+        setError('Esta área é restrita à equipe. Alunos entram pela plataforma de ensino.');
+        return;
+      }
+      navigate(role === 'admin' ? '/admin/alunos' : '/crm/leads', { replace: true });
+      return;
+    }
+
+    // Conta comercial não tem área de aluno; admin pode entrar para conferir o conteúdo.
+    if (role === 'comercial') {
+      await signOut();
+      setError('Esta conta é da equipe comercial. Entre pela área de gestão.');
+      return;
+    }
+    navigate('/inicio', { replace: true });
   }
 
   return (
@@ -53,9 +76,9 @@ export default function LoginPage() {
             fontFamily: 'Space Mono, monospace', fontWeight: 700, fontSize: '1rem', color: '#000',
           }}>M</div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: '1.1rem', lineHeight: 1.1 }}>Mentoria IA</div>
+            <div style={{ fontWeight: 700, fontSize: '1.1rem', lineHeight: 1.1 }}>{isGestao ? 'Neural Hub' : 'Mentoria IA'}</div>
             <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.65rem', color: 'var(--muted)', letterSpacing: '.1em', textTransform: 'uppercase' }}>
-              Zero-to-Hero
+              {isGestao ? 'Gestão' : 'Zero-to-Hero'}
             </div>
           </div>
         </div>
@@ -67,15 +90,15 @@ export default function LoginPage() {
           borderRadius: '6px',
           padding: '32px',
         }}>
-          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
-            Acesso à Plataforma
+          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
+            {isGestao ? 'Acesso da Equipe' : 'Acesso à Plataforma'}
           </div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '28px', lineHeight: 1.2 }}>
-            Entre na sua conta
+            {isGestao ? 'Gestão — admin e comercial' : 'Entre na sua conta'}
           </h1>
 
           {successMessage && (
-            <p style={{ color: '#4ade80', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '16px' }}>
+            <p style={{ color: 'var(--success)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '16px' }}>
               {successMessage}
             </p>
           )}
@@ -126,7 +149,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.75rem' }}>
+              <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem' }}>
                 {error}
               </p>
             )}
@@ -147,12 +170,24 @@ export default function LoginPage() {
             </button>
           </form>
           <p style={{ marginTop: '16px', fontSize: '.875rem', color: 'var(--muted)', textAlign: 'center' }}>
-            <Link to="/esqueci-senha" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Esqueci minha senha</Link>
+            <Link to="/esqueci-senha" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>Esqueci minha senha</Link>
           </p>
-          <p style={{ marginTop: '8px', fontSize: '.875rem', color: 'var(--muted)', textAlign: 'center' }}>
-            Ainda não tem conta?{' '}
-            <Link to="/registro" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Criar conta</Link>
-          </p>
+          {isGestao ? (
+            <p style={{ marginTop: '8px', fontSize: '.875rem', color: 'var(--muted)', textAlign: 'center' }}>
+              É aluno?{' '}
+              <a href="/plataforma/login" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>Ir para a plataforma de ensino</a>
+            </p>
+          ) : (
+            <>
+              <p style={{ marginTop: '8px', fontSize: '.875rem', color: 'var(--muted)', textAlign: 'center' }}>
+                Ainda não tem conta?{' '}
+                <Link to="/registro" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>Criar conta</Link>
+              </p>
+              <p style={{ marginTop: '8px', fontSize: '.8rem', color: 'var(--muted)', textAlign: 'center' }}>
+                <a href="/gestao/login" style={{ color: 'var(--muted)' }}>Acesso da equipe</a>
+              </p>
+            </>
+          )}
         </div>
       </div>
     </div>

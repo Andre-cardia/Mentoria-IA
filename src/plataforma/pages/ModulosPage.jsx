@@ -38,8 +38,8 @@ export default function ModulosPage() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: '800px' }}>
-        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px' }}>
+      <div style={{ maxWidth: '100%' }}>
+        <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
           Conteúdo
         </div>
         <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '16px' }}>Módulos & Aulas</h1>
@@ -49,7 +49,7 @@ export default function ModulosPage() {
           <div style={{ marginBottom: '32px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '.85rem' }}>
               <span style={{ color: 'var(--muted)' }}>Progresso geral</span>
-              <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--accent)' }}>
+              <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--accent-text)' }}>
                 {totalProgress.completed} / {totalProgress.total} aulas
               </span>
             </div>
@@ -66,7 +66,7 @@ export default function ModulosPage() {
         )}
 
         {loading && <p style={{ color: 'var(--muted)' }}>Carregando módulos...</p>}
-        {error && <p style={{ color: '#f87171', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
+        {error && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {modules.map((mod) => (
@@ -106,8 +106,8 @@ export default function ModulosPage() {
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
                         <span style={{
                           fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
-                          color: mp.completed > 0 ? 'var(--accent)' : 'var(--muted)',
-                          background: 'rgba(255,255,255,.05)',
+                          color: mp.completed > 0 ? 'var(--accent-text)' : 'var(--muted)',
+                          background: 'var(--hover)',
                           border: '1px solid var(--line)', borderRadius: '3px',
                           padding: '2px 10px',
                         }}>
@@ -126,7 +126,7 @@ export default function ModulosPage() {
                       </div>
                     );
                   })()}
-                  <span style={{ color: 'var(--accent)', fontSize: '1rem' }}>
+                  <span style={{ color: 'var(--accent-text)', fontSize: '1rem' }}>
                     {openModule === mod.id ? '▲' : '▼'}
                   </span>
                 </div>
@@ -147,7 +147,7 @@ export default function ModulosPage() {
                         borderBottom: idx < mod.lessons.length - 1 ? '1px solid var(--line)' : 'none',
                         transition: 'background .15s',
                       }}
-                      onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,.02)'}
+                      onMouseOver={(e) => e.currentTarget.style.background = 'var(--hover)'}
                       onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                       >
                         <div style={{
@@ -155,7 +155,7 @@ export default function ModulosPage() {
                           background: 'var(--accent-soft)', border: '1px solid rgba(255,106,0,.3)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontFamily: 'Space Mono, monospace', fontSize: '.7rem',
-                          color: 'var(--accent)', flexShrink: 0,
+                          color: 'var(--accent-text)', flexShrink: 0,
                         }}>
                           {idx + 1}
                         </div>
@@ -167,7 +167,7 @@ export default function ModulosPage() {
                             {isComplete(lesson.id) && (
                               <span style={{
                                 fontFamily: 'Space Mono, monospace', fontSize: '.65rem',
-                                color: '#4ade80', background: 'rgba(34,197,94,.1)',
+                                color: 'var(--success)', background: 'rgba(34,197,94,.1)',
                                 border: '1px solid rgba(34,197,94,.25)', borderRadius: '3px',
                                 padding: '1px 6px',
                               }}>

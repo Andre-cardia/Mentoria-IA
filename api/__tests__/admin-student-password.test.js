@@ -37,7 +37,7 @@ describe('api/admin/students/[id]/password handler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: 'admin-user', user_metadata: { role: 'admin' } } },
+      data: { user: { id: 'admin-user', app_metadata: { role: 'admin' } } },
       error: null,
     });
     mockSupabase.auth.admin.updateUserById.mockResolvedValue({ error: null });
@@ -76,7 +76,7 @@ describe('api/admin/students/[id]/password handler', () => {
 
   it('retorna 403 quando token não é de admin', async () => {
     mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: 'user-id', user_metadata: { role: 'aluno' } } },
+      data: { user: { id: 'user-id', app_metadata: { role: 'aluno' } } },
       error: null,
     });
 

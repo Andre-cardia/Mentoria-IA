@@ -29,7 +29,7 @@ export default function LessonTextContent({ content }) {
             .lesson-rich-content ul, .lesson-rich-content ol { padding-left: 1.5em; margin: .5em 0; color: var(--text); font-family: Space Grotesk, sans-serif; font-size: 1rem; line-height: 1.75; }
             .lesson-rich-content blockquote { border-left: 3px solid var(--accent); padding-left: 1em; color: var(--muted); margin: 1em 0; }
             .lesson-rich-content img { max-width: 100%; border-radius: 4px; margin: .5em 0; }
-            .lesson-rich-content a { color: var(--accent); }
+            .lesson-rich-content a { color: var(--accent-text); }
             .lesson-rich-content strong { font-weight: 700; }
             .lesson-rich-content em { font-style: italic; }
           `}</style>

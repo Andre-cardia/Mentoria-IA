@@ -15,7 +15,7 @@ export default function CrmRoute({ children }) {
   }
 
   if (!user) return <Navigate to="/login" replace />;
-  if (!hasCrmAccess) return <Navigate to="/inicio" replace />;
+  if (!hasCrmAccess) return <Navigate to="/login" replace />;
 
   return children;
 }
