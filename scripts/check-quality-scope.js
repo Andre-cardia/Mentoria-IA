@@ -349,9 +349,18 @@ async function runSelfTests() {
 }
 
 function listedTestFiles(output, project, inventory) {
-  const files = output.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).map((line) => projectRelative(resolve(projectRoot, line)))
+  const projectPrefix = `[${project}] `
+  const files = output.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).map((line) => {
+    if (!line.startsWith(projectPrefix)) {
+      throw new ScopeMismatch(`Vitest ${project} listou linha sem o prefixo de projeto esperado.`)
+    }
+    return projectRelative(resolve(projectRoot, line.slice(projectPrefix.length)))
+  })
   if (files.some((path) => !inventory.includes(path) || !testFilePattern.test(path))) {
     throw new ScopeMismatch(`Vitest ${project} listou caminho não reconhecido.`)
+  }
+  if (files.some((path) => (path.startsWith('src/') ? 'browser' : 'node') !== project)) {
+    throw new ScopeMismatch(`Vitest ${project} listou teste no contexto de ambiente incorreto.`)
   }
   return files
 }

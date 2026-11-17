@@ -2,31 +2,50 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
-// Replica os rewrites do vercel.json para o dev server local
+// O domínio reservado .localhost permite conferir as duas experiências sem alterar o DNS.
+function rotasLocais(server) {
+  server.middlewares.use((req, res, next) => {
+    const { pathname, search } = new URL(req.url, 'http://localhost')
+    const hostname = (req.headers.host || '').split(':')[0]
+    const institucional = ['neuralhub.ia.br', 'neuralhub.localhost'].includes(hostname)
+
+    if (institucional) {
+      if (pathname === '/' || pathname === '/neuralhub-compartilhado.html') {
+        res.writeHead(307, { Location: '/neuralhub.html' + search })
+        return res.end()
+      }
+      if (/^\/(?:plataforma(?:\.html|\/.*)?|solicitar-proposta|blog(?:\/.*)?|(?:aulas\/)?governanca-ia(?:\/.*)?)$/.test(pathname)) {
+        const destino = pathname === '/plataforma.html' ? '/plataforma' : pathname
+        res.writeHead(307, { Location: 'https://mentoria.neuralhub.ia.br' + destino + search })
+        return res.end()
+      }
+    }
+
+    const paginas = {
+      '/lead': '/lead.html',
+      '/brand': '/brand.html',
+      '/obrigado': '/obrigado.html',
+      '/solicitar-proposta': '/index.html',
+    }
+
+    let destino = paginas[pathname]
+    if (/^\/auditoria(?:\/|$)/.test(pathname)) destino = '/auditoria.html'
+    if (/^\/plataforma(?:\/|$)/.test(pathname)) destino = '/plataforma.html'
+    if (/^\/gestao(?:\/|$)/.test(pathname)) destino = '/gestao.html'
+    if (institucional && ['/privacidade', '/termos'].includes(pathname)) destino = pathname + '.html'
+    if (/^\/neuralhub(?:\.html$|\/|$)/.test(pathname)) {
+      destino = institucional ? '/identidade-neuralhub/inicio.html' : '/neuralhub-compartilhado.html'
+    }
+
+    if (destino) req.url = destino + search
+    next()
+  })
+}
+
 const devRewrites = {
   name: 'dev-rewrites',
-  configureServer(server) {
-    server.middlewares.use((req, _res, next) => {
-      if (req.url === '/plataforma' || req.url.startsWith('/plataforma/')) {
-        req.url = '/plataforma.html'
-      } else if (req.url === '/gestao' || req.url.startsWith('/gestao/')) {
-        req.url = '/gestao.html'
-      } else if (req.url === '/lead') {
-        req.url = '/lead.html'
-      } else if (req.url === '/brand') {
-        req.url = '/brand.html'
-      } else if (req.url === '/obrigado') {
-        req.url = '/obrigado.html'
-      } else if (req.url === '/solicitar-proposta') {
-        req.url = '/index.html'
-      } else if (req.url === '/neuralhub' || req.url.startsWith('/neuralhub/')) {
-        req.url = '/neuralhub.html'
-      } else if (req.url === '/auditoria' || req.url.startsWith('/auditoria/')) {
-        req.url = '/auditoria.html'
-      }
-      next()
-    })
-  },
+  configureServer: rotasLocais,
+  configurePreviewServer: rotasLocais,
 }
 
 export default defineConfig({
@@ -74,7 +93,7 @@ export default defineConfig({
         termos:     resolve(__dirname, 'termos.html'),
         plataforma: resolve(__dirname, 'plataforma.html'),
         gestao:     resolve(__dirname, 'gestao.html'),
-        neuralhub:  resolve(__dirname, 'neuralhub.html'),
+        neuralhub:  resolve(__dirname, 'neuralhub-compartilhado.html'),
         auditoria:  resolve(__dirname, 'auditoria.html'),
       },
     },

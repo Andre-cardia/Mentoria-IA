@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Explore como Astra e DeepSeek V4.1 Flash funcionam: do prompt ao datacenter, com diagramas e simulação educativa."
+    />
+    <title>Dentro do modelo · Neural Hub</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#inicio"
+        ><span class="brand-icon" aria-hidden="true">N</span> NEURAL HUB
+        <span class="brand-sub">/ LAB</span></a
+      ><span class="edition">EXPLORADOR DE IA · 01</span>
+    </header>
+    <main id="inicio">
+      <section class="intro">
+        <p class="eyebrow"><span class="dot"></span> DO PROMPT AO DATACENTER</p>
+        <h1>O que acontece<br /><span>dentro de um modelo?</span></h1>
+        <p class="lede">
+          Explore Astra e DeepSeek V4.1 Flash. Configure um cenário e acompanhe
+          as camadas que transformam sua pergunta em uma resposta.
+        </p>
+      </section>
+      <div class="workspace">
+        <aside class="settings">
+          <div class="section-label">01 / SEU CENÁRIO</div>
+          <form id="scenario">
+            <label for="model">Modelo</label>
+            <select id="model" aria-describedby="model-note">
+              <option value="astra">GPT-6 Astra</option>
+              <option value="deepseek">DeepSeek V4.1 Flash</option>
+            </select>
+            <p id="model-note" class="hint"></p>
+            <label for="hosting">Onde roda</label>
+            <select id="hosting" aria-describedby="hosting-note">
+              <option value="api">API gerenciada</option>
+              <option value="own">Infraestrutura própria</option>
+            </select>
+            <p id="hosting-note" class="hint"></p>
+            <label for="prompt">Sua pergunta de exemplo</label>
+            <textarea
+              id="prompt"
+              rows="3"
+              maxlength="500"
+              aria-describedby="prompt-note"
+              placeholder="Ex.: Como funciona uma rede neural?"
+            >
+Explique como a inteligência artificial aprende.</textarea>
+            <p id="prompt-note" class="hint">
+              Demonstração local. O texto não é enviado a um modelo.
+            </p>
+            <label for="context"
+              >Contexto por sessão
+              <output id="context-value" for="context" aria-live="off"></output
+            ></label>
+            <input
+              id="context"
+              type="range"
+              min="1000"
+              max="1000000"
+              step="1000"
+              value="32000"
+              aria-describedby="context-note"
+            />
+            <label class="numeric-label" for="context-number"
+              >Digitar tokens
+              <input
+                id="context-number"
+                type="number"
+                min="1000"
+                max="1000000"
+                step="1000"
+                value="32000"
+                required
+                aria-describedby="context-note"
+            /></label>
+            <p id="context-note" class="hint">
+              Tokens acumulados de prompt, histórico e geração, independentes do
+              texto acima. A faixa de 1 mil a 1 milhão é didática; não
+              representa o limite de todas as APIs.
+            </p>
+            <label for="concurrency"
+              >Sessões simultâneas
+              <output
+                id="concurrency-value"
+                for="concurrency"
+                aria-live="off"
+              ></output
+            ></label>
+            <input id="concurrency" type="range" min="1" max="64" value="4" />
+            <label class="check"
+              ><input id="tools" type="checkbox" checked /> Incluir consulta a
+              uma ferramenta</label
+            >
+            <button class="primary" type="submit">
+              Percorrer o funcionamento <span aria-hidden="true">↗</span>
+            </button>
+          </form>
+          <div class="local-note">
+            SIMULAÇÃO DIDÁTICA<br /><span
+              >Sem inferência real, cobrança ou credenciais.</span
+            >
+          </div>
+        </aside>
+        <section class="explorer" aria-label="Exploração do funcionamento">
+          <div class="explorer-top">
+            <div>
+              <div class="section-label">02 / POR DENTRO</div>
+              <h2 id="model-title">GPT-6 Astra</h2>
+            </div>
+            <span id="evidence-badge" class="badge"></span>
+          </div>
+          <div class="views" role="group" aria-label="Visão da infraestrutura">
+            <button type="button" data-view="journey" aria-pressed="true">
+              Percurso do prompt
+            </button>
+            <button type="button" data-view="model" aria-pressed="false">
+              Arquitetura
+            </button>
+            <button type="button" data-view="infra" aria-pressed="false">
+              Datacenter
+            </button>
+            <button type="button" data-view="training" aria-pressed="false">
+              Treinamento
+            </button>
+          </div>
+          <div class="canvas">
+            <div class="canvas-heading">
+              <span id="view-description"></span
+              ><span class="canvas-tag" id="map-tag"></span>
+            </div>
+            <div
+              id="diagram"
+              class="diagram"
+              role="group"
+              aria-label="Etapas selecionáveis"
+            ></div>
+            <div class="playback">
+              <button type="button" id="previous" aria-label="Etapa anterior">
+                ←</button
+              ><span id="step-counter"></span
+              ><button type="button" id="next" aria-label="Próxima etapa">
+                →</button
+              ><span class="playback-note"
+                >Selecione uma camada para explorar</span
+              >
+            </div>
+          </div>
+          <p id="selection-status" class="sr-only" role="status"></p>
+          <article class="detail">
+            <div class="detail-top">
+              <span id="detail-kind" class="eyebrow"></span
+              ><span id="detail-number"></span>
+            </div>
+            <h3 id="detail-title"></h3>
+            <p id="detail-text"></p>
+            <div id="detail-visual" class="detail-visual"></div>
+            <p id="scenario-detail" class="scenario-detail"></p>
+            <a id="detail-source" target="_blank" rel="noopener noreferrer"
+              >Consultar fonte ↗</a
+            >
+          </article>
+          <section class="memory" aria-label="Impacto do cenário na memória">
+            <div>
+              <p class="eyebrow">O PESO DO CONTEXTO</p>
+              <h3 id="memory-title"></h3>
+              <p id="memory-explanation"></p>
+            </div>
+            <div class="memory-result">
+              <strong id="memory-value"></strong><span id="memory-unit"></span>
+            </div>
+          </section>
+        </section>
+      </div>
+      <section class="references">
+        <div>
+          <p class="eyebrow">03 / TRANSPARÊNCIA</p>
+          <h2>Até onde podemos enxergar.</h2>
+          <p>
+            Dados públicos e esquemas educativos têm papéis diferentes. A
+            infraestrutura física apresentada é conceitual; a quantidade de
+            GPUs, o consumo elétrico e a topologia real dos provedores não estão
+            estabelecidos pelas fontes consultadas.
+          </p>
+        </div>
+        <div>
+          <details>
+            <summary>Fontes e limites da demonstração</summary>
+            <ul>
+              <li>
+                <a
+                  href="https://openai.com/index/gpt-6-astra/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >OpenAI — apresentação do Astra</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://developers.openai.com/api/docs/models/gpt-6-astra"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >OpenAI — ficha técnica e capacidades</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >DeepSeek — model card oficial</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/main/config.json"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >DeepSeek — configuração da arquitetura</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/main/encoding/README.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >DeepSeek — codificação de mensagens</a
+                >
+              </li>
+            </ul>
+            <p>
+              Consulta: 15/09/2026. No Astra, número de parâmetros, camadas,
+              GPUs e uso de profundidade recorrente permanecem não confirmados
+              nas fontes consultadas. No DeepSeek, o cálculo usa apenas KV
+              global: não mede a memória total de execução. A divisão visual do
+              prompt em palavras não reproduz um tokenizer real.
+            </p>
+          </details>
+        </div>
+      </section>
+      <footer>
+        NEURAL HUB / APRENDER EXPLORANDO
+        <span>Uma visão em camadas da inteligência artificial.</span>
+      </footer>
+    </main>
+    <noscript
+      >Ative JavaScript para explorar os diagramas e usar o
+      formulário.</noscript
+    >
+  </body>
+</html>

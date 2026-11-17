@@ -8,7 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  </head>
+    <script>!function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var j=d.createElement(s);j.async=1;j.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(j,f)}(window,document,"script","https://bzrcdn.openai.com/sdk/oaiq.min.js");oaiq("init",{pixelId:"3j5aQhNBufLJWFfSJFmMLq"});</script>
+  <script>
+    if (['neuralhub.ia.br', 'neuralhub.localhost'].includes(location.hostname)) {
+      import('/identidade-neuralhub/paginas.js').then(({ aplicarIdentidade }) => aplicarIdentidade('lead'))
+    }
+  </script>
+</head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/lead-main.jsx"></script>

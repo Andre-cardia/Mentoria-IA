@@ -232,7 +232,7 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
       <header className="no-print sticky top-0 z-50 border-b border-[var(--line)] bg-[#060606]/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-4 py-4 md:px-8">
           <a href="/auditoria" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded bg-[var(--accent)] flex items-center justify-center font-mono font-bold text-black text-sm group-hover:scale-105 transition-transform">
+            <div className="nh-inicial-secops w-8 h-8 rounded bg-[var(--accent)] flex items-center justify-center font-mono font-bold text-black text-sm group-hover:scale-105 transition-transform">
               NH
             </div>
             <div>
@@ -259,7 +259,7 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
       </header>
 
       {/* Hero Section */}
-      <section className="no-print relative border-b border-[var(--line)] overflow-hidden">
+      <section className="nh-auditoria-arte no-print relative border-b border-[var(--line)] overflow-hidden">
         {/* Epic Cyber Security Hero Background Layer */}
         <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden">
           <img
@@ -283,7 +283,7 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
         <div className="relative z-10 mx-auto max-w-[1500px] px-4 py-16 md:px-8 md:py-24">
           <div className="max-w-4xl">
             {/* Telemetry Status Bar */}
-            <div className="mb-6 flex flex-wrap items-center gap-2.5 sm:gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--muted)]">
+            <div className="nh-telemetria mb-6 flex flex-wrap items-center gap-2.5 sm:gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--muted)]">
               <div className="inline-flex items-center gap-2 rounded border border-[rgba(255,106,0,.35)] bg-[rgba(255,106,0,.1)] backdrop-blur-md px-3.5 py-1.5 text-[var(--accent)] font-bold shadow-[0_0_20px_rgba(255,106,0,.2)]">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--accent)] opacity-75" />
@@ -709,7 +709,7 @@ export default function AuditoriaLandingPage({ onNavigateToChecklist } = {}) {
           </div>
 
           {/* Banner Direct to Checklist */}
-          <div className="mt-12 rounded border border-[rgba(255,106,0,.4)] bg-gradient-to-r from-[rgba(255,106,0,.15)] via-[var(--panel)] to-black p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_0_40px_rgba(255,106,0,.15)]">
+          <div className="nh-chamada-checklist mt-12 rounded border border-[rgba(255,106,0,.4)] bg-gradient-to-r from-[rgba(255,106,0,.15)] via-[var(--panel)] to-black p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_0_40px_rgba(255,106,0,.15)]">
             <div className="max-w-2xl">
               <span className="font-mono text-[11px] uppercase tracking-widest text-[var(--accent)] font-bold">
                 // Diagnóstico Online Gratuito

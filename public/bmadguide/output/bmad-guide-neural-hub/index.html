@@ -8,6 +8,11 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/style.css">
   <link rel="preload" href="assets/fonts/space-grotesk-700.ttf" as="font" type="font/ttf" crossorigin>
   <script src="assets/data.js" defer></script><script src="assets/app.js" defer></script>
+<script>
+    if (['neuralhub.ia.br', 'neuralhub.localhost'].includes(location.hostname)) {
+      import('/identidade-neuralhub/paginas.js').then(({ aplicarIdentidade }) => aplicarIdentidade('guia-bmad'))
+    }
+  </script>
 </head>
 <body data-page="home">
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
