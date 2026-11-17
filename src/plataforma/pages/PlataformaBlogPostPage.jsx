@@ -98,30 +98,29 @@ export default function PlataformaBlogPostPage() {
 
   return (
     <Layout>
-      <div className="plat-blogpost-layout" style={{ maxWidth: '100%', margin: '0 auto', padding: '36px 24px 80px', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 280px', gap: '40px' }}>
+      <div className="plat-blogpost-layout" style={{ maxWidth: '1600px', margin: '0 auto', padding: '8px 0 80px', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: '48px' }}>
         {/* Article column */}
         <div>
-          {/* Cover hero */}
-          {post.cover_url && (
-            <div style={{ width: '100%', aspectRatio: '21 / 9', maxHeight: '520px', overflow: 'hidden', borderRadius: '8px', marginBottom: '28px' }}>
-              <img src={post.cover_url} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
-          )}
-
-          {/* Breadcrumb */}
-          <nav style={{ marginBottom: '20px', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', color: 'var(--muted)' }}>
-            <Link to="/blog" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>Blog</Link>
+          {/* Trilha de navegação */}
+          <nav aria-label="Trilha de navegação" style={{ marginBottom: '22px', fontFamily: 'Space Mono, monospace', fontSize: '.68rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+            <Link to="/inicio" style={{ color: 'var(--muted)', textDecoration: 'none' }}>Início</Link>
             <span style={{ margin: '0 8px' }}>›</span>
-            <span>{post.title}</span>
+            <Link to="/blog" style={{ color: 'var(--muted)', textDecoration: 'none' }}>Blog</Link>
+            {post.post_tags?.[0]?.tags && (
+              <>
+                <span style={{ margin: '0 8px' }}>›</span>
+                <span style={{ color: 'var(--text)' }}>{post.post_tags[0].tags.name}</span>
+              </>
+            )}
           </nav>
 
-          {/* Tags */}
+          {/* Categorias */}
           {post.post_tags?.length > 0 && (
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', marginBottom: '12px' }}>
               {post.post_tags.map((pt, i) => pt.tags && (
                 <span key={i} style={{
-                  fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--accent-text)',
-                  background: 'var(--accent-soft)', borderRadius: '3px', padding: '2px 8px',
+                  fontFamily: 'Space Grotesk, sans-serif', fontSize: '.75rem', fontWeight: 700,
+                  letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--accent-text)',
                 }}>
                   {pt.tags.name}
                 </span>
@@ -131,17 +130,35 @@ export default function PlataformaBlogPostPage() {
 
           <h1 style={{
             fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700,
-            fontSize: 'clamp(1.5rem, 4vw, 2.2rem)', lineHeight: 1.2,
-            color: 'var(--text)', margin: '0 0 14px',
+            fontSize: 'clamp(1.7rem, 3.4vw, 2.75rem)', lineHeight: 1.15, letterSpacing: '-.01em',
+            color: 'var(--text)', margin: '0 0 18px', maxWidth: '24ch',
           }}>
             {post.title}
           </h1>
 
-          <div style={{ display: 'flex', gap: '14px', marginBottom: '28px', fontFamily: 'Space Grotesk, sans-serif', fontSize: '.85rem', color: 'var(--muted)' }}>
-            {post.author_name && <span>{post.author_name}</span>}
-            <span>•</span>
+          {post.seo_description && (
+            <p style={{ fontSize: '1.1rem', lineHeight: 1.65, color: 'var(--muted)', margin: '0 0 24px' }}>
+              {post.seo_description}
+            </p>
+          )}
+
+          <div style={{
+            display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center',
+            padding: '16px 0', margin: '0 0 32px',
+            borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)',
+            fontFamily: 'Space Grotesk, sans-serif', fontSize: '.9rem', color: 'var(--muted)',
+          }}>
+            {post.author_name && <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{post.author_name}</strong>}
+            {post.author_name && <span>·</span>}
             <span>{fmtDate(post.published_at)}</span>
           </div>
+
+          {/* Capa: ocupa toda a coluna, depois do título */}
+          {post.cover_url && (
+            <div style={{ width: '100%', aspectRatio: '16 / 9', overflow: 'hidden', borderRadius: '8px', marginBottom: '32px', background: 'var(--panel-2)' }}>
+              <img src={post.cover_url} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            </div>
+          )}
 
           {/* Article body */}
           <div
@@ -176,7 +193,7 @@ export default function PlataformaBlogPostPage() {
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
+        @media (max-width: 1100px) {
           .plat-blogpost-layout { grid-template-columns: 1fr !important; }
           .plat-blogpost-layout > div:last-child { position: static !important; }
         }
