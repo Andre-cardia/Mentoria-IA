@@ -41,7 +41,7 @@ export default function PlataformaBlogPage() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: '100%', margin: '0 auto', padding: '32px 24px' }}>
         <h1 style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '1.8rem', fontWeight: 700, color: 'var(--text)', margin: '0 0 8px' }}>
           Blog
         </h1>

@@ -3,7 +3,7 @@ import Layout from '../components/Layout';
 export default function FormacoesPage() {
   return (
     <Layout>
-      <div style={{ maxWidth: '800px' }}>
+      <div style={{ maxWidth: '100%' }}>
         <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
           Formação
         </div>

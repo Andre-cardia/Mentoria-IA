@@ -241,7 +241,7 @@ export default function DashboardPage() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: '1080px' }}>
+      <div style={{ maxWidth: '100%' }}>
         {loading ? (
           <p style={{ color: 'var(--muted)', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>Carregando...</p>
         ) : (

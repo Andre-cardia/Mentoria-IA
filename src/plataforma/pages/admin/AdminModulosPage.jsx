@@ -480,7 +480,7 @@ export default function AdminModulosPage() {
 
   return (
     <AdminLayout>
-      <div style={{ maxWidth: '820px' }}>
+      <div style={{ maxWidth: '100%' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>

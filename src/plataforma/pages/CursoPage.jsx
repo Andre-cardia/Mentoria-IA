@@ -88,7 +88,7 @@ export default function CursoPage() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: '800px' }}>
+      <div style={{ maxWidth: '100%' }}>
         {/* Breadcrumb */}
         <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '.85rem', color: 'var(--muted)' }}>
           <Link to="/cursos" style={{ color: 'var(--muted)', textDecoration: 'none' }}>Trilhas</Link>

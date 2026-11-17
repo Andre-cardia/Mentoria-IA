@@ -423,7 +423,7 @@ export default function RankingPage() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: '1040px' }}>
+      <div style={{ maxWidth: '100%' }}>
         <div style={{ ...eyebrow, color: 'var(--accent-text)', marginBottom: '10px' }}>
           Missão
         </div>

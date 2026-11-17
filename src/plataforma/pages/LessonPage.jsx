@@ -159,7 +159,7 @@ export default function LessonPage() {
         @media (max-width: 1100px) { .lesson-layout { grid-template-columns: minmax(0, 1fr); } }
       `}</style>
 
-      <div style={{ maxWidth: '1280px' }}>
+      <div style={{ maxWidth: '100%' }}>
         {/* Caminho */}
         <nav aria-label="Caminho" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', fontSize: '.875rem', color: 'var(--muted)' }}>
           <Link to="/cursos" style={{ color: 'var(--muted)', textDecoration: 'none' }}>Trilhas</Link>

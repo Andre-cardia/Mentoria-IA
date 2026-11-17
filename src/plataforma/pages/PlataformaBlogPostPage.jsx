@@ -98,12 +98,12 @@ export default function PlataformaBlogPostPage() {
 
   return (
     <Layout>
-      <div className="plat-blogpost-layout" style={{ maxWidth: '1060px', margin: '0 auto', padding: '36px 24px 80px', display: 'grid', gridTemplateColumns: '1fr 280px', gap: '40px' }}>
+      <div className="plat-blogpost-layout" style={{ maxWidth: '100%', margin: '0 auto', padding: '36px 24px 80px', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 280px', gap: '40px' }}>
         {/* Article column */}
         <div>
           {/* Cover hero */}
           {post.cover_url && (
-            <div style={{ width: '100%', height: '300px', overflow: 'hidden', borderRadius: '8px', marginBottom: '28px' }}>
+            <div style={{ width: '100%', aspectRatio: '21 / 9', maxHeight: '520px', overflow: 'hidden', borderRadius: '8px', marginBottom: '28px' }}>
               <img src={post.cover_url} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
           )}

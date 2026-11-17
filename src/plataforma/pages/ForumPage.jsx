@@ -89,7 +89,7 @@ export default function ForumPage() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: '780px' }}>
+      <div style={{ maxWidth: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
           <div>
             <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>

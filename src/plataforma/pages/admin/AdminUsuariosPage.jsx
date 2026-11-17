@@ -232,7 +232,7 @@ export default function AdminUsuariosPage() {
 
   return (
     <AdminLayout>
-      <div style={{ maxWidth: '1120px' }}>
+      <div style={{ maxWidth: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '18px', flexWrap: 'wrap', marginBottom: '28px' }}>
           <div>
             <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '6px' }}>

@@ -9,7 +9,8 @@ import { APEX_NAME, APEX_U, GALAXIES, galaxyCenterU } from '../lib/starRace';
 import { unlockedUpgradeIds } from '../lib/shipUpgrades';
 
 const SPACE = 0x03040a;
-const MAX_LABELS = 8;
+// Etiquetas dos colegas só aparecem com a câmera por perto, para não poluir a visão geral.
+const LABEL_RANGE = 135;
 const GALAXY_RADIUS = 26;
 
 const ROUTE_POINTS = [
@@ -452,10 +453,16 @@ export default function StarRace({ racers = [] }) {
     ));
 
     const labels = [];
-    const addLabel = (text, variant, anchor, lift) => {
+    const addLabel = (text, variant, anchor, lift, onClick = null) => {
       const el = makeLabel(text, variant);
+      if (onClick) {
+        // Clicar na etiqueta leva a câmera até a nave ou galáxia.
+        el.style.pointerEvents = 'auto';
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', onClick);
+      }
       overlay.appendChild(el);
-      labels.push({ el, anchor, lift });
+      labels.push({ el, anchor, lift, near: variant === 'racer' });
     };
 
     const galaxies = GALAXIES.map((galaxy, index) => {
@@ -464,21 +471,20 @@ export default function StarRace({ racers = [] }) {
       group.position.copy(route.getPointAt(galaxyCenterU(index))).add(new THREE.Vector3(0, -9, -4));
       group.rotation.set(0.62 + index * 0.08, 0, 0.22 * (index - 1));
       scene.add(group);
-      addLabel(galaxy.name, 'galaxy', group.position, 26);
+      addLabel(galaxy.name, 'galaxy', group.position, 26, () => flyTo(sectorView(index)));
       return group;
     });
 
     const apex = buildApex(texture);
     apex.position.copy(route.getPointAt(APEX_U)).add(new THREE.Vector3(6, 3, 0));
     scene.add(apex);
-    addLabel(APEX_NAME, 'galaxy', apex.position, 13);
+    addLabel(APEX_NAME, 'galaxy', apex.position, 13, () => flyTo(sectorView(GALAXIES.length)));
 
     // Naves: cada uma na sua posição da rota, em "faixas" ao redor dela
     // para que alunos com o mesmo progresso não fiquem sobrepostos.
     const up = new THREE.Vector3(0, 1, 0);
     let myShip = null;
     let myU = 0;
-    let labelCount = 0;
     const ships = racers.map((racer, index) => {
       const u = THREE.MathUtils.clamp(racer.position.u, 0.02, 0.98);
       const center = route.getPointAt(u);
@@ -503,10 +509,9 @@ export default function StarRace({ racers = [] }) {
       if (racer.isCurrentUser) {
         myShip = ship;
         myU = u;
-        addLabel(`VOCÊ ${'★'.repeat(racer.rank?.stars ?? 1)}`, 'me', ship.position, 4.2);
-      } else if (labelCount < MAX_LABELS) {
-        labelCount += 1;
-        addLabel(`${racer.name} ${'★'.repeat(racer.rank?.stars ?? 1)}`, 'racer', ship.position, 2.4);
+        addLabel(`VOCÊ ${'★'.repeat(racer.rank?.stars ?? 1)}`, 'me', ship.position, 4.2, () => flyTo(shipView(ship)));
+      } else {
+        addLabel(`${racer.name} ${'★'.repeat(racer.rank?.stars ?? 1)}`, 'racer', ship.position, 2.4, () => flyTo(shipView(ship)));
       }
       return ship;
     });
@@ -526,7 +531,8 @@ export default function StarRace({ racers = [] }) {
     const controls = new OrbitControls(camera, canvas);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
-    controls.enablePan = false;
+    controls.enablePan = true; // botão direito ou dois dedos: desloca a câmera pela rota
+    controls.screenSpacePanning = true;
     controls.minDistance = 9;
     controls.maxDistance = 520;
 
@@ -543,13 +549,23 @@ export default function StarRace({ racers = [] }) {
       const reach = Math.max(1, 1.75 / camera.aspect);
       return { position: target.clone().add(new THREE.Vector3(0, 105, 185).multiplyScalar(reach)), target };
     }
-    function shipView() {
-      if (!myShip) return overviewView();
-      const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(myShip.quaternion);
+    function shipView(ship = myShip) {
+      if (!ship) return overviewView();
+      const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(ship.quaternion);
       return {
-        position: myShip.userData.base.clone().addScaledVector(forward, -19).add(new THREE.Vector3(7, 8, 5)),
-        target: myShip.userData.base.clone().addScaledVector(forward, 10),
+        position: ship.userData.base.clone().addScaledVector(forward, -19).add(new THREE.Vector3(7, 8, 5)),
+        target: ship.userData.base.clone().addScaledVector(forward, 10),
       };
+    }
+    // Vista de um setor: cada galáxia (0 a 2) ou a Estrela da Certificação (3).
+    function sectorView(index) {
+      const reach = Math.max(1, 1.5 / camera.aspect);
+      if (index >= GALAXIES.length) {
+        const target = apex.position.clone();
+        return { position: target.clone().add(new THREE.Vector3(-8, 14, 34).multiplyScalar(reach)), target };
+      }
+      const target = route.getPointAt(galaxyCenterU(index));
+      return { position: target.clone().add(new THREE.Vector3(0, 30, 62).multiplyScalar(reach)), target };
     }
     let flight = null; // transição de câmera em andamento
     function flyTo(view, instant = false) {
@@ -576,16 +592,21 @@ export default function StarRace({ racers = [] }) {
     observer?.observe(mount);
 
     flyTo(shipView(), true);
-    apiRef.current = { showShip: () => flyTo(shipView()), showAll: () => flyTo(overviewView()) };
+    apiRef.current = {
+      showShip: () => flyTo(shipView()),
+      showAll: () => flyTo(overviewView()),
+      showSector: (index) => flyTo(sectorView(index)),
+    };
     controls.addEventListener('start', () => { flight = null; });
 
     const projected = new THREE.Vector3();
     function placeLabels() {
-      for (const { el, anchor, lift } of labels) {
+      for (const { el, anchor, lift, near } of labels) {
         projected.copy(anchor);
         projected.y += lift;
+        const inRange = !near || camera.position.distanceTo(projected) < LABEL_RANGE;
         projected.project(camera);
-        const visible = projected.z < 1 && Math.abs(projected.x) < 1.05 && Math.abs(projected.y) < 1.05;
+        const visible = inRange && projected.z < 1 && Math.abs(projected.x) < 1.05 && Math.abs(projected.y) < 1.05;
         el.style.display = visible ? 'block' : 'none';
         if (!visible) continue;
         const x = (projected.x * 0.5 + 0.5) * size.x;
@@ -660,6 +681,12 @@ export default function StarRace({ racers = [] }) {
     border: '1px solid rgba(255,255,255,.35)',
   };
 
+  // Quantas naves há em cada setor (três galáxias + certificação).
+  const sectors = [...GALAXIES.map((galaxy) => galaxy.name.replace('Galáxia ', '')), 'Certificação'].map((name, index) => ({
+    name,
+    count: racers.filter((racer) => (racer.position.certified ? GALAXIES.length : racer.position.galaxyIndex) === index).length,
+  }));
+
   return (
     <div style={{
       position: 'relative', height: 'min(66vh, 580px)', minHeight: '340px',
@@ -669,12 +696,23 @@ export default function StarRace({ racers = [] }) {
       {/* Escurece as bordas para dar profundidade */}
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%)' }} />
       <div ref={overlayRef} aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }} />
+      <div role="group" aria-label="Navegar pelos setores" style={{ position: 'absolute', left: '16px', top: '16px', right: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        {sectors.map((sector, index) => (
+          <button
+            key={sector.name} type="button" style={hudButton}
+            aria-label={`Ir para ${sector.name}: ${sector.count} nave${sector.count === 1 ? '' : 's'}`}
+            onClick={() => apiRef.current?.showSector(index)}
+          >
+            {sector.name} <span style={{ color: '#ffb347' }}>{String(sector.count).padStart(2, '0')}</span>
+          </button>
+        ))}
+      </div>
       <div style={{ position: 'absolute', left: '16px', bottom: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
         <button type="button" style={hudButton} onClick={() => apiRef.current?.showShip()}>Minha nave</button>
         <button type="button" style={hudButton} onClick={() => apiRef.current?.showAll()}>Ver a rota inteira</button>
       </div>
       <div aria-hidden="true" style={{ position: 'absolute', right: '16px', bottom: '20px', fontFamily: 'Space Mono, monospace', fontSize: '10px', letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(220,228,245,.5)' }}>
-        Arraste para girar · role para aproximar
+        Arraste · role · clique numa nave
       </div>
     </div>
   );

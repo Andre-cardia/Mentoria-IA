@@ -361,7 +361,7 @@ export default function AdminAlunosPage() {
 
   return (
     <AdminLayout>
-      <div style={{ maxWidth: '960px' }}>
+      <div style={{ maxWidth: '100%' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '32px', gap: '16px', flexWrap: 'wrap' }}>
           <div>

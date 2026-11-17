@@ -379,7 +379,7 @@ export default function AdminBlogEditorPage() {
         />
       )}
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: '100%', margin: '0 auto', padding: '32px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <h1 style={{ margin: 0, fontFamily: 'Space Grotesk, sans-serif', fontSize: '1.5rem', color: 'var(--text)' }}>
             {isEdit ? 'Editar post' : 'Novo post'}

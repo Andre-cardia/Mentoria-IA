@@ -100,7 +100,7 @@ export default function AdminBlogPage() {
 
   return (
     <AdminLayout>
-      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: '100%', margin: '0 auto', padding: '32px 24px' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <h1 style={{ margin: 0, fontFamily: 'Space Grotesk, sans-serif', fontSize: '1.5rem', color: 'var(--text)' }}>

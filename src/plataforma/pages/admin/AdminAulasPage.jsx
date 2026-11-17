@@ -75,7 +75,7 @@ export default function AdminAulasPage() {
 
   return (
     <AdminLayout>
-      <div style={{ maxWidth: '820px' }}>
+      <div style={{ maxWidth: '100%' }}>
         <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>Admin</div>
         <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '28px' }}>Aulas</h1>
 

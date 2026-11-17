@@ -69,7 +69,7 @@ export default function MateriaisPage() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: '780px' }}>
+      <div style={{ maxWidth: '100%' }}>
         <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '8px' }}>
           Recursos
         </div>
