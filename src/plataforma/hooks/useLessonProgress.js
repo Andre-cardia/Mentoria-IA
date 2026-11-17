@@ -12,6 +12,9 @@ function announce(lessonId, completed) {
 
 export function useLessonProgress() {
   const { user } = useAuth();
+  // A sessão renovada troca o objeto `user` sem trocar de pessoa: recarregar
+  // só quando o id muda evita o contador piscar para zero.
+  const userId = user?.id ?? null;
   const [completedIds, setCompletedIds] = useState(new Set());
   const [marking, setMarking] = useState(false);
 
@@ -20,11 +23,11 @@ export function useLessonProgress() {
     async function load() {
       // Reseta ao trocar de usuário — evita exibir dados do usuário anterior.
       setCompletedIds(new Set());
-      if (!user) return;
+      if (!userId) return;
       const { data } = await supabase
         .from('lesson_progress')
         .select('lesson_id')
-        .eq('user_id', user.id);
+        .eq('user_id', userId);
 
       if (data) {
         setCompletedIds(new Set(data.map((r) => r.lesson_id)));
@@ -32,7 +35,7 @@ export function useLessonProgress() {
     }
 
     load();
-  }, [user]);
+  }, [userId]);
 
   useEffect(() => {
     function onChange(event) {

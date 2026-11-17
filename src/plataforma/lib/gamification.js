@@ -23,7 +23,7 @@ export const BADGES = [
   { id: 'aula-10',     glyph: 'trajectory', tier: 'II',  title: 'Em órbita',         metric: 'lessons',     target: 10,  description: 'Conclua 10 aulas' },
   { id: 'aula-25',     glyph: 'trajectory', tier: 'III', title: 'Velocidade de cruzeiro', metric: 'lessons', target: 25, description: 'Conclua 25 aulas' },
   { id: 'aula-50',     glyph: 'trajectory', tier: 'IV',  title: 'Espaço profundo',   metric: 'lessons',     target: 50,  description: 'Conclua 50 aulas' },
-  { id: 'aula-100',    glyph: 'trajectory', tier: 'V',   title: 'Comandante',        metric: 'lessons',     target: 100, description: 'Conclua 100 aulas' },
+  { id: 'aula-100',    glyph: 'trajectory', tier: 'V',   title: 'Veterano',          metric: 'lessons',     target: 100, description: 'Conclua 100 aulas' },
   { id: 'acesso-7',    glyph: 'orbit',      tier: 'I',   title: 'Presença',          metric: 'access_days', target: 7,   description: 'Acesse a plataforma em 7 dias' },
   { id: 'acesso-30',   glyph: 'orbit',      tier: 'II',  title: 'Órbita estável',    metric: 'access_days', target: 30,  description: 'Acesse a plataforma em 30 dias' },
   { id: 'acesso-100',  glyph: 'orbit',      tier: 'III', title: 'Residente',         metric: 'access_days', target: 100, description: 'Acesse a plataforma em 100 dias' },

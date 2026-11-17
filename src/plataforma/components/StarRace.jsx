@@ -552,9 +552,13 @@ export default function StarRace({ racers = [] }) {
     function shipView(ship = myShip) {
       if (!ship) return overviewView();
       const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(ship.quaternion);
+      // Em tela em pé (celular) a câmera recua e mira a própria nave, para ela caber no quadro.
+      const portrait = camera.aspect < 1;
+      const reach = portrait ? Math.min(1.9, 1.1 / camera.aspect) : 1;
+      const offset = forward.clone().multiplyScalar(-19).add(new THREE.Vector3(7, 8, 5)).multiplyScalar(reach);
       return {
-        position: ship.userData.base.clone().addScaledVector(forward, -19).add(new THREE.Vector3(7, 8, 5)),
-        target: ship.userData.base.clone().addScaledVector(forward, 10),
+        position: ship.userData.base.clone().add(offset),
+        target: ship.userData.base.clone().addScaledVector(forward, portrait ? 2 : 10),
       };
     }
     // Vista de um setor: cada galáxia (0 a 2) ou a Estrela da Certificação (3).
@@ -696,7 +700,14 @@ export default function StarRace({ racers = [] }) {
       {/* Escurece as bordas para dar profundidade */}
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%)' }} />
       <div ref={overlayRef} aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }} />
-      <div role="group" aria-label="Navegar pelos setores" style={{ position: 'absolute', left: '16px', top: '16px', right: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+      <style>{`
+        @media (max-width: 640px) {
+          .star-race-hud { gap: 6px !important; left: 10px !important; right: 10px !important; }
+          .star-race-hud button { padding: 6px 8px !important; font-size: 9px !important; letter-spacing: .08em !important; }
+          .star-race-hint { display: none; }
+        }
+      `}</style>
+      <div className="star-race-hud" role="group" aria-label="Navegar pelos setores" style={{ position: 'absolute', left: '16px', top: '16px', right: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
         {sectors.map((sector, index) => (
           <button
             key={sector.name} type="button" style={hudButton}
@@ -707,11 +718,11 @@ export default function StarRace({ racers = [] }) {
           </button>
         ))}
       </div>
-      <div style={{ position: 'absolute', left: '16px', bottom: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+      <div className="star-race-hud" style={{ position: 'absolute', left: '16px', bottom: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
         <button type="button" style={hudButton} onClick={() => apiRef.current?.showShip()}>Minha nave</button>
         <button type="button" style={hudButton} onClick={() => apiRef.current?.showAll()}>Ver a rota inteira</button>
       </div>
-      <div aria-hidden="true" style={{ position: 'absolute', right: '16px', bottom: '20px', fontFamily: 'Space Mono, monospace', fontSize: '10px', letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(220,228,245,.5)' }}>
+      <div className="star-race-hint" aria-hidden="true" style={{ position: 'absolute', right: '16px', bottom: '20px', fontFamily: 'Space Mono, monospace', fontSize: '10px', letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(220,228,245,.5)' }}>
         Arraste · role · clique numa nave
       </div>
     </div>
