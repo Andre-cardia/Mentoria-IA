@@ -51,6 +51,10 @@ export default function RegisterPage() {
       }
 
       setDone(true);
+      const oaiq = /** @type {(Window & { oaiq?: (...args: unknown[]) => void })} */ (window).oaiq;
+      if (oaiq) {
+        oaiq('measure', 'registration_completed', { type: 'customer_action', amount: 0, currency: 'BRL' });
+      }
       setTimeout(() => navigate('/login', { replace: true }), 3000);
     } catch {
       setError('Erro de conexão. Tente novamente.');

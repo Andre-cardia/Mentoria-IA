@@ -44,6 +44,10 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   {
+    files: ['public/identidade-neuralhub/*.js'],
+    languageOptions: { globals: globals.browser },
+  },
+  {
     files: ['server/**/*.js', 'api/**/*.js', 'scripts/**/*.js', 'eslint.config.js'],
     languageOptions: { globals: globals.nodeBuiltin },
   },

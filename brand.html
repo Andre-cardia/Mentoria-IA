@@ -3,10 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brand & Design System — Mentoria IA</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Identidade visual da Neural Hub | Guia da Mentoria</title>
+  <meta name="description" content="Guia de uso da marca original da Neural Hub, com assinaturas para fundos claros e escuros, paleta, tipografia e componentes da Mentoria." />
   <style>
+    @font-face { font-family: 'Space Grotesk'; src: url('/identidade-neuralhub/fontes/space-grotesk-400.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+    @font-face { font-family: 'Space Grotesk'; src: url('/identidade-neuralhub/fontes/space-grotesk-500.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+    @font-face { font-family: 'Space Grotesk'; src: url('/identidade-neuralhub/fontes/space-grotesk-600.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+    @font-face { font-family: 'Space Grotesk'; src: url('/identidade-neuralhub/fontes/space-grotesk-700.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'Space Mono'; src: url('/identidade-neuralhub/fontes/space-mono-400.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+
     :root {
       --bg:           #060606;
       --bg-2:         #0b0b0b;
@@ -316,36 +321,44 @@
       animation: progressFill 1.8s ease forwards;
     }
 
-    /* ─── Logo ─── */
-    .logo-mark {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
+    .guide-bar { max-width: 1600px; margin: auto; padding: 12px clamp(16px,4vw,56px); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .guide-signature { display: block; width: clamp(134px,17vw,178px); height: auto; }
+    .guide-back { font-size: .875rem; font-weight: 600; color: var(--text); }
+    .guide-intro { padding-block: 12px 20px; }
+    .guide-intro h1 { font-size: clamp(2.75rem,6.5vw,5.75rem); line-height: 1.02; letter-spacing: -.055em; margin: 14px 0 20px; }
+    .guide-intro h1 span { display: block; color: var(--accent); }
+    .guide-intro p, .guide-copy { max-width: 64ch; color: #c9c5bc; }
+    .guide-intro p { font-size: clamp(1rem,2vw,1.2rem); }
+    .guide-links { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 28px; margin-top: 24px; }
+    .guide-links a, .guide-files a { color: var(--text); text-decoration: underline; text-underline-offset: 4px; }
+    .guide-marks { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0 18px; }
+    .guide-mark { padding: clamp(18px,3vw,32px); background: #101010; border: 1px solid #393732; color: #f5f2ea; }
+    .guide-mark.light { background: #f5f2ea; color: #101010; border-color: #ccc8be; }
+    .guide-mark img { display: block; width: 94%; max-width: 320px; height: auto; margin: clamp(16px,3vw,40px) auto; }
+    .guide-mark figcaption { font-family: 'Space Mono',monospace; font-size: .78rem; }
+    .guide-files { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 12px 0; }
+    .guide-skip { position:absolute; top:-100px; left:12px; z-index:60; padding:8px 14px; background:var(--text); color:#060606; }
+    .guide-skip:focus { top:8px; }
+    section[id] { scroll-margin-top: 90px; }
+    a:focus-visible, summary:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+    @media (max-width:1023px) {
+      .brand-sidebar { padding: 10px 16px; border-bottom: 1px solid var(--line); }
+      .brand-sidebar > p, .brand-sidebar nav > div { display: none; }
+      .brand-sidebar nav { flex-direction: row !important; overflow-x:auto; }
+      .brand-sidebar .nav-link { flex:none; }
+      .brand-layout main { padding: 32px clamp(16px,4vw,40px) 56px !important; }
     }
-    .logo-icon {
-      width: 36px;
-      height: 36px;
-      background: var(--accent);
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Space Mono', monospace;
-      font-weight: 700;
-      font-size: 1rem;
-      color: #000;
+    @media (max-width:700px) {
+      .guide-marks { grid-template-columns: 1fr; }
+      main section div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+      main #colors div[style*="grid-template-columns"] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+      .token-table { display: block; max-width: 100%; overflow-x: auto !important; }
+      .component-frame { padding: 16px; }
+      main section { overflow-wrap: anywhere; }
+      footer { flex-wrap: wrap; gap: 20px; }
     }
-    .logo-text-primary {
-      font-weight: 700;
-      font-size: 1.1rem;
-      line-height: 1.1;
-    }
-    .logo-text-sub {
-      font-family: 'Space Mono', monospace;
-      font-size: .65rem;
-      color: var(--muted);
-      letter-spacing: .1em;
-      text-transform: uppercase;
+    @media (prefers-reduced-motion:reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
     }
 
     /* ─── Section header ─── */
@@ -512,24 +525,16 @@
     .wcag-fail { color: var(--error); font-family: 'Space Mono', monospace; font-size: .7rem; }
     .wcag-warn { color: var(--warning); font-family: 'Space Mono', monospace; font-size: .7rem; }
   </style>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" href="/identidade-neuralhub/favicon.png" />
 </head>
 <body>
 
 <!-- ══════════════════════ TOP NAV ══════════════════════ -->
+<a class="guide-skip" href="#overview">Pular para o guia</a>
 <header class="brand-nav">
-  <div style="max-width:1600px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;">
-    <div class="logo-mark">
-      <div class="logo-icon">M</div>
-      <div>
-        <div class="logo-text-primary">Mentoria IA</div>
-        <div class="logo-text-sub">Brand & Design System</div>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:24px;">
-      <span class="badge badge-accent">v1.1</span>
-      <a href="/" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:.7rem;text-decoration:none;letter-spacing:.06em;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">← SITE PRINCIPAL</a>
-    </div>
+  <div class="guide-bar">
+    <a href="https://neuralhub.ia.br/" aria-label="Neural Hub, site institucional"><img class="guide-signature" src="/identidade-neuralhub/assinatura.webp" width="720" height="203" alt="Neural Hub" /></a>
+    <a class="guide-back" href="https://mentoria.neuralhub.ia.br/">Ir para a Mentoria ↗</a>
   </div>
 </header>
 
@@ -572,81 +577,29 @@
     <div style="max-width:900px;">
 
       <!-- ════════ OVERVIEW ════════ -->
-      <section id="overview" style="margin-bottom:80px;">
-        <div class="section-eyebrow" style="margin-bottom:12px;">BRAND SYSTEM</div>
-        <h1 style="font-size:clamp(2rem,4vw,3.2rem);font-weight:700;line-height:1.1;margin-bottom:20px;">
-          Design System<br><span style="color:var(--accent);">Mentoria IA</span>
-        </h1>
-        <p style="color:var(--muted);font-size:1.1rem;line-height:1.7;max-width:600px;margin-bottom:40px;">
-          Documentação completa das decisões visuais, tokens de design, componentes e princípios que formam a identidade da Mentoria IA.
-        </p>
-
-        <!-- Quick overview cards -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
-          <div class="stat-card">
-            <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:4px;">8</div>
-            <div style="font-size:.875rem;color:var(--muted);">Tokens de Cor</div>
-          </div>
-          <div class="stat-card">
-            <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:4px;">2</div>
-            <div style="font-size:.875rem;color:var(--muted);">Famílias Tipográficas</div>
-          </div>
-          <div class="stat-card">
-            <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:4px;">9</div>
-            <div style="font-size:.875rem;color:var(--muted);">Animações</div>
-          </div>
-          <div class="stat-card">
-            <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:4px;">10</div>
-            <div style="font-size:.875rem;color:var(--muted);">Componentes</div>
-          </div>
-        </div>
+      <section id="overview" class="guide-intro" style="margin-bottom:48px;">
+        <div class="section-eyebrow">Guia de marca</div>
+        <h1>Identidade visual da <span>Neural Hub</span></h1>
+        <p>Inteligência Artificial aplicada aos negócios. A abordagem AI-First orienta nosso trabalho em consultoria, formação e desenvolvimento de agentes. Na Mentoria, a mesma marca identifica a formação em Engenharia de IA.</p>
+        <div class="guide-links"><a href="#logo">Ver a logo original ↓</a><a href="#colors">Consultar a paleta ↓</a></div>
       </section>
 
       <hr class="section-rule" style="margin-bottom:80px;">
 
       <!-- ════════ LOGO ════════ -->
-      <section id="logo" style="margin-bottom:80px;">
-        <div class="section-eyebrow" style="margin-bottom:8px;">01 — LOGO & MARCA</div>
-        <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Identidade Visual</h2>
-        <p style="color:var(--muted);margin-bottom:40px;">A marca é construída sobre dois elementos: o ícone e a tipografia. Sempre use em fundo escuro.</p>
-
-        <!-- Logo on dark -->
-        <div style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:48px;display:flex;flex-wrap:wrap;gap:48px;align-items:center;justify-content:center;margin-bottom:24px;">
-          <!-- Full lockup -->
-          <div style="text-align:center;">
-            <div class="logo-mark" style="justify-content:center;margin-bottom:12px;">
-              <div class="logo-icon animate-glow">M</div>
-              <div>
-                <div class="logo-text-primary">Mentoria IA</div>
-                <div class="logo-text-sub">Zero-to-Hero</div>
-              </div>
-            </div>
-            <p class="component-label">LOCKUP COMPLETO</p>
-          </div>
-          <!-- Icon only -->
-          <div style="text-align:center;">
-            <div class="logo-icon animate-glow" style="width:48px;height:48px;font-size:1.25rem;margin:0 auto 12px;">M</div>
-            <p class="component-label">ÍCONE ISOLADO</p>
-          </div>
-          <!-- Text only -->
-          <div style="text-align:center;">
-            <div style="font-weight:700;font-size:1.5rem;margin-bottom:4px;">Mentoria <span style="color:var(--accent);">IA</span></div>
-            <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;">Zero-to-Hero</div>
-            <p class="component-label" style="margin-top:12px;">WORDMARK</p>
-          </div>
+      <section id="logo" style="margin-bottom:64px;">
+        <div class="section-eyebrow">01 — Logo e marca</div>
+        <h2 style="font-size:1.75rem;margin:8px 0;">A assinatura original</h2>
+        <p class="guide-copy">O símbolo em prata e laranja acompanha o nome NEURAL HUB. Escolha a assinatura pelo fundo da peça e mantenha as proporções do arquivo original.</p>
+        <div class="guide-marks">
+          <figure class="guide-mark"><img src="/identidade-neuralhub/assinatura.webp" width="720" height="203" alt="Logo original Neural Hub para fundo escuro" /><figcaption>Assinatura sobre grafite</figcaption></figure>
+          <figure class="guide-mark light"><img src="/identidade-neuralhub/assinatura-clara.webp" width="720" height="203" alt="Logo original Neural Hub para fundo claro" /><figcaption>Assinatura sobre marfim</figcaption></figure>
         </div>
-
-        <!-- Don'ts -->
-        <div style="background:rgba(255,50,50,.04);border:1px solid rgba(255,50,50,.15);border-radius:8px;padding:24px;">
-          <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:rgba(255,80,80,.8);letter-spacing:.08em;margin-bottom:12px;">⚠ NÃO FAZER</p>
-          <ul style="color:var(--muted);font-size:.9rem;display:flex;flex-direction:column;gap:8px;list-style:none;padding-left:0;">
-            <li style="display:flex;gap:10px;"><span style="color:rgba(255,80,80,.7);">✕</span> Usar a logo em fundos claros ou coloridos</li>
-            <li style="display:flex;gap:10px;"><span style="color:rgba(255,80,80,.7);">✕</span> Alterar a cor do ícone (sempre laranja #ff6a00)</li>
-            <li style="display:flex;gap:10px;"><span style="color:rgba(255,80,80,.7);">✕</span> Distorcer proporções ou rotacionar o ícone</li>
-            <li style="display:flex;gap:10px;"><span style="color:rgba(255,80,80,.7);">✕</span> Usar fontes diferentes das especificadas</li>
-            <li style="display:flex;gap:10px;"><span style="color:rgba(255,80,80,.7);">✕</span> Adicionar efeitos extras como gradiente ou sombra colorida</li>
-          </ul>
-        </div>
+        <nav class="guide-files" aria-label="Baixar arquivos originais da marca">
+          <a download href="/identidade-neuralhub/assinatura.webp">Baixar logo para fundo escuro</a>
+          <a download href="/identidade-neuralhub/assinatura-clara.webp">Baixar logo para fundo claro</a>
+          <a download href="/identidade-neuralhub/simbolo.webp">Baixar símbolo original</a>
+        </nav>
       </section>
 
       <hr class="section-rule" style="margin-bottom:80px;">
@@ -655,7 +608,7 @@
       <section id="colors" style="margin-bottom:80px;">
         <div class="section-eyebrow" style="margin-bottom:8px;">02 — CORES</div>
         <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Paleta de Cores</h2>
-        <p style="color:var(--muted);margin-bottom:40px;">Tema escuro técnico. O laranja é o único acento — use com intenção.</p>
+        <p style="color:var(--muted);margin-bottom:40px;">O preto (#060606) e o grafite (#101010) formam os fundos escuros. O marfim (#F5F2EA) serve como fundo claro ou texto sobre grafite. Use o laranja (#FF6A00) nas chamadas para ação. Nos componentes da Mentoria, as cores de estado indicam sucesso, atenção e erro.</p>
 
         <!-- Swatches row - Primary -->
         <p style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;">Cores de Fundo</p>
@@ -1461,7 +1414,7 @@
       <section id="voice" style="margin-bottom:80px;">
         <div class="section-eyebrow" style="margin-bottom:8px;">14 — VOZ & TOM</div>
         <h2 style="font-size:1.75rem;font-weight:700;margin-bottom:8px;">Voz e Tom da Marca</h2>
-        <p style="color:var(--muted);margin-bottom:40px;">Como a Mentoria IA fala com o mundo.</p>
+        <p style="color:var(--muted);margin-bottom:40px;">Na Mentoria Zero-to-Hero de Inteligência Artificial, explicamos o que a pessoa vai construir, como vai testar e quem decide se o resultado pode ser usado.</p>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px;">
           <div class="card-accent">
@@ -1807,11 +1760,10 @@
 <!-- Footer -->
 <footer style="border-top:1px solid var(--line);background:var(--bg-2);padding:24px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
   <div class="logo-mark">
-    <div class="logo-icon" style="width:28px;height:28px;font-size:.8rem;">M</div>
-    <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);">Brand & Design System</span>
+    <img src="/identidade-neuralhub/simbolo.webp" alt="Símbolo original da Neural Hub" width="40" height="40" />
+    <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);">Guia de marca · Neural Hub</span>
   </div>
   <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center;">
-    <span class="badge badge-neutral">v1.1 · 2025</span>
     <a href="/privacidade.html" style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-decoration:none;letter-spacing:.06em;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">POLÍTICA DE PRIVACIDADE</a>
     <a href="/termos.html" style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-decoration:none;letter-spacing:.06em;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">TERMOS DE USO</a>
     <a href="/" style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-decoration:none;letter-spacing:.06em;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">← VOLTAR AO SITE</a>

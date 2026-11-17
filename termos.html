@@ -7,7 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  </head>
+  <script>
+    if (['neuralhub.ia.br', 'neuralhub.localhost'].includes(location.hostname)) {
+      import('/identidade-neuralhub/paginas.js').then(({ aplicarIdentidade }) => aplicarIdentidade('juridico'))
+    }
+  </script>
+</head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/termos.jsx"></script>

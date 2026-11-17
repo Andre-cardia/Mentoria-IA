@@ -1,4 +1,5 @@
 import { SupabaseAdapter } from "../adapters/supabase-adapter.js";
+import { sendConversionEvent } from "../adapters/openai-conversions-adapter.js";
 
 const supabaseAdapter = new SupabaseAdapter();
 
@@ -35,5 +36,12 @@ export async function handleWebhook(body) {
       email,
       rawEvent: body,
     });
+
+    if (status === "PAID") {
+      await sendConversionEvent({
+        eventId: referenceId,
+        sourceUrl: "https://mentoria.neuralhub.com.br/obrigado",
+      });
+    }
   }
 }
