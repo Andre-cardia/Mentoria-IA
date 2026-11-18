@@ -6,7 +6,7 @@
 # Migrado do frontmatter AIOX em 2026-09-01. Atualize com bmad-sprint-planning.
 
 generated: 09-01-2026 10:00
-last_updated: 09-04-2026 00:00
+last_updated: 11-18-2026 01:03
 project: Mentoria IA
 project_key: NOKEY
 tracking_system: file-system
@@ -104,3 +104,86 @@ development_status:
   13-4-garantir-descoberta-e-ambiente-corretos-dos-testes: review
   13-3-bloquear-deploy-quando-os-gates-falharem: backlog
   epic-13-retrospective: optional
+
+  epic-14: in-progress
+  14-1-trilhas-de-aprendizagem-basico-intermediario-avancado: review
+  14-2-separar-ensino-de-gestao-papeis-em-app-metadata: review
+  14-3-novo-design-tema-claro-e-tema-escuro: review
+  14-4-gamificacao-pontos-medalhas-e-ranking: review
+  14-5-corrida-estelar-em-3d-com-tres-galaxias: review
+  14-6-quiz-de-fim-de-modulo-valendo-pontos: review
+  14-7-patentes-naves-por-nivel-e-acessorios: review
+  14-8-aval-do-administrador-para-comandante-e-master: review
+  14-9-gestao-de-alunos-ordenacao-avisos-e-exportacao: review
+  epic-14-retrospective: done
+action_items:
+  - id: "epic-14-retro-item-1-publicar-só-pelo-merge-no-master-não-rod"
+    epic: 14
+    action: "Publicar só pelo merge no master; não rodar vercel --prod a partir do
+      checkout principal desatualizado"
+    owner: "Andre / @devops"
+    status: open
+    ref: "docs/stories/epic-14-retro-2026-11-17.md"
+  - id: "epic-14-retro-item-2-decidir-o-destino-do-trabalho-fora-do-gi"
+    epic: 14
+    action: "Decidir o destino do trabalho fora do Git (checkout principal e neuralhub-redesign-branding)"
+    owner: "Andre"
+    status: open
+    ref: "docs/stories/epic-14-retro-2026-11-17.md"
+  - id: "epic-14-retro-item-3-registrar-o-épico-14-no-sprint-status-e"
+    epic: 14
+    action: "Registrar o épico 14 no sprint status e criar o arquivo do épico"
+    owner: "@sm / @po"
+    status: done
+    ref: "docs/stories/epic-14-retro-2026-11-17.md"
+  - id: "epic-14-retro-item-4-atualizar-pendências-das-stories-14-1-a"
+    epic: 14
+    action: "Atualizar pendências das stories 14.1 a 14.9 e passar cada uma pelo QA
+      gate"
+    owner: "@qa / @dev"
+    status: in-progress
+    ref: "docs/stories/epic-14-retro-2026-11-17.md"
+  - id: "epic-14-retro-item-5-corrigir-o-sourceurl-do-webhook-de-conve"
+    epic: 14
+    action: "Corrigir o sourceUrl do webhook de conversão (.com.br para .ia.br)"
+    owner: "@dev"
+    status: done
+    ref: "docs/stories/epic-14-retro-2026-11-17.md"
+  - id: "epic-14-retro-item-6-ter-revisão-de-código-independente-antes"
+    epic: 14
+    action: "Ter revisão de código independente antes de mesclar"
+    owner: "Andre"
+    status: open
+    ref: "docs/stories/epic-14-retro-2026-11-17.md"
+  - id: "epic-14-retro-item-7-esconder-quiz_options-is_correct-de-não"
+    epic: 14
+    action: "Esconder quiz_options.is_correct de não admins antes de criar qualquer
+      quiz"
+    owner: "@dev"
+    status: open
+    ref: "docs/stories/epic-14-retro-2026-11-17.md"
+  - id: "epic-14-retro-item-8-criar-migração-de-base-com-o-que-existe"
+    epic: 14
+    action: "Criar migração de base com o que existe em produção e não está no histórico
+      (payments)"
+    owner: "@data-engineer"
+    status: open
+    ref: "docs/stories/epic-14-retro-2026-11-17.md"
+  - id: "epic-14-retro-item-9-reconferir-em-uma-semana-o-registro-de-a"
+    epic: 14
+    action: "Reconferir em uma semana o registro de acessos e os alertas de inatividade"
+    owner: "@dev"
+    status: open
+    ref: "docs/stories/epic-14-retro-2026-11-17.md"
+  - id: "epic-14-retro-item-10-fazer-inscrição-de-teste-no-aulão-antes"
+    epic: 14
+    action: "Fazer inscrição de teste no aulão antes de 19/11 e conferir a planilha"
+    owner: "Andre"
+    status: open
+    ref: "docs/stories/epic-14-retro-2026-11-17.md"
+  - id: "epic-14-retro-item-11-conferir-logado-em-produção-a-gestão-de"
+    epic: 14
+    action: "Conferir logado em produção a gestão de alunos e a Corrida Estelar"
+    owner: "Andre"
+    status: open
+    ref: "docs/stories/epic-14-retro-2026-11-17.md"

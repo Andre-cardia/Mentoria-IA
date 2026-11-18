@@ -40,7 +40,7 @@ export async function handleWebhook(body) {
     if (status === "PAID") {
       await sendConversionEvent({
         eventId: referenceId,
-        sourceUrl: "https://mentoria.neuralhub.com.br/obrigado",
+        sourceUrl: "https://mentoria.neuralhub.ia.br/obrigado",
       });
     }
   }
