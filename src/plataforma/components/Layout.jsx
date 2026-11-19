@@ -3,6 +3,8 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../context/useAuth';
 import { useLessonProgress } from '../hooks/useLessonProgress';
+import { useMyRank } from '../hooks/useMyRank';
+import RankInsignia from './RankInsignia';
 import NavIcon from './NavIcon';
 import ThemeToggle from './ThemeToggle';
 
@@ -67,6 +69,7 @@ export default function Layout({ children }) {
   const { user, isAdmin, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const { getTotalProgress } = useLessonProgress();
+  const myRank = useMyRank();
   const [modules, setModules] = useState([]);
   const [collapsed, setCollapsed] = useState(isMobileViewport);
 
@@ -249,8 +252,16 @@ export default function Layout({ children }) {
               </div>
             )}
             {!collapsed && (
-              <div style={{ fontSize: '.8rem', color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
-                {user?.email}
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                  <span style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                    {profile?.full_name || user?.email?.split('@')[0]}
+                  </span>
+                  <RankInsignia rank={myRank} size={24} />
+                </div>
+                <div style={{ fontSize: '.75rem', color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                  {user?.email}
+                </div>
               </div>
             )}
           </div>
