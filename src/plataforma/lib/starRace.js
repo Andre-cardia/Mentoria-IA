@@ -180,3 +180,31 @@ export function rankForRankingRow(row, totals) {
   const racer = { points: row.total_points, certified: row.certified, granted_rank: row.granted_rank ?? null };
   return rankFor(racePosition(racer, totals), racer.granted_rank);
 }
+
+// Versão em alta (1024 px, fundo transparente) de um badge, para download.
+function fullBadge(path) {
+  return path.replace('/mini/', '/').replace(/\.webp$/, '.png');
+}
+
+function slugOf(path) {
+  return path.split('/').pop().replace(/\.webp$/, '');
+}
+
+/**
+ * Badges de patente e nave para baixar: todos os da carreira, na ordem,
+ * com `earned` indicando os que o aluno já conquistou (até a patente atual).
+ */
+export function badgeDownloads(rank) {
+  const reached = rank ? RANKS.findIndex((item) => item.id === rank.id) : -1;
+  return RANKS.flatMap((item, index) => {
+    const earned = index <= reached;
+    return [
+      { key: item.id, kind: 'Patente', name: item.name, preview: item.badge, earned },
+      { key: `${item.id}-nave`, kind: 'Nave', name: item.ship.name, preview: item.ship.badge, earned },
+    ].map((entry) => ({
+      ...entry,
+      href: fullBadge(entry.preview),
+      filename: `zero-to-hero-${slugOf(entry.preview)}.png`,
+    }));
+  });
+}

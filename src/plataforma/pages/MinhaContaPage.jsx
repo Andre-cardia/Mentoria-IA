@@ -3,6 +3,8 @@ import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../context/useAuth';
 import Layout from '../components/Layout';
+import RankInsignia from '../components/RankInsignia';
+import { useMyRank } from '../hooks/useMyRank';
 
 /** @type {import('react').CSSProperties} */
 const inputStyle = {
@@ -28,6 +30,7 @@ function getInitials(name) {
 
 export default function MinhaContaPage() {
   const { user, profile: ctxProfile, refreshProfile } = useAuth();
+  const myRank = useMyRank();
 
   // ── Dados pessoais
   const [localProfile, setLocalProfile] = useState(null);
@@ -286,7 +289,13 @@ export default function MinhaContaPage() {
             />
 
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 600, fontSize: '.95rem', marginBottom: '4px' }}>{fullName || '—'}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                <span style={{ fontWeight: 600, fontSize: '.95rem' }}>{fullName || '—'}</span>
+                <RankInsignia rank={myRank} size={32} />
+                {myRank && (
+                  <span style={{ ...labelStyle, fontSize: '.62rem' }}>{myRank.name} · {myRank.ship.name}</span>
+                )}
+              </div>
               {pendingFile ? (
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <button

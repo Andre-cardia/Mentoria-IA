@@ -2,7 +2,7 @@ import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 import StellarGlyph from '../components/StellarGlyph';
-import { APEX_NAME, GALAXIES, RANKS, buildRacers, levelTotals, positionLabel, rankForRankingRow } from '../lib/starRace';
+import { APEX_NAME, GALAXIES, RANKS, badgeDownloads, buildRacers, levelTotals, positionLabel, rankForRankingRow } from '../lib/starRace';
 import RankInsignia from '../components/RankInsignia';
 import { nextUpgrade, upgradeStatus } from '../lib/shipUpgrades';
 import {
@@ -238,6 +238,55 @@ function MissionPanel({ me, racers }) {
   );
 }
 
+// Badges da carreira em alta resolução, para o aluno usar onde quiser.
+function BadgeDownloads({ rank }) {
+  const items = badgeDownloads(rank);
+  const earnedCount = items.filter((item) => item.earned).length;
+  return (
+    <section aria-labelledby="seus-badges" style={{ marginBottom: '40px' }}>
+      <SectionTitle
+        id="seus-badges"
+        aside={<span style={{ ...mono, fontSize: '.75rem', color: 'var(--muted)' }}>{pad(earnedCount)} / {pad(items.length)}</span>}
+      >
+        Seus badges
+      </SectionTitle>
+      <p style={{ margin: '0 0 16px 0', fontSize: '.9rem', color: 'var(--muted)', maxWidth: '70ch' }}>
+        Baixe os badges que você conquistou em PNG com fundo transparente (1024 px) e use onde quiser:
+        LinkedIn, GitHub, apresentações ou assinatura de e-mail. Cada patente traz a nave que você recebeu na jornada.
+      </p>
+      <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '12px' }}>
+        {items.map((item) => (
+          <li
+            key={item.key}
+            aria-label={`${item.kind} ${item.name}: ${item.earned ? 'conquistado' : 'bloqueado'}`}
+            style={{ ...card, padding: '16px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', textAlign: 'center', borderColor: item.earned ? 'var(--line-strong)' : 'var(--line)' }}
+          >
+            <img
+              src={item.preview} alt="" width={96} height={96} loading="lazy"
+              style={{ width: '96px', height: '96px', filter: item.earned ? 'none' : 'grayscale(1)', opacity: item.earned ? 1 : 0.35 }}
+            />
+            <div>
+              <div style={{ ...eyebrow, color: 'var(--muted)', fontSize: '.62rem' }}>{item.kind}</div>
+              <div style={{ fontWeight: 600, fontSize: '.9rem' }}>{item.name}</div>
+            </div>
+            {item.earned ? (
+              <a
+                href={item.href} download={item.filename}
+                aria-label={`Baixar ${item.kind.toLowerCase()} ${item.name} em PNG`}
+                style={{ ...eyebrow, fontWeight: 700, fontSize: '.66rem', textDecoration: 'none', color: '#261000', background: 'var(--accent)', padding: '7px 12px', borderRadius: '4px' }}
+              >
+                Baixar PNG
+              </a>
+            ) : (
+              <span style={{ ...eyebrow, fontSize: '.62rem', color: 'var(--muted)', padding: '7px 0' }}>Bloqueado</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function BadgeGrid({ badges, upcoming }) {
   const earnedCount = badges.filter((badge) => badge.earned).length;
   return (
@@ -407,6 +456,7 @@ export default function RankingPage() {
 
   const totals = useMemo(() => levelTotals(race.tracks), [race.tracks]);
   const racers = useMemo(() => buildRacers(race.rows, totals), [race.rows, totals]);
+  const mine = racers.find((racer) => racer.isCurrentUser);
 
   useEffect(() => {
     let active = true;
@@ -451,6 +501,7 @@ export default function RankingPage() {
         {error && <p role="alert" style={{ color: 'var(--danger)', marginBottom: '20px' }}>{error}</p>}
 
         {(me || racers.length > 0) && <MissionPanel me={me} racers={racers} />}
+        {mine && <BadgeDownloads rank={mine.rank} />}
         {me && <BadgeGrid badges={computeBadges(me)} upcoming={nextBadge(me)} />}
         <RankingList period={period} onPeriodChange={changePeriod} rows={rows} loading={loadingRows} totals={race.tracks.length > 0 ? totals : null} />
         <Rules />
