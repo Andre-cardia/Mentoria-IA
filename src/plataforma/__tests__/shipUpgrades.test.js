@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { SHIP_UPGRADES, nextUpgrade, unlockedUpgradeIds, upgradeStatus } from '../lib/shipUpgrades';
-import { GRANTABLE_RANKS, RANKS, buildRacers, rankFor } from '../lib/starRace';
+import { GRANTABLE_RANKS, RANKS, buildRacers, rankFor, rankForRankingRow } from '../lib/starRace';
 
 describe('acessórios da nave', () => {
   it('não instala nada sem módulos concluídos', () => {
@@ -31,10 +31,10 @@ describe('acessórios da nave', () => {
 describe('patentes', () => {
   it('uma estrela a mais por patente', () => {
     expect(RANKS.map((rank) => rank.stars)).toEqual([1, 2, 3, 4]);
-    expect(RANKS.map((rank) => rank.name)).toEqual(['Aspirante', 'Primeiro Oficial', 'Comandante', 'Master']);
+    expect(RANKS.map((rank) => rank.name)).toEqual(['Cadete', 'Primeiro Oficial', 'Comandante', 'Master']);
   });
 
-  it('Aspirante e Primeiro Oficial vêm dos pontos', () => {
+  it('Cadete e Primeiro Oficial vêm dos pontos', () => {
     expect(rankFor({ traveled: 0 }).id).toBe('aspirante');
     expect(rankFor({ traveled: 0.99 }).id).toBe('aspirante');
     expect(rankFor({ traveled: 1 }).id).toBe('primeiro_oficial');
@@ -60,5 +60,28 @@ describe('patentes', () => {
     const [racer] = buildRacers([{ user_name: 'Ana Aluna', points: 70, modules_completed: '2', granted_rank: null }], totals);
     expect(racer.rank.id).toBe('primeiro_oficial');
     expect(racer.modulesCompleted).toBe(2);
+  });
+});
+
+describe('patente no ranking de pontuação', () => {
+  const tracks = { basico: 4, intermediario: 2, avancado: 2 }; // Básica pede 24 pts
+
+  it('usa os pontos de todo o tempo, não os do período', () => {
+    expect(rankForRankingRow({ points: 50, total_points: 12 }, tracks).id).toBe('aspirante');
+    expect(rankForRankingRow({ points: 5, total_points: 30 }, tracks).id).toBe('primeiro_oficial');
+  });
+
+  it('respeita o aval do admin para Comandante e Master', () => {
+    expect(rankForRankingRow({ total_points: 0, granted_rank: 'comandante' }, tracks).id).toBe('comandante');
+    expect(rankForRankingRow({ total_points: 0, granted_rank: 'master' }, tracks).id).toBe('master');
+  });
+
+  it('cada patente tem badge próprio e uma nave', () => {
+    expect(RANKS.map((rank) => rank.ship.name)).toEqual(['Falcon 9', 'Falcon Heavy', 'Crew Dragon', 'Starship']);
+    expect(RANKS.find((rank) => rank.id === 'aspirante').badge).toBe('/zero-to-hero/badges/mini/cadete.webp');
+  });
+
+  it('não mostra patente quando o banco ainda não envia os pontos totais', () => {
+    expect(rankForRankingRow({ points: 50 }, tracks)).toBeNull();
   });
 });

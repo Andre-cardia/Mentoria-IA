@@ -112,18 +112,27 @@ export function positionLabel(position) {
 
 // Patentes: uma por galáxia, e Master para quem conclui a certificação.
 // `stars` é a insígnia; `shipClass` define o modelo da nave na corrida.
+// O id 'aspirante' é o nome antigo do Cadete e segue assim no banco.
+// `badge` e `ship` apontam para os badges renderizados no Blender
+// (scripts/badges/gerar_badges.py), exibidos ao lado do nome no ranking.
+const BADGE_DIR = '/zero-to-hero/badges/mini';
+
 export const RANKS = [
-  { id: 'aspirante',        name: 'Aspirante',        stars: 1, shipClass: 1, shipName: 'Lançador orbital' },
-  { id: 'primeiro_oficial', name: 'Primeiro Oficial', stars: 2, shipClass: 2, shipName: 'Lançador pesado' },
-  { id: 'comandante',       name: 'Comandante',       stars: 3, shipClass: 3, shipName: 'Nave interplanetária' },
-  { id: 'master',           name: 'Master',           stars: 4, shipClass: 4, shipName: 'Nave completa com propulsor' },
+  { id: 'aspirante',        name: 'Cadete',           stars: 1, shipClass: 1, shipName: 'Lançador orbital',
+    badge: `${BADGE_DIR}/cadete.webp`,           ship: { name: 'Falcon 9',     badge: `${BADGE_DIR}/nave-falcon-9.webp` } },
+  { id: 'primeiro_oficial', name: 'Primeiro Oficial', stars: 2, shipClass: 2, shipName: 'Lançador pesado',
+    badge: `${BADGE_DIR}/primeiro-oficial.webp`, ship: { name: 'Falcon Heavy', badge: `${BADGE_DIR}/nave-falcon-heavy.webp` } },
+  { id: 'comandante',       name: 'Comandante',       stars: 3, shipClass: 3, shipName: 'Nave interplanetária',
+    badge: `${BADGE_DIR}/comandante.webp`,       ship: { name: 'Crew Dragon',  badge: `${BADGE_DIR}/nave-crew-dragon.webp` } },
+  { id: 'master',           name: 'Master',           stars: 4, shipClass: 4, shipName: 'Nave completa com propulsor',
+    badge: `${BADGE_DIR}/master.webp`,           ship: { name: 'Starship',     badge: `${BADGE_DIR}/nave-starship.webp` } },
 ];
 
 // Patentes que um admin concede. Comandante e Master só existem com esse aval.
 export const GRANTABLE_RANKS = RANKS.filter((rank) => rank.id !== 'aspirante');
 
 /**
- * Patente do aluno. Aspirante e Primeiro Oficial vêm dos pontos; Comandante
+ * Patente do aluno. Cadete e Primeiro Oficial vêm dos pontos; Comandante
  * e Master, só do aval de um admin. `promoted` indica promoção por mérito:
  * a patente concedida está acima do que os pontos dariam.
  */
@@ -159,4 +168,15 @@ export function buildRacers(rows = [], totals) {
       rank: rankFor(position, row.granted_rank),
     };
   });
+}
+
+/**
+ * Patente de uma linha do ranking de pontuação (get_gamification_ranking).
+ * Usa os pontos de todo o tempo, não os do período exibido. Devolve null
+ * quando o banco ainda não envia `total_points` (migração 39 não aplicada).
+ */
+export function rankForRankingRow(row, totals) {
+  if (row?.total_points === undefined || row?.total_points === null) return null;
+  const racer = { points: row.total_points, certified: row.certified, granted_rank: row.granted_rank ?? null };
+  return rankFor(racePosition(racer, totals), racer.granted_rank);
 }

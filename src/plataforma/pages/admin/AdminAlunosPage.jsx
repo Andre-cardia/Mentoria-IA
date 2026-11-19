@@ -60,7 +60,7 @@ function RankForm({ initial = /** @type {{ rank?: string, note?: string }} */ ({
   return (
     <form onSubmit={(e) => { e.preventDefault(); onSave({ rank, note }); }} style={{ display: 'grid', gap: '16px' }}>
       <p style={{ color: 'var(--muted)', fontSize: '.875rem', lineHeight: 1.6, margin: 0 }}>
-        Aspirante e Primeiro Oficial vêm dos pontos do aluno na Corrida Estelar. Comandante e Master só existem com o seu aval:
+        Cadete e Primeiro Oficial vêm dos pontos do aluno na Corrida Estelar. Comandante e Master só existem com o seu aval:
         Comandante libera a Galáxia Avançada e Master leva o aluno à Estrela da Certificação.
       </p>
       <div style={{ display: 'grid', gap: '6px' }}>

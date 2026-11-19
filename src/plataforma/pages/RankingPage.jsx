@@ -2,7 +2,8 @@ import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import Layout from '../components/Layout';
 import StellarGlyph from '../components/StellarGlyph';
-import { APEX_NAME, GALAXIES, RANKS, buildRacers, levelTotals, positionLabel } from '../lib/starRace';
+import { APEX_NAME, GALAXIES, RANKS, buildRacers, levelTotals, positionLabel, rankForRankingRow } from '../lib/starRace';
+import RankInsignia from '../components/RankInsignia';
 import { nextUpgrade, upgradeStatus } from '../lib/shipUpgrades';
 import {
   POINT_RULES, RANKING_PERIODS,
@@ -292,7 +293,8 @@ function BadgeGrid({ badges, upcoming }) {
   );
 }
 
-function RankingList({ period, onPeriodChange, rows, loading }) {
+// `totals` é null enquanto as trilhas não chegam: sem elas a patente sairia errada.
+function RankingList({ period, onPeriodChange, rows, loading, totals }) {
   const filter = (
     <div role="group" aria-label="Período do ranking" style={{ display: 'flex' }}>
       {RANKING_PERIODS.map(({ id, label }, index) => {
@@ -341,9 +343,12 @@ function RankingList({ period, onPeriodChange, rows, loading }) {
                 <span style={{ ...mono, minWidth: '32px', fontSize: '.85rem', fontWeight: position <= 3 ? 700 : 400, color: position <= 3 ? 'var(--text)' : 'var(--muted)' }}>
                   {pad(position)}
                 </span>
-                <span style={{ flex: 1, minWidth: 0, fontWeight: row.is_current_user ? 700 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {row.user_name}
-                  {row.is_current_user && <span style={{ ...eyebrow, color: 'var(--accent-text)', fontWeight: 700, marginLeft: '10px' }}>(você)</span>}
+                <span style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <RankInsignia rank={totals ? rankForRankingRow(row, totals) : null} />
+                  <span style={{ minWidth: 0, fontWeight: row.is_current_user ? 700 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {row.user_name}
+                    {row.is_current_user && <span style={{ ...eyebrow, color: 'var(--accent-text)', fontWeight: 700, marginLeft: '10px' }}>(você)</span>}
+                  </span>
                 </span>
                 <span style={{ ...mono, color: 'var(--muted)', fontSize: '.75rem', whiteSpace: 'nowrap' }}>
                   {Number(row.lessons)} aula{Number(row.lessons) === 1 ? '' : 's'}
@@ -447,7 +452,7 @@ export default function RankingPage() {
 
         {(me || racers.length > 0) && <MissionPanel me={me} racers={racers} />}
         {me && <BadgeGrid badges={computeBadges(me)} upcoming={nextBadge(me)} />}
-        <RankingList period={period} onPeriodChange={changePeriod} rows={rows} loading={loadingRows} />
+        <RankingList period={period} onPeriodChange={changePeriod} rows={rows} loading={loadingRows} totals={race.tracks.length > 0 ? totals : null} />
         <Rules />
       </div>
     </Layout>
