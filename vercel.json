@@ -16,6 +16,7 @@
   "rewrites": [
     {"source": "/aulao", "has": [{"type": "host", "value": "neuralhub.ia.br"}], "destination": "/aulao/index.html"},
     {"source": "/aulao/obrigado", "has": [{"type": "host", "value": "neuralhub.ia.br"}], "destination": "/aulao/obrigado.html"},
+    {"source": "/zero-to-hero", "destination": "/zero-to-hero/index.html"},
     {"source": "/auditoria", "destination": "/auditoria.html"},
     {"source": "/auditoria/(.*)", "destination": "/auditoria.html"},
     {"source": "/privacidade", "has": [{"type": "host", "value": "neuralhub.ia.br"}], "destination": "/privacidade.html"},
