@@ -9,6 +9,7 @@ import AdminAnnouncements from '../components/AdminAnnouncements';
 import StellarGlyph from '../components/StellarGlyph';
 import RankInsignia from '../components/RankInsignia';
 import { levelTotals, rankForRankingRow } from '../lib/starRace';
+import { useMyRank } from '../hooks/useMyRank';
 
 const WHATSAPP_URL = 'https://chat.whatsapp.com/CzkXZ1ol61YC1zw5dUjy7v?mode=gi_t';
 
@@ -186,6 +187,7 @@ export default function DashboardPage() {
   const [latestLessons, setLatestLessons] = useState([]);
   const [ranking, setRanking]             = useState([]);
   const [rankTotals, setRankTotals]       = useState(null);
+  const myRank = useMyRank();
   const [mission, setMission]             = useState(null);
   const [blogPosts, setBlogPosts]         = useState([]);
 
@@ -255,6 +257,7 @@ export default function DashboardPage() {
             {/* ── Stats + saudação ──────────────────────────────── */}
             <DashboardStats
               userName={userName}
+              rank={myRank}
               completed={progress.completed}
               total={progress.total}
               diasEstudando={diasEstudando}
