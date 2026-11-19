@@ -1,3 +1,5 @@
+import RankInsignia from './RankInsignia';
+
 function getGreeting() {
   const h = new Date().getHours();
   if (h >= 5 && h < 12) return 'Bom dia';
@@ -29,7 +31,7 @@ function StatCard({ label, value, accent = false }) {
   );
 }
 
-export default function DashboardStats({ userName, completed, total, diasEstudando }) {
+export default function DashboardStats({ userName, completed, total, diasEstudando, rank = null }) {
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
@@ -46,9 +48,12 @@ export default function DashboardStats({ userName, completed, total, diasEstudan
         }}>
           {getGreeting()}
         </div>
-        <h1 style={{ fontSize: '1.8rem', fontWeight: 700, margin: '0 0 18px', lineHeight: 1.1 }}>
-          {userName}
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px 14px', margin: '0 0 18px' }}>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0, lineHeight: 1.1 }}>
+            {userName}
+          </h1>
+          <RankInsignia rank={rank} size={44} />
+        </div>
 
         {/* Barra de progresso */}
         <div>
