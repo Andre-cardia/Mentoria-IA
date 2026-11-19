@@ -79,6 +79,23 @@ describe('RankingPage', () => {
     expect(mocks.rpc).toHaveBeenCalledWith('get_gamification_ranking', { p_period: 'week', p_limit: 20 });
   });
 
+  it('mostra a patente e a nave ao lado de cada nome', async () => {
+    setup({
+      ranking: [
+        { ...WEEK[0], total_points: 30, certified: false, granted_rank: null },
+        { ...WEEK[1], total_points: 0, certified: false, granted_rank: 'master' },
+      ],
+    });
+    expect(await screen.findByRole('img', { name: 'Patente Primeiro Oficial, nave Falcon Heavy' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Patente Master, nave Starship' })).toBeInTheDocument();
+  });
+
+  it('não mostra badges quando o banco ainda não envia a patente', async () => {
+    setup();
+    await screen.findByText('Bia Souza');
+    expect(screen.queryByRole('img', { name: /^Patente / })).not.toBeInTheDocument();
+  });
+
   it('troca o período ao clicar em Geral', async () => {
     setup();
     await screen.findByText('Bia Souza');

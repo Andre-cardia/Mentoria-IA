@@ -7,6 +7,8 @@ import Layout from '../components/Layout';
 import DashboardStats from '../components/DashboardStats';
 import AdminAnnouncements from '../components/AdminAnnouncements';
 import StellarGlyph from '../components/StellarGlyph';
+import RankInsignia from '../components/RankInsignia';
+import { levelTotals, rankForRankingRow } from '../lib/starRace';
 
 const WHATSAPP_URL = 'https://chat.whatsapp.com/CzkXZ1ol61YC1zw5dUjy7v?mode=gi_t';
 
@@ -183,13 +185,14 @@ export default function DashboardPage() {
   const [modules, setModules]             = useState([]);
   const [latestLessons, setLatestLessons] = useState([]);
   const [ranking, setRanking]             = useState([]);
+  const [rankTotals, setRankTotals]       = useState(null);
   const [mission, setMission]             = useState(null);
   const [blogPosts, setBlogPosts]         = useState([]);
 
   useEffect(() => {
     if (!user) return;
     async function load() {
-      const [profileRes, progressRes, modulesRes, latestRes, rankingRes, blogRes, missionRes] = await Promise.all([
+      const [profileRes, progressRes, modulesRes, latestRes, rankingRes, blogRes, missionRes, tracksRes] = await Promise.all([
         supabase.from('profiles').select('full_name').eq('user_id', user.id).single(),
         supabase.from('lesson_progress').select('completed_at').eq('user_id', user.id),
         supabase.from('modules').select('id, title, order, lessons(id, title, lesson_type, order, module_id)').order('order'),
@@ -205,6 +208,8 @@ export default function DashboardPage() {
           .order('published_at', { ascending: false })
           .limit(3),
         supabase.rpc('get_my_gamification', { p_period: 'all' }),
+        // Aulas por trilha: a patente ao lado de cada nome do ranking depende delas.
+        supabase.from('tracks').select('level, modules(lessons(id))'),
       ]);
 
       const name = profileRes.data?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Aluno';
@@ -217,6 +222,7 @@ export default function DashboardPage() {
       if (modulesRes.data) setModules(modulesRes.data);
       if (latestRes.data)  setLatestLessons(latestRes.data);
       if (rankingRes.data) setRanking(rankingRes.data);
+      if (tracksRes?.data?.length) setRankTotals(levelTotals(tracksRes.data));
       if (missionRes?.data?.[0]) setMission(missionRes.data[0]);
       if (blogRes.data)    setBlogPosts(blogRes.data);
 
@@ -403,6 +409,7 @@ export default function DashboardPage() {
                         }}>
                           {String(i + 1).padStart(2, '0')}
                         </span>
+                        <RankInsignia rank={rankTotals ? rankForRankingRow(entry, rankTotals) : null} size={22} />
                         <span style={{ flex: 1, fontSize: '.875rem', fontWeight: entry.is_current_user ? 600 : 400, color: 'var(--text)' }}>
                           {entry.user_name}
                           {entry.is_current_user && (
