@@ -79,6 +79,16 @@ describe('RankingPage', () => {
     expect(mocks.rpc).toHaveBeenCalledWith('get_gamification_ranking', { p_period: 'week', p_limit: 20 });
   });
 
+  it('oferece para download só os badges conquistados', async () => {
+    setup();
+    const link = await screen.findByRole('link', { name: 'Baixar patente Cadete em PNG' });
+    expect(link).toHaveAttribute('href', '/zero-to-hero/badges/cadete.png');
+    expect(link).toHaveAttribute('download', 'zero-to-hero-cadete.png');
+    expect(screen.getByRole('link', { name: 'Baixar nave Falcon 9 em PNG' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Baixar patente Master/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('listitem', { name: 'Patente Master: bloqueado' })).toBeInTheDocument();
+  });
+
   it('mostra a patente e a nave ao lado de cada nome', async () => {
     setup({
       ranking: [

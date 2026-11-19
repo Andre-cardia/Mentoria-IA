@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { SHIP_UPGRADES, nextUpgrade, unlockedUpgradeIds, upgradeStatus } from '../lib/shipUpgrades';
-import { GRANTABLE_RANKS, RANKS, buildRacers, rankFor, rankForRankingRow } from '../lib/starRace';
+import { GRANTABLE_RANKS, RANKS, badgeDownloads, buildRacers, rankFor, rankForRankingRow } from '../lib/starRace';
 
 describe('acessórios da nave', () => {
   it('não instala nada sem módulos concluídos', () => {
@@ -83,5 +83,25 @@ describe('patente no ranking de pontuação', () => {
 
   it('não mostra patente quando o banco ainda não envia os pontos totais', () => {
     expect(rankForRankingRow({ points: 50 }, tracks)).toBeNull();
+  });
+});
+
+describe('badges para download', () => {
+  it('libera as patentes e naves até a patente atual', () => {
+    const items = badgeDownloads(RANKS.find((rank) => rank.id === 'primeiro_oficial'));
+    expect(items).toHaveLength(8);
+    expect(items.filter((item) => item.earned).map((item) => item.name))
+      .toEqual(['Cadete', 'Falcon 9', 'Primeiro Oficial', 'Falcon Heavy']);
+  });
+
+  it('aponta para o PNG em alta com nome de arquivo próprio', () => {
+    const [cadete, nave] = badgeDownloads(RANKS[0]);
+    expect(cadete.href).toBe('/zero-to-hero/badges/cadete.png');
+    expect(cadete.filename).toBe('zero-to-hero-cadete.png');
+    expect(nave.href).toBe('/zero-to-hero/badges/nave-falcon-9.png');
+  });
+
+  it('sem patente, nada é liberado', () => {
+    expect(badgeDownloads(null).some((item) => item.earned)).toBe(false);
   });
 });
