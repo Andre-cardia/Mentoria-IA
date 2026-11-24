@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { appBasePath } from '../../lib/app-env';
 import { AuthContext } from './auth-context';
+import { requiresFirstAccessPasswordChange } from '../../../shared/first-access.js';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -9,8 +10,9 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [profileError, setProfileError] = useState(null);
 
-  async function loadProfile(userId) {
-    if (!userId) {
+  async function loadProfile(authUser) {
+    const userId = authUser?.id;
+    if (!userId || requiresFirstAccessPasswordChange(authUser)) {
       setProfile(null);
       setProfileError(null);
       return;
@@ -34,7 +36,7 @@ export function AuthProvider({ children }) {
   }
 
   async function refreshProfile() {
-    if (user) await loadProfile(user.id);
+    if (user) await loadProfile(user);
   }
 
   useEffect(() => {
@@ -43,7 +45,7 @@ export function AuthProvider({ children }) {
       const u = session?.user ?? null;
       setUser(u);
       setLoading(false);
-      loadProfile(u?.id);
+      loadProfile(u);
     });
 
     // Listener de mudanças de auth
@@ -52,7 +54,7 @@ export function AuthProvider({ children }) {
       if (event === 'PASSWORD_RECOVERY') return;
       const u = session?.user ?? null;
       setUser(u);
-      loadProfile(u?.id);
+      loadProfile(u);
     });
 
     return () => subscription.unsubscribe();

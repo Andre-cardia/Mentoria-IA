@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { createClient } from "@supabase/supabase-js";
+import { requiresFirstAccessPasswordChange } from "../../shared/first-access.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -19,7 +20,7 @@ export default async function handler(req, res) {
   if (authErr || !user) return res.status(401).json({ error: "Invalid token" });
 
   const role = user.app_metadata?.role;
-  if (role !== "admin") return res.status(403).json({ error: "Forbidden" });
+  if (role !== "admin" || requiresFirstAccessPasswordChange(user)) return res.status(403).json({ error: "Forbidden" });
 
   const { fileName, contentType, type } = req.body;
   if (!fileName || !contentType) {

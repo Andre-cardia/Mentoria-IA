@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { isSupabaseConfigured } from '../../lib/supabase';
-import { isStaffRole } from '../../lib/app-env';
+import { FIRST_ACCESS_PATH, isStaffRole } from '../../lib/app-env';
+import { requiresFirstAccessPasswordChange } from '../../../shared/first-access.js';
 
 /**
  * @param {{ area?: 'ensino' | 'gestao' }} props
@@ -15,7 +16,7 @@ export default function LoginPage({ area = 'ensino' }) {
   const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(location.state?.errorMessage ?? '');
   const [loading, setLoading] = useState(false);
   const successMessage = location.state?.successMessage ?? null;
 
@@ -35,25 +36,24 @@ export default function LoginPage({ area = 'ensino' }) {
       setError('Email ou senha inválidos.');
       return;
     }
-    const role = data?.user?.app_metadata?.role;
+    const user = data?.user;
+    const role = user?.app_metadata?.role;
 
-    if (isGestao) {
-      if (!isStaffRole(role)) {
-        await signOut();
-        setError('Esta área é restrita à equipe. Alunos entram pela plataforma de ensino.');
-        return;
-      }
-      navigate(role === 'admin' ? '/admin/alunos' : '/crm/leads', { replace: true });
+    if (isGestao && !isStaffRole(role)) {
+      await signOut();
+      setError('Esta área é restrita à equipe. Alunos entram pela plataforma de ensino.');
       return;
     }
 
     // Conta comercial não tem área de aluno; admin pode entrar para conferir o conteúdo.
-    if (role === 'comercial') {
+    if (!isGestao && role === 'comercial') {
       await signOut();
       setError('Esta conta é da equipe comercial. Entre pela área de gestão.');
       return;
     }
-    navigate('/inicio', { replace: true });
+
+    const destination = isGestao ? (role === 'admin' ? '/admin/alunos' : '/crm/leads') : '/inicio';
+    navigate(requiresFirstAccessPasswordChange(user) ? FIRST_ACCESS_PATH : destination, { replace: true });
   }
 
   return (
@@ -98,7 +98,7 @@ export default function LoginPage({ area = 'ensino' }) {
           </h1>
 
           {successMessage && (
-            <p style={{ color: 'var(--success)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '16px' }}>
+            <p role="status" style={{ color: 'var(--success)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem', marginBottom: '16px' }}>
               {successMessage}
             </p>
           )}
@@ -149,7 +149,7 @@ export default function LoginPage({ area = 'ensino' }) {
             </div>
 
             {error && (
-              <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem' }}>
+              <p role="alert" style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.75rem' }}>
                 {error}
               </p>
             )}

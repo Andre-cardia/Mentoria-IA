@@ -45,6 +45,7 @@ export default async function handler(req, res) {
     email: email.toLowerCase().trim(),
     password,
     email_confirm: true,
+    app_metadata: { password_change_required: true },
   });
 
   if (authError) {

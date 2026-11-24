@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { Router } from "express";
 import { createClient } from "@supabase/supabase-js";
+import { requiresFirstAccessPasswordChange } from "../../shared/first-access.js";
 import { SUPABASE_URL, SUPABASE_SERVICE_KEY } from "../config.js";
 
 const router = Router();
@@ -24,7 +25,7 @@ router.post("/image-upload", async (req, res) => {
     if (authErr || !user) return res.status(401).json({ error: "Token inválido" });
 
     const role = user.app_metadata?.role;
-    if (role !== "admin") return res.status(403).json({ error: "Forbidden" });
+    if (role !== "admin" || requiresFirstAccessPasswordChange(user)) return res.status(403).json({ error: "Forbidden" });
 
     const { fileName, contentType, type } = req.body;
     if (!fileName || !contentType) {

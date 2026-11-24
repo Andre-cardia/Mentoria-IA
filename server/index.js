@@ -6,6 +6,7 @@ import pagbankRoutes from "./routes/pagbank.js";
 import materialsRoutes from "./routes/materials.js";
 import profileRoutes from "./routes/profile.js";
 import blogRoutes from "./routes/blog.js";
+import firstPasswordHandler from "../api/auth/first-password.js";
 import { PORT } from "./config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -22,6 +23,9 @@ app.use(express.json({
     }
   },
 }));
+
+// A troca de senha atende os builds Vercel e o servidor local.
+app.post("/api/auth/first-password", firstPasswordHandler);
 
 // Rotas da API de pagamento
 app.use("/api/pagbank", pagbankRoutes);

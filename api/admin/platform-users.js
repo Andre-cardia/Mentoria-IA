@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { requiresFirstAccessPasswordChange } from "../../shared/first-access.js";
 
 const ALLOWED_ROLES = ["admin", "comercial"];
 
@@ -13,7 +14,7 @@ async function getAdminUser(req, supabase) {
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (!token) return null;
   const { data: { user } } = await supabase.auth.getUser(token);
-  return user?.app_metadata?.role === "admin" ? user : null;
+  return user?.app_metadata?.role === "admin" && !requiresFirstAccessPasswordChange(user) ? user : null;
 }
 
 function sanitizeUser(user) {
@@ -72,7 +73,7 @@ export default async function handler(req, res) {
       email_confirm: true,
       user_metadata: { full_name: full_name.trim() },
       // O papel vive em app_metadata: só o servidor altera, o usuário não.
-      app_metadata: { role: nextRole },
+      app_metadata: { role: nextRole, password_change_required: true },
     });
 
     if (error) {

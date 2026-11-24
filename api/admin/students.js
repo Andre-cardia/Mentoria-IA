@@ -1,4 +1,14 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, isAuthSessionMissingError } from "@supabase/supabase-js";
+import { requiresFirstAccessPasswordChange } from "../../shared/first-access.js";
+
+const SESSION_ERROR_CODES = new Set([
+  "bad_jwt", "no_authorization", "session_not_found", "session_expired", "user_not_found",
+]);
+const AUTH_ERRORS = {
+  401: "Sessão inválida. Entre novamente na Gestão.",
+  403: "Acesso negado",
+  503: "Não foi possível validar a sessão. Tente novamente.",
+};
 
 function makeClient() {
   return createClient(
@@ -7,36 +17,65 @@ function makeClient() {
   );
 }
 
-async function verifyAdmin(req, supabase) {
-  const token = req.headers.authorization?.replace("Bearer ", "");
-  if (!token) return false;
-  const { data: { user } } = await supabase.auth.getUser(token);
-  return user?.app_metadata?.role === "admin";
+async function verifyAdmin(token, supabase) {
+  try {
+    const { data, error } = await supabase.auth.getUser(token);
+    if (error) {
+      // O gateway também pode responder 401 por uma chave de API inválida.
+      const sessionRejected = isAuthSessionMissingError(error) || SESSION_ERROR_CODES.has(error.code);
+      return sessionRejected ? 401 : 503;
+    }
+    if (!data?.user?.id) return 503;
+    return data.user.app_metadata?.role === "admin" && !requiresFirstAccessPasswordChange(data.user) ? 200 : 403;
+  } catch {
+    return 503;
+  }
 }
 
 export default async function handler(req, res) {
-  const supabase = makeClient();
+  const authorization = req.headers.authorization;
+  const token = typeof authorization === "string" ? authorization.match(/^Bearer\s+(\S+)$/i)?.[1] : null;
+  if (!token) return res.status(401).json({ error: AUTH_ERRORS[401] });
 
-  if (!(await verifyAdmin(req, supabase))) {
-    return res.status(403).json({ error: "Acesso negado" });
+  let supabase;
+  try {
+    supabase = makeClient();
+  } catch {
+    return res.status(503).json({ error: AUTH_ERRORS[503] });
+  }
+
+  const authStatus = await verifyAdmin(token, supabase);
+  if (authStatus !== 200) {
+    return res.status(authStatus).json({ error: AUTH_ERRORS[authStatus] });
   }
 
   // GET — lista alunos ou compradores sem cadastro
   if (req.method === "GET") {
-    const [profilesRes, usersRes, paymentsRes] = await Promise.all([
+    const results = await Promise.all([
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
       supabase.auth.admin.listUsers({ perPage: 1000 }),
       supabase.from("payments").select("email, reference_id, amount, created_at")
         .eq("status", "PAID")
         .not("email", "is", null)
         .order("created_at", { ascending: false }),
-    ]);
+    ]).catch(() => null);
+    if (!results) return res.status(500).json({ error: "Erro ao buscar a lista de alunos" });
 
-    if (profilesRes.error) {
+    const [profilesRes, usersRes, paymentsRes] = results;
+    if (profilesRes.error || !Array.isArray(profilesRes.data)
+      || !profilesRes.data.every((profile) => typeof profile?.user_id === "string")) {
       return res.status(500).json({ error: "Erro ao buscar perfis" });
     }
+    if (usersRes.error || !Array.isArray(usersRes.data?.users)
+      || !usersRes.data.users.every((user) => typeof user?.id === "string"
+        && (user.email == null || typeof user.email === "string"))
+      || paymentsRes.error || !Array.isArray(paymentsRes.data)
+      || !paymentsRes.data.every((payment) => typeof payment?.email === "string"
+        && (payment.reference_id == null || typeof payment.reference_id === "string"))) {
+      return res.status(500).json({ error: "Erro ao buscar a lista de alunos" });
+    }
 
-    const authUsers = usersRes.data?.users ?? [];
+    const authUsers = usersRes.data.users;
     const emailMap = Object.fromEntries(authUsers.map((u) => [u.id, u.email]));
     const registeredEmails = new Set(authUsers.map((u) => u.email?.toLowerCase()));
 
@@ -49,7 +88,7 @@ export default async function handler(req, res) {
     // Compradores PAID que não criaram conta
     // Deduplica por email (um comprador pode ter mais de um pagamento)
     const seenEmails = new Set();
-    const pendingRegistration = (paymentsRes.data ?? [])
+    const pendingRegistration = paymentsRes.data
       .filter((p) => {
         const email = p.email?.toLowerCase();
         if (!email || registeredEmails.has(email) || seenEmails.has(email)) return false;
@@ -81,6 +120,7 @@ export default async function handler(req, res) {
       email: email.toLowerCase().trim(),
       password,
       email_confirm: true,
+      app_metadata: { password_change_required: true },
     });
 
     if (authError) {

@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { requiresFirstAccessPasswordChange } from "../../shared/first-access.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST")
@@ -22,6 +23,10 @@ export default async function handler(req, res) {
   } = await supabaseAdmin.auth.getUser(token);
   if (authError || !user)
     return res.status(401).json({ error: "Token inválido" });
+
+  if (requiresFirstAccessPasswordChange(user)) {
+    return res.status(403).json({ error: "Altere sua senha para concluir o primeiro acesso." });
+  }
 
   const { data: existing } = await supabaseAdmin
     .from("profiles")
