@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { FIRST_ACCESS_PATH } from '../../lib/app-env';
 
 const authState = {
   user: null,
@@ -76,6 +77,27 @@ describe('ProtectedRoute', () => {
     );
     expect(screen.getByText('Carregando...')).toBeInTheDocument();
   });
+});
+
+it.each([
+  { Guard: ProtectedRoute, role: 'aluno' },
+  { Guard: AdminRoute, role: 'admin' },
+  { Guard: CrmRoute, role: 'comercial' },
+])('exige a troca antes de abrir diretamente a rota protegida de $role', ({ Guard, role }) => {
+  renderWithAuth(
+    <Routes>
+      <Route path="/" element={<Guard><div>Conteúdo protegido</div></Guard>} />
+      <Route path={FIRST_ACCESS_PATH} element={<div>Primeiro acesso</div>} />
+    </Routes>,
+    {
+      user: { app_metadata: { role, password_change_required: true } },
+      isAdmin: role === 'admin',
+      hasCrmAccess: role !== 'aluno',
+    },
+  );
+
+  expect(screen.getByText('Primeiro acesso')).toBeInTheDocument();
+  expect(screen.queryByText('Conteúdo protegido')).not.toBeInTheDocument();
 });
 
 describe('CrmRoute', () => {

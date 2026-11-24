@@ -90,7 +90,7 @@ export default function RegisterPage() {
             <div style={{ textAlign: 'center', padding: '16px 0' }}>
               <div style={{ fontSize: '2rem', marginBottom: '12px' }}>✓</div>
               <p style={{ fontWeight: 600, marginBottom: '6px' }}>Conta criada com sucesso!</p>
-              <p style={{ fontSize: '.875rem', color: 'var(--muted)' }}>Redirecionando para o login...</p>
+              <p style={{ fontSize: '.875rem', color: 'var(--muted)' }}>No primeiro login, você vai escolher uma nova senha.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

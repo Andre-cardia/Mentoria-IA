@@ -1,4 +1,6 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { isAuthSessionMissingError } from '@supabase/supabase-js';
+import { Link } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
 import AdminLayout from '../../components/AdminLayout';
 import { GRANTABLE_RANKS } from '../../lib/starRace';
@@ -14,8 +16,18 @@ const STATUS_COLOR = {
   cancelled: { color: 'var(--danger)', bg: 'rgba(248,113,113,.1)', border: 'rgba(248,113,113,.25)' },
 };
 
-/** @typedef {{ user_id: string, full_name?: string, email?: string, phone?: string, origin?: string, status?: keyof typeof STATUS_COLOR, created_at?: string }} Student */
-/** @typedef {{ email: string, plan?: string, amount?: number, purchased_at?: string }} PendingRegistration */
+/** @typedef {{
+ * user_id: string, full_name?: string | null, email?: string | null, phone?: string | null,
+ * origin?: string | null, status?: string | null, created_at?: string | number | null
+ * }} Student */
+/** @typedef {{
+ * email: string, plan?: string | null, amount?: string | number | null, purchased_at?: string | number | null
+ * }} PendingRegistration */
+/** @typedef {'loading' | 'session' | 'forbidden' | 'error' | 'ready'} ListStatus */
+
+const SESSION_ERROR_CODES = new Set([
+  'bad_jwt', 'session_not_found', 'session_expired', 'refresh_token_not_found', 'refresh_token_already_used', 'user_not_found',
+]);
 
 const inputStyle = {
   width: '100%', background: 'var(--bg-2)', border: '1px solid var(--line-strong)',
@@ -31,6 +43,22 @@ const labelStyle = {
 async function authHeaders() {
   const { data: { session } } = await supabase.auth.getSession();
   return { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` };
+}
+
+function isStudentsResponse(data) {
+  const optionalText = (value) => value == null || typeof value === 'string';
+  const optionalTextOrNumber = (value) => optionalText(value) || typeof value === 'number';
+
+  return Array.isArray(data?.students) && Array.isArray(data?.pendingRegistration)
+    && data.students.every((student) =>
+      typeof student?.user_id === 'string' && student.user_id.length > 0
+      && [student.full_name, student.email, student.phone, student.origin, student.status].every(optionalText)
+      && optionalTextOrNumber(student.created_at)
+    )
+    && data.pendingRegistration.every((buyer) =>
+      typeof buyer?.email === 'string' && buyer.email.length > 0
+      && optionalText(buyer.plan) && optionalTextOrNumber(buyer.amount) && optionalTextOrNumber(buyer.purchased_at)
+    );
 }
 
 // ── Modal genérico ────────────────────────────────────────────
@@ -308,13 +336,53 @@ function SortHeader({ label, sortKey, sort, onSort }) {
   );
 }
 
+/** @param {{ children?: import('react').ReactNode }} props */
+function StudentsHeading({ children }) {
+  return (
+    <div>
+      <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '6px' }}>
+        Gestão
+      </div>
+      <h1 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Alunos</h1>
+      {children}
+    </div>
+  );
+}
+
+const LIST_FAILURE_MESSAGE = {
+  session: 'Sua sessão é inválida ou expirou. Entre novamente na Gestão.',
+  forbidden: 'Acesso negado. Apenas administradores podem acessar a lista de alunos.',
+  error: 'Não foi possível carregar a lista de alunos.',
+};
+
+/** @param {{ status: Exclude<ListStatus, 'ready'>, onRetry: () => void }} props */
+function StudentListFeedback({ status, onRetry }) {
+  if (status === 'loading') return <p role="status" style={{ color: 'var(--muted)' }}>Carregando...</p>;
+
+  return (
+    <div style={{ padding: '20px', border: '1px solid var(--line)', borderRadius: '6px', background: 'var(--panel)' }}>
+      <p role="alert" style={{ color: 'var(--danger)', fontSize: '.875rem', margin: 0 }}>{LIST_FAILURE_MESSAGE[status]}</p>
+      {status === 'session' && (
+        <Link to="/login" style={{ display: 'inline-block', marginTop: '12px', color: 'var(--accent-text)', fontWeight: 600 }}>
+          Ir para o login da Gestão
+        </Link>
+      )}
+      {status === 'error' && (
+        <button type="button" onClick={onRetry} style={{ marginTop: '12px', padding: '8px 14px', border: '1px solid var(--line-strong)', borderRadius: '4px', background: 'var(--bg-2)', color: 'var(--text)', cursor: 'pointer' }}>
+          Tentar novamente
+        </button>
+      )}
+    </div>
+  );
+}
+
 // ── Página principal ──────────────────────────────────────────
 export default function AdminAlunosPage() {
   const [students, setStudents] = useState(/** @type {Student[]} */ ([]));
   const [pendingRegistration, setPendingRegistration] = useState(/** @type {PendingRegistration[]} */ ([]));
   const [tab, setTab] = useState('enrolled'); // 'enrolled' | 'pending'
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [listStatus, setListStatus] = useState(/** @type {ListStatus} */ ('loading'));
+  const listRequest = useRef(/** @type {AbortController | null} */ (null));
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null); // null | { type: 'create' | 'edit' | 'delete', student? }
   const [saving, setSaving] = useState(false);
@@ -373,16 +441,63 @@ export default function AdminAlunosPage() {
   }
 
   const load = useCallback(async () => {
-    setLoading(true);
-    const headers = await authHeaders();
-    const res = await fetch('/api/admin/students', { headers });
-    const data = await res.json();
-    if (!res.ok) { setError(data.error ?? 'Erro ao carregar'); }
-    else { setStudents(data.students ?? []); setPendingRegistration(data.pendingRegistration ?? []); }
-    setLoading(false);
+    listRequest.current?.abort();
+    const controller = new AbortController();
+    listRequest.current = controller;
+    const { signal } = controller;
+    setListStatus('loading');
+
+    try {
+      const { data, error: sessionError } = await supabase.auth.getSession();
+      signal.throwIfAborted();
+      if (sessionError) {
+        const sessionRejected = SESSION_ERROR_CODES.has(sessionError.code) || isAuthSessionMissingError(sessionError);
+        if (sessionRejected) setModal(null);
+        setListStatus(sessionRejected ? 'session' : 'error');
+        return;
+      }
+
+      const token = data?.session?.access_token;
+      if (!token) {
+        setModal(null);
+        setListStatus('session');
+        return;
+      }
+
+      const response = await fetch('/api/admin/students', { headers: { Authorization: `Bearer ${token}` }, signal });
+      signal.throwIfAborted();
+      if (response.status === 401 || response.status === 403) {
+        setModal(null);
+        setListStatus(response.status === 401 ? 'session' : 'forbidden');
+        return;
+      }
+      if (!response.ok) {
+        setListStatus('error');
+        return;
+      }
+
+      const result = await response.json();
+      signal.throwIfAborted();
+      if (!isStudentsResponse(result)) {
+        setListStatus('error');
+        return;
+      }
+      setStudents(result.students);
+      setPendingRegistration(result.pendingRegistration);
+      setListStatus('ready');
+    } catch {
+      if (!signal.aborted) setListStatus('error');
+    }
   }, []);
 
-  useEffect(() => { void Promise.resolve().then(load); }, [load]);
+  useEffect(() => {
+    let active = true;
+    void Promise.resolve().then(() => { if (active) void load(); });
+    return () => {
+      active = false;
+      listRequest.current?.abort();
+    };
+  }, [load]);
 
   const enriched = withOverview(students, overview);
   const inactiveCount = enriched.filter((student) => inactivityStatus(student).alert).length;
@@ -482,16 +597,18 @@ export default function AdminAlunosPage() {
     load();
   }
 
-  return (
-    <AdminLayout>
+  const studentList = listStatus !== 'ready'
+    ? (
+      <>
+        <div style={{ marginBottom: '32px' }}><StudentsHeading /></div>
+        <StudentListFeedback status={listStatus} onRetry={load} />
+      </>
+    )
+    : (
       <div style={{ maxWidth: '100%' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '32px', gap: '16px', flexWrap: 'wrap' }}>
-          <div>
-            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent-text)', marginBottom: '6px' }}>
-              Gestão
-            </div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Alunos</h1>
+          <StudentsHeading>
             <p style={{ color: 'var(--muted)', fontSize: '.875rem', margin: '6px 0 0' }}>
               {students.length} aluno{students.length !== 1 ? 's' : ''} cadastrado{students.length !== 1 ? 's' : ''}
               {pendingRegistration.length > 0 && (
@@ -502,7 +619,7 @@ export default function AdminAlunosPage() {
                 </span>
               )}
             </p>
-          </div>
+          </StudentsHeading>
           <button
             onClick={() => { setActionError(''); setModal({ type: 'create' }); }}
             style={{
@@ -602,17 +719,14 @@ export default function AdminAlunosPage() {
             </>
           )}
         </div>
-        {tab === 'enrolled' && (search || joinFrom || joinTo) && !loading && (
+        {tab === 'enrolled' && (search || joinFrom || joinTo) && (
           <p style={{ color: 'var(--muted)', fontSize: '.8rem', margin: '-8px 0 14px' }}>
             Mostrando {filtered.length} de {students.length} aluno{students.length === 1 ? '' : 's'}.
           </p>
         )}
 
-        {loading && <p style={{ color: 'var(--muted)' }}>Carregando...</p>}
-        {error && <p style={{ color: 'var(--danger)', fontFamily: 'Space Mono, monospace', fontSize: '.8rem' }}>{error}</p>}
-
         {/* Tabela — Matriculados */}
-        {!loading && tab === 'enrolled' && (
+        {tab === 'enrolled' && (
           <div style={{ border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden' }}>
             <div style={{
               display: 'grid', gridTemplateColumns: 'minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,.8fr) minmax(0,.6fr) minmax(0,.45fr) minmax(0,.6fr) auto',
@@ -630,7 +744,7 @@ export default function AdminAlunosPage() {
 
             {filtered.length === 0 && (
               <p style={{ padding: '24px 20px', color: 'var(--muted)', fontSize: '.875rem' }}>
-                {search || joinFrom || joinTo ? 'Nenhum aluno encontrado.' : 'Nenhum aluno cadastrado.'}
+                {students.length === 0 ? 'Nenhum aluno cadastrado.' : 'Nenhum aluno encontrado.'}
               </p>
             )}
 
@@ -756,7 +870,7 @@ export default function AdminAlunosPage() {
         )}
 
         {/* Tabela — Aguardando cadastro */}
-        {!loading && tab === 'pending' && (() => {
+        {tab === 'pending' && (() => {
           const filteredPending = pendingRegistration.filter(p =>
             !search || p.email?.toLowerCase().includes(search.toLowerCase())
           );
@@ -796,7 +910,7 @@ export default function AdminAlunosPage() {
                   </div>
                   <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.75rem', color: 'var(--muted)' }}>
                     {p.amount != null
-                      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.amount / 100)
+                      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(p.amount) / 100)
                       : '—'}
                   </div>
                   <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '.7rem', color: 'var(--muted)' }}>
@@ -824,7 +938,10 @@ export default function AdminAlunosPage() {
           );
         })()}
       </div>
+    );
 
+  const studentModals = (
+    <>
       {/* Modal — Criar */}
       {modal?.type === 'create' && (
         <Modal title="Novo aluno" onClose={() => setModal(null)}>
@@ -903,6 +1020,14 @@ export default function AdminAlunosPage() {
           </div>
         </Modal>
       )}
+    </>
+  );
+
+  return (
+    <AdminLayout>
+      {studentList}
+      {/* A recarga temporária preserva o formulário até a lista ficar disponível. */}
+      {modal && <div hidden={listStatus !== 'ready'}>{studentModals}</div>}
     </AdminLayout>
   );
 }

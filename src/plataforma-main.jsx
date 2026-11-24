@@ -4,12 +4,13 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from '
 import { AuthProvider } from './plataforma/context/AuthContext';
 import ProtectedRoute from './plataforma/components/ProtectedRoute';
 import ProfileGuard from './plataforma/components/ProfileGuard';
-import { GESTAO_BASE } from './lib/app-env';
+import { ENSINO_BASE, FIRST_ACCESS_PATH, GESTAO_BASE } from './lib/app-env';
 import LoginPage from './plataforma/pages/LoginPage';
 import RegisterPage from './plataforma/pages/RegisterPage';
 import CompletarPerfilPage from './plataforma/pages/CompletarPerfilPage';
 import ForgotPasswordPage from './plataforma/pages/ForgotPasswordPage';
 import ResetPasswordPage from './plataforma/pages/ResetPasswordPage';
+import FirstAccessPasswordPage from './plataforma/pages/FirstAccessPasswordPage';
 
 // Lazy-load para code splitting
 export const DashboardPage    = lazy(() => import('./plataforma/pages/DashboardPage'));
@@ -49,7 +50,7 @@ export const Fallback = () => (
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
-      <BrowserRouter basename="/plataforma">
+      <BrowserRouter basename={ENSINO_BASE}>
         <Suspense fallback={<Fallback />}>
           <Routes>
             {/* Pública */}
@@ -57,6 +58,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/registro"        element={<RegisterPage />} />
             <Route path="/esqueci-senha"   element={<ForgotPasswordPage />} />
             <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
+            <Route path={FIRST_ACCESS_PATH} element={<FirstAccessPasswordPage />} />
 
             {/* Perfil — autenticado mas sem guard (evita loop) */}
             <Route path="/completar-perfil" element={<ProtectedRoute><CompletarPerfilPage /></ProtectedRoute>} />

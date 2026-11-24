@@ -5,6 +5,7 @@
 
 export const GESTAO_BASE = '/gestao';
 export const ENSINO_BASE = '/plataforma';
+export const FIRST_ACCESS_PATH = '/primeiro-acesso';
 export const STAFF_ROLES = ['admin', 'comercial'];
 
 export function isGestaoPath(pathname) {

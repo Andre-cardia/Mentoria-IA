@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { createClient } from "@supabase/supabase-js";
+import { requiresFirstAccessPasswordChange } from "../../shared/first-access.js";
 import { S3Adapter } from "../adapters/s3-adapter.js";
 import { SUPABASE_URL, SUPABASE_SERVICE_KEY, AWS_BUCKET, AWS_REGION } from "../config.js";
 
@@ -26,6 +27,10 @@ async function getAuthenticatedUserId(req, res) {
   const { data: { user }, error } = await supabase.auth.getUser(token);
   if (error || !user) {
     res.status(401).json({ error: "Token inválido ou expirado" });
+    return null;
+  }
+  if (requiresFirstAccessPasswordChange(user)) {
+    res.status(403).json({ error: "Altere sua senha para concluir o primeiro acesso." });
     return null;
   }
   return user.id;
@@ -118,6 +123,10 @@ router.post("/update-avatar", async (req, res) => {
 
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) return res.status(401).json({ error: "Token inválido" });
+
+    if (requiresFirstAccessPasswordChange(user)) {
+      return res.status(403).json({ error: "Altere sua senha para concluir o primeiro acesso." });
+    }
 
     const { avatarUrl } = req.body;
     if (!avatarUrl) return res.status(400).json({ error: "avatarUrl é obrigatório" });

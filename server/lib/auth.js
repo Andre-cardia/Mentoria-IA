@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { requiresFirstAccessPasswordChange } from "../../shared/first-access.js";
 
 export function createServiceSupabaseClient() {
   if (!process.env.VITE_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
@@ -40,7 +41,7 @@ export async function getAuthenticatedUser(req, supabase = createServiceSupabase
 }
 
 export async function requireAuthenticatedUser(req, res, options = {}) {
-  const { supabase = createServiceSupabaseClient(), requireAdmin = false } = options;
+  const { supabase = createServiceSupabaseClient(), requireAdmin = false, allowFirstAccess = false } = options;
   const { user, error } = await getAuthenticatedUser(req, supabase);
 
   if (error === "missing_supabase") {
@@ -55,6 +56,11 @@ export async function requireAuthenticatedUser(req, res, options = {}) {
 
   if (error) {
     res.status(401).json({ error: "Invalid token" });
+    return null;
+  }
+
+  if (!allowFirstAccess && requiresFirstAccessPasswordChange(user)) {
+    res.status(403).json({ error: "Altere sua senha para concluir o primeiro acesso." });
     return null;
   }
 

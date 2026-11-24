@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { requiresFirstAccessPasswordChange } from "../../../../shared/first-access.js";
 
 function makeClient() {
   return createClient(
@@ -11,7 +12,7 @@ async function verifyAdmin(req, supabase) {
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (!token) return false;
   const { data: { user } } = await supabase.auth.getUser(token);
-  return user?.app_metadata?.role === "admin";
+  return user?.app_metadata?.role === "admin" && !requiresFirstAccessPasswordChange(user);
 }
 
 export default async function handler(req, res) {

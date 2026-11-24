@@ -8,7 +8,9 @@ import CrmRoute from './plataforma/components/CrmRoute';
 import LoginPage from './plataforma/pages/LoginPage';
 import ForgotPasswordPage from './plataforma/pages/ForgotPasswordPage';
 import ResetPasswordPage from './plataforma/pages/ResetPasswordPage';
-import { GESTAO_BASE } from './lib/app-env';
+import FirstAccessPasswordPage from './plataforma/pages/FirstAccessPasswordPage';
+import { FIRST_ACCESS_PATH, GESTAO_BASE } from './lib/app-env';
+import { requiresFirstAccessPasswordChange } from '../shared/first-access.js';
 
 // Ambiente de gestão: administrativo (admin) e comercial (CRM).
 // Login e sessão próprios, separados da plataforma de ensino.
@@ -37,6 +39,7 @@ export function HomeRedirect() {
   const { user, isAdmin, hasCrmAccess, loading } = useAuth();
   if (loading) return <Fallback />;
   if (!user || !hasCrmAccess) return <Navigate to="/login" replace />;
+  if (requiresFirstAccessPasswordChange(user)) return <Navigate to={FIRST_ACCESS_PATH} replace />;
   return <Navigate to={isAdmin ? '/admin/alunos' : '/crm/leads'} replace />;
 }
 
@@ -50,6 +53,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/login"           element={<LoginPage area="gestao" />} />
             <Route path="/esqueci-senha"   element={<ForgotPasswordPage />} />
             <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
+            <Route path={FIRST_ACCESS_PATH} element={<FirstAccessPasswordPage area="gestao" />} />
 
             {/* Administrativo */}
             <Route path="/admin/alunos"           element={<AdminRoute><AdminAlunosPage /></AdminRoute>} />
